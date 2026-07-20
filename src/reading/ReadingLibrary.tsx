@@ -71,6 +71,13 @@ function ShelfRow({ id }: { id: string }) {
 
 const FMT_LABEL: Record<string, string> = { epub: 'EPUB', pdf: 'PDF', txt: 'TXT' };
 
+/** 按书名生成稳定的封面配色索引(0–7),让书架色彩雅致而有变化 */
+function coverIndex(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h % 8;
+}
+
 export function ReadingLibrary() {
   const shelfIds = useReadingStore((s) => s.shelves.map((x) => x.id));
   const activeShelfId = useReadingStore((s) => s.activeShelfId);
@@ -91,6 +98,7 @@ export function ReadingLibrary() {
 
   const shelfBooks = books.filter((b) => b.shelfId === activeShelfId);
   const openBookMeta = openBookId ? books.find((b) => b.id === openBookId) ?? null : null;
+  const activeShelf = useReadingStore((s) => s.shelves.find((x) => x.id === s.activeShelfId));
 
   return (
     <div id="reading">
@@ -126,39 +134,49 @@ export function ReadingLibrary() {
       </div>
 
       <div id="reading-main">
+        <div className="lib-head">
+          <h2>{activeShelf?.name ?? '书架'}</h2>
+          <span className="lib-count">{shelfBooks.length} 部作品</span>
+        </div>
+
         {shelfBooks.length === 0 ? (
           <div className="empty">
-            这个书架还没有作品。
-            <br />
-            点左下角「导入」添加你的 EPUB / PDF,或等每周自动更新的公版作品。
+            <div className="empty-ico">📖</div>
+            这个书架还没有作品
+            <div className="empty-sub">
+              点左下角「导入」添加你的 EPUB / PDF / TXT,或等每周自动更新的公版作品
+            </div>
           </div>
         ) : (
           <div className="book-grid">
             {shelfBooks.map((b) => (
-              <div className="book-card" key={b.id} onClick={() => openBook(b.id)}>
-                <div className={'cover fmt-' + b.format}>
-                  <span className="badge">{FMT_LABEL[b.format] || b.format}</span>
-                  {b.source === 'repo' && <span className="repo-tag">公版</span>}
+              <div className="book" key={b.id} onClick={() => openBook(b.id)}>
+                <div className={'cover cover-' + coverIndex(b.title)}>
+                  <span className="spine" />
+                  <div className="cover-tags">
+                    <span className="fmt-badge">{FMT_LABEL[b.format] || b.format}</span>
+                    {b.source === 'repo' && <span className="pub-tag">公版</span>}
+                  </div>
+                  <div className="cover-title" title={b.title}>
+                    {b.title}
+                  </div>
+                  {b.author && <div className="cover-author">{b.author}</div>}
+                  <button
+                    className="bdel"
+                    title="删除这本书"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const msg =
+                        b.source === 'repo'
+                          ? `从书架移除公版书「${b.title}」?(之后不会再自动出现)`
+                          : `删除「${b.title}」?此操作不可撤销。`;
+                      if (confirm(msg)) removeBook(b.id);
+                    }}
+                  >
+                    ✕
+                  </button>
                 </div>
-                <div className="bt" title={b.title}>
-                  {b.title}
-                </div>
-                {b.author && <div className="ba">{b.author}</div>}
-                {b.note && <div className="bn">{b.note}</div>}
-                <button
-                  className="bdel"
-                  title="删除这本书"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const msg =
-                      b.source === 'repo'
-                        ? `从书架移除公版书「${b.title}」?(之后不会再自动出现)`
-                        : `删除「${b.title}」?此操作不可撤销。`;
-                    if (confirm(msg)) removeBook(b.id);
-                  }}
-                >
-                  删除
-                </button>
+                {b.note && <div className="book-note">{b.note}</div>}
               </div>
             ))}
           </div>

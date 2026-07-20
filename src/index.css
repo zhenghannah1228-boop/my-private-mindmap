@@ -512,114 +512,186 @@ svg#edges {
 #reading-main {
   flex: 1;
   overflow-y: auto;
-  padding: 46px 22px 22px;
+  padding: 24px 26px 40px;
+}
+.lib-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e6e3da;
+}
+.lib-head h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #2c2c2a;
+  letter-spacing: 0.5px;
+}
+.lib-count {
+  font-size: 12px;
+  color: #a8a69e;
 }
 #reading-main .empty {
   color: #888780;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.9;
   text-align: center;
-  margin-top: 12vh;
+  margin-top: 14vh;
 }
+.empty-ico {
+  font-size: 40px;
+  opacity: 0.5;
+  margin-bottom: 10px;
+}
+.empty-sub {
+  font-size: 12px;
+  color: #b0aea5;
+  margin-top: 8px;
+}
+
 .book-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
+  gap: 26px 22px;
 }
-.book-card {
-  position: relative;
+.book {
   cursor: pointer;
-  border-radius: 8px;
-  padding: 6px;
 }
-.book-card:hover {
-  background: #f1efe8;
-}
-.book-card .cover {
-  height: 150px;
-  border-radius: 6px;
-  border: 1px solid #d3d1c7;
+/* 书封 */
+.book .cover {
+  position: relative;
+  aspect-ratio: 3 / 4.15;
+  border-radius: 3px 7px 7px 3px;
+  padding: 16px 15px 15px 20px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 8px;
-  background: linear-gradient(135deg, #efedf8, #e3e0f3);
+  flex-direction: column;
+  overflow: hidden;
+  color: #f4efe2;
+  box-shadow: 0 3px 10px rgba(40, 34, 24, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
-.book-card .cover.fmt-pdf {
-  background: linear-gradient(135deg, #fbeaf0, #f7dbe6);
+.book:hover .cover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(40, 34, 24, 0.24), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
-.book-card .cover.fmt-txt {
-  background: linear-gradient(135deg, #e1f5ee, #d3efe4);
+.book .cover .spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.28),
+    rgba(0, 0, 0, 0.06) 60%,
+    rgba(255, 255, 255, 0.08)
+  );
 }
-.book-card .cover .badge {
-  font-size: 10px;
+.book .cover .cover-tags {
+  display: flex;
+  gap: 5px;
+  margin-bottom: auto;
+}
+.book .cover .fmt-badge,
+.book .cover .pub-tag {
+  font-size: 9px;
   font-weight: 600;
-  color: #534ab7;
-  background: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.5px;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(2px);
 }
-.book-card .cover .repo-tag {
-  font-size: 10px;
-  color: #1d9e75;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 2px 6px;
-  border-radius: 4px;
+.book .cover .pub-tag {
+  background: rgba(255, 255, 255, 0.9);
+  color: #3c5a44;
 }
-.book-card .bt {
-  font-size: 13px;
-  font-weight: 500;
-  margin-top: 7px;
-  line-height: 1.35;
+.book .cover .cover-title {
+  font-family: 'Songti SC', 'STSong', Georgia, serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.book-card .ba {
+.book .cover .cover-author {
   font-size: 11px;
-  color: #888780;
-  margin-top: 2px;
+  opacity: 0.82;
+  margin-top: 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.book-card .bn {
+.book .book-note {
   font-size: 11px;
   color: #a8a69e;
-  margin-top: 3px;
+  margin-top: 8px;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.book-card .bdel {
+.book .cover .bdel {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
   border: none;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.92);
-  color: #e24b4a;
-  font-size: 11px;
-  padding: 3px 8px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
+  font-size: 12px;
+  line-height: 22px;
+  padding: 0;
   cursor: pointer;
-  font-family: inherit;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   opacity: 0;
-  transition: opacity 0.12s;
+  transition: opacity 0.14s;
 }
-.book-card:hover .bdel,
-.book-card:focus-within .bdel {
+.book:hover .bdel,
+.book:focus-within .bdel {
   opacity: 1;
 }
-.book-card .bdel:hover {
+.book .cover .bdel:hover {
   background: #e24b4a;
-  color: #fff;
 }
-/* 触摸屏没有 hover:删除键常显(半透明) */
 @media (hover: none) {
-  .book-card .bdel {
-    opacity: 0.85;
+  .book .cover .bdel {
+    opacity: 0.9;
   }
+}
+
+/* 封面配色(雅致深色书封,暖白字) */
+.cover-0 {
+  background: linear-gradient(150deg, #3a7373, #2b5757);
+}
+.cover-1 {
+  background: linear-gradient(150deg, #874550, #6c3540);
+}
+.cover-2 {
+  background: linear-gradient(150deg, #3f5680, #35486e);
+}
+.cover-3 {
+  background: linear-gradient(150deg, #6b6f45, #565a38);
+}
+.cover-4 {
+  background: linear-gradient(150deg, #66497a, #513a66);
+}
+.cover-5 {
+  background: linear-gradient(150deg, #a5643f, #8a5334);
+}
+.cover-6 {
+  background: linear-gradient(150deg, #446a50, #385a44);
+}
+.cover-7 {
+  background: linear-gradient(150deg, #545a63, #454a53);
 }
 
 /* ── 阅读器(护眼) ── */
@@ -775,4 +847,38 @@ svg#edges {
   line-height: 2;
   letter-spacing: 0.01em;
   color: inherit;
+}
+
+/* 点击翻页热区(左右边缘,中间留白供选词) */
+.tap-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24%;
+  cursor: pointer;
+  z-index: 5;
+}
+.tap-left {
+  left: 0;
+}
+.tap-right {
+  right: 0;
+}
+
+/* 阅读进度条 */
+.reader-progress {
+  height: 3px;
+  background: rgba(128, 120, 100, 0.15);
+  flex-shrink: 0;
+}
+.reader-progress-fill {
+  height: 100%;
+  background: #534ab7;
+  transition: width 0.2s ease;
+}
+.rtheme-night .reader-progress-fill {
+  background: #8f86e0;
+}
+.rtheme-sepia .reader-progress-fill {
+  background: #9a6a3c;
 }

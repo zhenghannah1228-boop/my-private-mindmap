@@ -87,6 +87,7 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
   const [txt, setTxt] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
+  const [progress, setProgress] = useState(0); // 0–1,阅读进度
   const [theme, setTheme] = useState<ThemeId>(loadTheme);
   const [fs, setFs] = useState<number>(loadFs);
   const navRef = useRef<{ prev: () => void; next: () => void } | null>(null);
@@ -157,9 +158,27 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
           applyEpubTheme(rendition, THEMES[loadTheme()], loadFs());
           const saved = localStorage.getItem(posKey(book.id)) || undefined;
           await rendition.display(saved);
-          rendition.on('relocated', (loc: { start?: { cfi?: string } }) => {
-            if (loc?.start?.cfi) localStorage.setItem(posKey(book.id), loc.start.cfi);
-          });
+          // 后台生成 locations,让进度百分比精确(大书需一两秒)
+          b.ready
+            .then(() => b.locations.generate(1600))
+            .catch(() => {});
+          rendition.on(
+            'relocated',
+            (loc: {
+              start?: {
+                cfi?: string;
+                percentage?: number;
+                displayed?: { page: number; total: number };
+              };
+            }) => {
+              if (loc?.start?.cfi) localStorage.setItem(posKey(book.id), loc.start.cfi);
+              // 优先用精确百分比;未就绪则用当前章的页码比例兜底
+              let pct = loc?.start?.percentage || 0;
+              const d = loc?.start?.displayed;
+              if (!pct && d && d.total) pct = d.page / d.total;
+              setProgress(pct);
+            }
+          );
           navRef.current = { prev: () => rendition.prev(), next: () => rendition.next() };
           if (!cancelled) setLoading(false);
           cleanup = () => {
@@ -196,11 +215,13 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
           const go = (n: number) => {
             cur = Math.min(Math.max(1, n), pdf.numPages);
             setPage(cur);
+            setProgress(cur / pdf.numPages);
             localStorage.setItem(posKey(book.id), String(cur));
             renderPage(cur);
           };
           navRef.current = { prev: () => go(cur - 1), next: () => go(cur + 1) };
           setPage(cur);
+          setProgress(cur / pdf.numPages);
           await renderPage(cur);
           if (!cancelled) setLoading(false);
           cleanup = () => pdf.destroy();
@@ -287,7 +308,22 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
         ) : (
           <div className="reader-host epub" ref={hostRef} />
         )}
+
+        {/* 点击左右边缘翻页(中间留白供选词/点链接)*/}
+        {book.format !== 'txt' && !loading && !err && (
+          <>
+            <div className="tap-zone tap-left" onClick={() => navRef.current?.prev()} />
+            <div className="tap-zone tap-right" onClick={() => navRef.current?.next()} />
+          </>
+        )}
       </div>
+
+      {/* 阅读进度条 */}
+      {book.format !== 'txt' && (
+        <div className="reader-progress">
+          <div className="reader-progress-fill" style={{ width: Math.round(progress * 100) + '%' }} />
+        </div>
+      )}
     </div>
   );
 }
