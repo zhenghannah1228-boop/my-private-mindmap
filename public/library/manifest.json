@@ -22,5 +22,53 @@
     "format": "pdf",
     "file": "sonnet18.pdf",
     "note": "Public-domain PDF sample"
+  },
+  {
+    "shelf": "小说",
+    "title": "Alice's Adventures in Wonderland",
+    "author": "Lewis Carroll",
+    "format": "epub",
+    "file": "alice.epub",
+    "note": "刘易斯·卡罗尔《爱丽丝梦游仙境》(公版)"
+  },
+  {
+    "shelf": "小说",
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "format": "epub",
+    "file": "pride-and-prejudice.epub",
+    "note": "简·奥斯汀《傲慢与偏见》(公版)"
+  },
+  {
+    "shelf": "小说",
+    "title": "Frankenstein",
+    "author": "Mary Shelley",
+    "format": "epub",
+    "file": "frankenstein.epub",
+    "note": "玛丽·雪莱《弗兰肯斯坦》(公版)"
+  },
+  {
+    "shelf": "小说",
+    "title": "The Adventures of Sherlock Holmes",
+    "author": "Arthur Conan Doyle",
+    "format": "epub",
+    "file": "sherlock-holmes.epub",
+    "note": "柯南·道尔《福尔摩斯探案集》(公版)"
+  },
+  {
+    "shelf": "散文集",
+    "title": "Walden",
+    "author": "Henry David Thoreau",
+    "format": "epub",
+    "file": "walden.epub",
+    "note": "梭罗《瓦尔登湖》(公版)"
+  },
+  {
+    "shelf": "诗歌",
+    "title": "Shakespeare's Sonnets",
+    "author": "William Shakespeare",
+    "format": "epub",
+    "file": "shakespeare-sonnets.epub",
+    "note": "莎士比亚十四行诗全集(公版)"
   }
 ]

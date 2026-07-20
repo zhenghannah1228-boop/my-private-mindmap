@@ -47,11 +47,14 @@ export function makeEpub(spec, outPath) {
         .join('')}</ol></nav></body></html>`
     );
 
+    // 段落内的换行保留为 <br/>(诗歌需要),散文调用方已把硬折行合并为单行
+    const para = (p) => `<p>${esc(p).replace(/\n/g, '<br/>')}</p>`;
     const bodies = chapters
       .map(
-        (c, i) => `<section id="c${i}"><h2>${esc(c.title)}</h2>${(c.paragraphs || [])
-          .map((p) => `<p>${esc(p)}</p>`)
-          .join('')}</section>`
+        (c, i) =>
+          `<section id="c${i}"><h2>${esc(c.title)}</h2>${(c.paragraphs || [])
+            .map(para)
+            .join('')}</section>`
       )
       .join('\n');
 
