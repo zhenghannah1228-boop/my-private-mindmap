@@ -445,3 +445,255 @@ svg#edges {
     display: none;
   }
 }
+
+/* ── 模式切换 ── */
+#modeswitch {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  gap: 3px;
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 8px;
+  padding: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+#modeswitch button {
+  border: none;
+  background: transparent;
+  padding: 5px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #5f5e5a;
+  font-family: inherit;
+}
+#modeswitch button.on {
+  background: #534ab7;
+  color: #fff;
+}
+
+/* ── 阅读库 ── */
+#reading {
+  display: flex;
+  height: 100%;
+}
+#reading #side {
+  width: 220px;
+}
+#reading-foot {
+  border-top: 1px solid #d3d1c7;
+  padding: 10px 12px;
+}
+.import-btn {
+  width: 100%;
+  padding: 9px;
+  border: 1px dashed #b4b2a9;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  color: #534ab7;
+}
+.import-btn:hover {
+  background: #f6f5f1;
+}
+.reading-status {
+  font-size: 10px;
+  color: #888780;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+#reading-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 46px 22px 22px;
+}
+#reading-main .empty {
+  color: #888780;
+  font-size: 14px;
+  line-height: 1.9;
+  text-align: center;
+  margin-top: 12vh;
+}
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+.book-card {
+  position: relative;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 6px;
+}
+.book-card:hover {
+  background: #f1efe8;
+}
+.book-card .cover {
+  height: 150px;
+  border-radius: 6px;
+  border: 1px solid #d3d1c7;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 8px;
+  background: linear-gradient(135deg, #efedf8, #e3e0f3);
+}
+.book-card .cover.fmt-pdf {
+  background: linear-gradient(135deg, #fbeaf0, #f7dbe6);
+}
+.book-card .cover.fmt-txt {
+  background: linear-gradient(135deg, #e1f5ee, #d3efe4);
+}
+.book-card .cover .badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #534ab7;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.book-card .cover .repo-tag {
+  font-size: 10px;
+  color: #1d9e75;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.book-card .bt {
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 7px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.book-card .ba {
+  font-size: 11px;
+  color: #888780;
+  margin-top: 2px;
+}
+.book-card .bn {
+  font-size: 11px;
+  color: #a8a69e;
+  margin-top: 3px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.book-card .bdel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #e24b4a;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+}
+.book-card:hover .bdel {
+  opacity: 1;
+}
+
+/* ── 阅读器 ── */
+#reader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #faf9f7;
+  display: flex;
+  flex-direction: column;
+}
+.reader-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #d3d1c7;
+  background: #f1efe8;
+}
+.reader-bar .rt {
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55vw;
+}
+.reader-bar .rspacer {
+  flex: 1;
+}
+.reader-bar .rpage {
+  font-size: 12px;
+  color: #888780;
+}
+.reader-bar button {
+  border: 1px solid #b4b2a9;
+  background: #fff;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #444441;
+}
+.reader-bar button:hover {
+  background: #e9e6dd;
+}
+.reader-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.reader-msg {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #888780;
+  font-size: 14px;
+}
+.reader-host {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+}
+.reader-host.epub {
+  padding: 0;
+}
+.reader-host canvas {
+  max-width: 100%;
+  height: max-content;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+.reader-txt {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 24px max(24px, calc((100% - 720px) / 2));
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.9;
+  color: #2c2c2a;
+}

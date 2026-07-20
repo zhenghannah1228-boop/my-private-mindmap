@@ -1,0 +1,26 @@
+[
+  {
+    "shelf": "诗歌",
+    "title": "唐诗选",
+    "author": "李白 · 杜甫 · 王维 等",
+    "format": "epub",
+    "file": "tangshi.epub",
+    "note": "公版唐诗精选,可直接在线阅读"
+  },
+  {
+    "shelf": "散文集",
+    "title": "爱莲说",
+    "author": "周敦颐",
+    "format": "txt",
+    "file": "aitianya.txt",
+    "note": "北宋公版散文名篇"
+  },
+  {
+    "shelf": "诗歌",
+    "title": "Sonnet 18",
+    "author": "William Shakespeare",
+    "format": "pdf",
+    "file": "sonnet18.pdf",
+    "note": "Public-domain PDF sample"
+  }
+]
