@@ -30,6 +30,10 @@ const THEMES: Record<ThemeId, Theme> = {
 const SERIF =
   '"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun",Georgia,"Times New Roman",serif';
 
+/** 自生成的纸张颗粒纹理(SVG 分形噪声,做旧质感,不外链图片) */
+const GRAIN =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)' opacity='0.38'/%3E%3C/svg%3E\")";
+
 function loadTheme(): ThemeId {
   const t = (localStorage.getItem(THEME_KEY) || 'sepia') as ThemeId;
   return THEMES[t] ? t : 'sepia';
@@ -63,7 +67,9 @@ function applyEpubTheme(rendition: any, theme: Theme, fs: number) {
   rendition.themes.register('reader', {
     html: { background: theme.bg + ' !important' },
     body: {
-      background: theme.bg + ' !important',
+      'background-color': theme.bg + ' !important',
+      'background-image': GRAIN + ' !important',
+      'background-size': '170px 170px !important',
       color: theme.text + ' !important',
       'font-family': SERIF + ' !important',
       'line-height': '1.9 !important',
@@ -90,7 +96,28 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
   const [progress, setProgress] = useState(0); // 0–1,阅读进度
   const [theme, setTheme] = useState<ThemeId>(loadTheme);
   const [fs, setFs] = useState<number>(loadFs);
+  const [flip, setFlip] = useState<'next' | 'prev' | null>(null); // 翻页动画方向
   const navRef = useRef<{ prev: () => void; next: () => void } | null>(null);
+  const reduceMotion = useRef(false);
+
+  useEffect(() => {
+    reduceMotion.current =
+      typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  // 翻页:先亮起翻页纸,再在下一帧真正换页(新页在纸背后就绪,翻走后露出)
+  const turnRef = useRef<(dir: 'next' | 'prev') => void>(() => {});
+  turnRef.current = (dir) => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const doTurn = () => (dir === 'next' ? nav.next() : nav.prev());
+    if (reduceMotion.current) {
+      doTurn();
+      return;
+    }
+    setFlip(dir);
+    requestAnimationFrame(doTurn);
+  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renditionRef = useRef<any>(null);
 
@@ -113,8 +140,8 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      else if (e.key === 'ArrowLeft') navRef.current?.prev();
-      else if (e.key === 'ArrowRight') navRef.current?.next();
+      else if (e.key === 'ArrowLeft') turnRef.current('prev');
+      else if (e.key === 'ArrowRight') turnRef.current('next');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -282,10 +309,10 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
         )}
         {book.format !== 'txt' && (
           <div className="rnav">
-            <button onClick={() => navRef.current?.prev()} title="上一页(←)">
+            <button onClick={() => turnRef.current('prev')} title="上一页(←)">
               ‹
             </button>
-            <button onClick={() => navRef.current?.next()} title="下一页(→)">
+            <button onClick={() => turnRef.current('next')} title="下一页(→)">
               ›
             </button>
           </div>
@@ -312,9 +339,18 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
         {/* 点击左右边缘翻页(中间留白供选词/点链接)*/}
         {book.format !== 'txt' && !loading && !err && (
           <>
-            <div className="tap-zone tap-left" onClick={() => navRef.current?.prev()} />
-            <div className="tap-zone tap-right" onClick={() => navRef.current?.next()} />
+            <div className="tap-zone tap-left" onClick={() => turnRef.current('prev')} />
+            <div className="tap-zone tap-right" onClick={() => turnRef.current('next')} />
           </>
+        )}
+
+        {/* 拟态翻页纸 */}
+        {flip && (
+          <div
+            className={'page-flip flip-' + flip}
+            style={{ backgroundColor: t.bg }}
+            onAnimationEnd={() => setFlip(null)}
+          />
         )}
       </div>
 

@@ -849,6 +849,91 @@ svg#edges {
   color: inherit;
 }
 
+/* 纸张颗粒纹理(做旧,不外链图片) */
+:root {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)' opacity='0.38'/%3E%3C/svg%3E");
+}
+.reader-body {
+  perspective: 2200px; /* 供翻页 3D */
+}
+.reader-scroll,
+.reader-host {
+  background-image: var(--grain);
+  background-size: 170px 170px;
+}
+/* 边缘微做旧(泛黄暗角),夜间不加 */
+.reader-body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 62%, rgba(90, 62, 28, 0.07));
+}
+.rtheme-night .reader-body::after {
+  background: radial-gradient(120% 90% at 50% 45%, transparent 66%, rgba(0, 0, 0, 0.22));
+}
+
+/* 拟态翻页纸:一张与当前页同色的纸被掀起翻走,露出下方新页 */
+.page-flip {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  background-image: var(--grain);
+  background-size: 170px 170px;
+  box-shadow: 0 0 46px rgba(0, 0, 0, 0.2);
+  transform-style: preserve-3d;
+  backface-visibility: hidden; /* 转过 90° 后自然消失,不露背面 */
+  will-change: transform;
+}
+/* 纸面光泽(掀起时反光) */
+.page-flip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.14) 44%, rgba(0, 0, 0, 0.12));
+}
+/* 翻动边缘的投影 */
+.page-flip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.28), transparent 40%);
+}
+.page-flip.flip-next {
+  transform-origin: left center;
+  animation: flipNext 0.62s cubic-bezier(0.42, 0.1, 0.35, 1) both;
+}
+.page-flip.flip-prev {
+  transform-origin: right center;
+  animation: flipPrev 0.62s cubic-bezier(0.42, 0.1, 0.35, 1) both;
+}
+.page-flip.flip-prev::after {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.28), transparent 40%);
+}
+@keyframes flipNext {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(-155deg);
+  }
+}
+@keyframes flipPrev {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(155deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-flip {
+    animation-duration: 0.01s !important;
+  }
+}
+
 /* 点击翻页热区(左右边缘,中间留白供选词) */
 .tap-zone {
   position: absolute;
