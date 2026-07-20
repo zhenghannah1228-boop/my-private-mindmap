@@ -55,3 +55,20 @@ export interface View {
   y: number;
   k: number;
 }
+
+/**
+ * 作品库空间。每个分类(小说/电影/音乐…)是一个独立空间,
+ * 有自己的 nodes/edges 和视口 —— 互不干扰,像不同的看板。
+ * view 随空间保存,保留各自的空间记忆(对 ADHD 用户很重要)。
+ */
+export interface Space {
+  id: string;
+  name: string;
+  doc: Doc;
+  view: View;
+}
+
+export interface Library {
+  spaces: Space[];
+  activeId: string;
+}

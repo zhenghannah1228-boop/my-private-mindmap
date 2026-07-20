@@ -4,7 +4,7 @@
  * 这里的函数都是纯函数,不改动全局状态 —— ID 游标由 store 统一管理。
  */
 
-import type { ColorIndex, Doc, Edge, InboxItem, MindNode } from './types';
+import type { ColorIndex, Doc, Edge, InboxItem, Library, MindNode, Space, View } from './types';
 
 /** 颜色索引 → 语义。UI 不强制含义,由用户自己约定,默认建议如下 */
 export const COLORS: { i: ColorIndex; bg: string; border: string; hint: string }[] = [
@@ -105,4 +105,65 @@ export function makeNode(
 
 export function makeEdge(doc: Doc, a: number, b: number): Edge {
   return { id: doc.eid, a, b, ct: Date.now() };
+}
+
+// ─────────────────────────────────────────────────────────────
+// 作品库(多空间)
+// ─────────────────────────────────────────────────────────────
+
+/** 默认分类。作为新用户的起点,之后可自由增删改 */
+export const PRESET_SPACE_NAMES = ['小说', '散文集', '诗歌', '电影', '音乐'];
+
+const DEFAULT_VIEW: View = { x: 200, y: 200, k: 1 };
+
+function newId(): string {
+  // 浏览器环境可用;避免多端撞 ID
+  return typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : 's_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+}
+
+export function makeSpace(name: string): Space {
+  return { id: newId(), name: name || '新分类', doc: emptyDoc(), view: { ...DEFAULT_VIEW } };
+}
+
+export function defaultLibrary(): Library {
+  const spaces = PRESET_SPACE_NAMES.map(makeSpace);
+  return { spaces, activeId: spaces[0].id };
+}
+
+function isView(v: unknown): v is View {
+  return !!v && typeof (v as View).k === 'number';
+}
+
+/**
+ * 规范化作品库。兼容三种输入:
+ * 1. 新版 Library({ spaces, activeId })
+ * 2. 旧版单文档 Doc({ nodes, edges… }) —— 迁移成「未分类」空间 + 追加预设分类
+ * 3. null / 空 —— 返回预设作品库
+ */
+export function normalizeLibrary(raw: unknown): Library {
+  const r = raw as Partial<Library> & Partial<Doc>;
+
+  if (r && Array.isArray(r.spaces)) {
+    const spaces: Space[] = r.spaces.map((s) => ({
+      id: s?.id || newId(),
+      name: s?.name || '未命名',
+      doc: normalizeDoc(s?.doc),
+      view: isView(s?.view) ? (s!.view as View) : { ...DEFAULT_VIEW },
+    }));
+    if (!spaces.length) return defaultLibrary();
+    const activeId = spaces.some((s) => s.id === r.activeId) ? (r.activeId as string) : spaces[0].id;
+    return { spaces, activeId };
+  }
+
+  // 旧版单文档:保住数据,迁移为「未分类」,再补上预设分类
+  if (r && (Array.isArray(r.nodes) || Array.isArray(r.edges))) {
+    const legacy = makeSpace('未分类');
+    legacy.doc = normalizeDoc(r as Partial<Doc>);
+    const spaces = [legacy, ...PRESET_SPACE_NAMES.map(makeSpace)];
+    return { spaces, activeId: legacy.id };
+  }
+
+  return defaultLibrary();
 }

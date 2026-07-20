@@ -19,7 +19,6 @@ export function Canvas() {
   const linkingFrom = useStore((s) => s.ui.linkingFrom);
   const filterMode = useStore((s) => s.ui.filterMode);
   const placeMode = useStore((s) => s.ui.placeMode);
-  const inboxToNode = useStore((s) => s.inboxToNode);
 
   const { linkPreview, handlers } = usePointerInteraction(canvasRef);
 
@@ -35,17 +34,6 @@ export function Canvas() {
       ref={canvasRef}
       className={placeMode ? 'placing' : ''}
       {...handlers}
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        // 收集箱条目拖到画布 → 转节点(保留原始时间戳)
-        e.preventDefault();
-        const idx = Number(e.dataTransfer.getData('text/plain'));
-        if (Number.isNaN(idx)) return;
-        const r = canvasRef.current!.getBoundingClientRect();
-        const wx = (e.clientX - r.left - view.x) / view.k;
-        const wy = (e.clientY - r.top - view.y) / view.k;
-        inboxToNode(idx, wx - 60, wy - 20);
-      }}
     >
       <div id="world" style={{ transform: toCss(view) }}>
         <Edges nodes={nodes} edges={edges} view={view} linkPreview={linkPreview} />

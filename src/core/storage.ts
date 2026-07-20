@@ -9,23 +9,24 @@
  * - 写入同步阻塞,所以 saveDoc 做了防抖。
  */
 
-import { normalizeDoc } from './model';
-import type { Doc } from './types';
+import { normalizeLibrary } from './model';
+import type { Library } from './types';
 
-const DOC_KEY = 'mm_v2';
+const LIB_KEY = 'mm_library'; // 新版:整个作品库
+const DOC_KEY = 'mm_v2'; // 旧版:单文档(仅用于迁移读取)
 const SYNC_KEY = 'mm_key';
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** 防抖写入。immediate=true 用于 beforeunload 等必须立刻落盘的场景 */
-export function saveDoc(
-  doc: Doc,
+/** 防抖写入整个作品库。immediate=true 用于 beforeunload 等必须立刻落盘的场景 */
+export function saveLibrary(
+  lib: Library,
   opts: { immediate?: boolean; onSaved?: (ok: boolean, err?: unknown) => void } = {}
 ): void {
   const { immediate = false, onSaved } = opts;
   const write = () => {
     try {
-      localStorage.setItem(DOC_KEY, JSON.stringify(doc));
+      localStorage.setItem(LIB_KEY, JSON.stringify(lib));
       onSaved?.(true);
     } catch (e) {
       // 常见原因:超出配额,或隐私模式禁用了 localStorage
@@ -39,15 +40,22 @@ export function saveDoc(
   else saveTimer = setTimeout(write, 300);
 }
 
-export function loadDoc(): Doc {
-  let raw: Partial<Doc> | null = null;
+/** 读取作品库。优先新版 key;否则迁移旧版单文档;都没有则返回预设作品库 */
+export function loadLibrary(): Library {
   try {
-    const s = localStorage.getItem(DOC_KEY);
-    if (s) raw = JSON.parse(s);
+    const s = localStorage.getItem(LIB_KEY);
+    if (s) return normalizeLibrary(JSON.parse(s));
   } catch (e) {
-    console.error('读取失败,使用空文档', e);
+    console.error('作品库读取失败', e);
   }
-  return normalizeDoc(raw);
+  // 迁移旧版单文档(不丢数据)
+  try {
+    const legacy = localStorage.getItem(DOC_KEY);
+    if (legacy) return normalizeLibrary(JSON.parse(legacy));
+  } catch (e) {
+    console.error('旧数据迁移失败', e);
+  }
+  return normalizeLibrary(null);
 }
 
 export function saveSyncKey(key: string): void {
@@ -66,9 +74,9 @@ export function loadSyncKey(): string {
   }
 }
 
-/** 导出为文件下载 */
-export function exportJson(doc: Doc): void {
-  const blob = new Blob([JSON.stringify(doc, null, 2)], {
+/** 导出整个作品库为文件下载 */
+export function exportJson(lib: Library): void {
+  const blob = new Blob([JSON.stringify(lib, null, 2)], {
     type: 'application/json',
   });
   const a = document.createElement('a');
@@ -79,10 +87,10 @@ export function exportJson(doc: Doc): void {
 }
 
 /**
- * 读取导入文件为原始 Doc(仅解析,不落盘)。
- * 二次确认与「合并 vs 覆盖」的决策交给调用方(store.importDoc) —— 见「不要丢数据」约束。
+ * 读取导入文件为原始对象(仅解析,不落盘)。可能是新版 Library 或旧版单文档。
+ * 二次确认交给调用方 —— 见「不要丢数据」约束。
  */
-export function readJsonFile(file: File): Promise<Partial<Doc>> {
+export function readJsonFile(file: File): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {

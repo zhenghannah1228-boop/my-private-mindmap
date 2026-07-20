@@ -15,13 +15,6 @@ export default function App() {
   // 持久化 + 自动同步副作用(装一次)
   useEffect(() => installPersistence(), []);
 
-  // 首次为空时给一个起点节点(与原型一致)
-  useEffect(() => {
-    const st = useStore.getState();
-    if (!st.doc.nodes.length) st.addNode(0, 0, '从这里开始');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // 全局键盘:Delete/Backspace 删除选中节点(编辑中屏蔽 —— 不变量 2)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

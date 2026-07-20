@@ -80,46 +80,84 @@ body {
   font-family: inherit;
   color: #5f5e5a;
 }
-#inbox {
+/* ── 作品库导航 ── */
+#nav {
   flex: 1;
   overflow-y: auto;
-  padding: 0 12px 12px;
+  padding: 0 8px 12px;
   min-height: 60px;
 }
-.ib {
-  background: #fff;
-  border: 1px solid #d3d1c7;
+.navitem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 8px 9px 12px;
+  margin-bottom: 3px;
   border-radius: 6px;
-  padding: 8px 22px 8px 10px;
-  margin-bottom: 6px;
-  font-size: 13px;
-  cursor: grab;
-  line-height: 1.4;
+  font-size: 14px;
+  color: #2c2c2a;
+  cursor: pointer;
+  user-select: none;
   position: relative;
-  touch-action: none;
 }
-.ib.dragging {
-  opacity: 0.4;
+.navitem:hover {
+  background: #e9e6dd;
 }
-.ib .meta {
-  font-size: 10px;
+.navitem.on {
+  background: #534ab7;
+  color: #fff;
+}
+.navitem .nm {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.navitem .cnt {
+  font-size: 11px;
   color: #888780;
-  margin-top: 4px;
+  padding: 1px 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
 }
-.ib .due {
-  color: #993c1d;
+.navitem.on .cnt {
+  color: #e7e4ff;
+  background: rgba(255, 255, 255, 0.18);
 }
-.ib .del {
-  position: absolute;
-  top: 5px;
-  right: 6px;
+.navitem .del {
   color: #b4b2a9;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
+  opacity: 0;
+  padding: 0 2px;
 }
-.ib .del:hover {
+.navitem:hover .del {
+  opacity: 1;
+}
+.navitem.on .del {
+  color: #d8d5f2;
+  opacity: 0.85;
+}
+.navitem .del:hover {
   color: #e24b4a;
+}
+.navitem.renaming {
+  padding: 4px 8px;
+}
+.navitem.renaming input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #534ab7;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: #2c2c2a;
+}
+.sh a {
+  cursor: pointer;
 }
 
 /* ── 同步 ── */
@@ -316,6 +354,16 @@ svg#edges {
 #bar button.on {
   background: #534ab7;
   color: #fff;
+}
+#bar .space-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #534ab7;
+  padding: 0 4px;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .sw {
   width: 22px;

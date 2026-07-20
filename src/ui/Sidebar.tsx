@@ -1,42 +1,101 @@
 /**
- * 侧栏:闪念收集箱 + 云端同步。
- * - 收集箱:回车即存;拖拽条目到画布转节点。
- * - 同步:共享同步码模型(P2 待升级为 Auth)。pull 前做 updated_at 提示 + 二次确认。
+ * 侧栏:作品库导航 + 云端同步。
+ *
+ * 作品库导航:每个分类(小说/散文集/诗歌/电影/音乐…)是一个独立看板,
+ * 点击切换、双击重命名、× 删除、＋ 新增。切换时载入该空间自己的节点与视口。
+ *
+ * 同步:共享同步码模型(P2 待升级为 Auth)。上传/下载整个作品库;
+ * 下载前提示云端 updated_at + 二次确认(冲突最低护栏,不丢数据)。
  */
 
-import { useState } from 'react';
-import { formatTime, fromDatetimeLocal } from '../core/time';
+import { useEffect, useRef, useState } from 'react';
+import { formatTime } from '../core/time';
 import { pull, push } from '../sync/supabase';
 import { useStore } from '../store/useStore';
 
+function SpaceRow({ id }: { id: string }) {
+  const space = useStore((s) => s.spaces.find((x) => x.id === id))!;
+  const active = useStore((s) => s.activeId === id);
+  const renaming = useStore((s) => s.ui.renamingSpaceId === id);
+  const count = useStore((s) => s.spaces.length);
+  const switchSpace = useStore((s) => s.switchSpace);
+  const renameSpace = useStore((s) => s.renameSpace);
+  const deleteSpace = useStore((s) => s.deleteSpace);
+  const setRenaming = useStore((s) => s.setRenaming);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState(space.name);
+
+  useEffect(() => {
+    if (renaming) {
+      setDraft(space.name);
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [renaming, space.name]);
+
+  const nodeCount = space.doc.nodes.length;
+
+  if (renaming) {
+    return (
+      <div className="navitem renaming">
+        <input
+          ref={inputRef}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') renameSpace(id, draft);
+            else if (e.key === 'Escape') setRenaming(null);
+          }}
+          onBlur={() => renameSpace(id, draft)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={'navitem' + (active ? ' on' : '')}
+      onClick={() => switchSpace(id)}
+      onDoubleClick={() => setRenaming(id)}
+      title="点击切换 · 双击重命名"
+    >
+      <span className="nm">{space.name}</span>
+      {nodeCount > 0 && <span className="cnt">{nodeCount}</span>}
+      <span
+        className="del"
+        title="删除这个分类"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (count <= 1) {
+            alert('至少保留一个分类');
+            return;
+          }
+          if (confirm(`删除分类「${space.name}」及其全部内容?此操作不可撤销。`)) deleteSpace(id);
+        }}
+      >
+        ×
+      </span>
+    </div>
+  );
+}
+
 export function Sidebar() {
-  const inbox = useStore((s) => s.doc.inbox);
-  const addInbox = useStore((s) => s.addInbox);
-  const removeInbox = useStore((s) => s.removeInbox);
+  const spaceIds = useStore((s) => s.spaces.map((x) => x.id));
+  const addSpace = useStore((s) => s.addSpace);
   const syncKey = useStore((s) => s.ui.syncKey);
   const syncMsg = useStore((s) => s.ui.syncMsg);
   const autoSync = useStore((s) => s.ui.autoSync);
   const setSyncKey = useStore((s) => s.setSyncKey);
   const setSyncMsg = useStore((s) => s.setSyncMsg);
   const setAutoSync = useStore((s) => s.setAutoSync);
-  const replaceDoc = useStore((s) => s.replaceDoc);
-
-  const [text, setText] = useState('');
-  const [due, setDue] = useState('');
-
-  const submit = () => {
-    const v = text.trim();
-    if (!v) return;
-    addInbox(v, fromDatetimeLocal(due));
-    setText('');
-    setDue('');
-  };
+  const replaceLibrary = useStore((s) => s.replaceLibrary);
 
   const doPush = async () => {
     if (!syncKey.trim()) return setSyncMsg('请先填同步码');
     setSyncMsg('上传中…');
     try {
-      await push(syncKey.trim(), useStore.getState().doc);
+      await push(syncKey.trim(), useStore.getState().snapshot());
       setSyncMsg('✓ 已上传 ' + new Date().toTimeString().slice(0, 5));
     } catch (e) {
       setSyncMsg((e as Error).message || '网络错误');
@@ -49,12 +108,11 @@ export function Sidebar() {
     try {
       const res = await pull(syncKey.trim());
       if (!res) return setSyncMsg('云端还没有这个同步码的数据');
-      // 冲突护栏(P1 最低版):提示云端更新时间,让用户决定是否覆盖
       const when = formatTime(res.updatedAt);
-      if (!confirm(`云端更新于 ${when}。下载会覆盖当前本地内容,继续?`)) {
+      if (!confirm(`云端更新于 ${when}。下载会覆盖当前整个作品库,继续?`)) {
         return setSyncMsg('已取消下载');
       }
-      replaceDoc(res.doc);
+      replaceLibrary(res.data);
       setSyncMsg(`✓ 已下载(云端更新于 ${when})`);
     } catch (e) {
       setSyncMsg((e as Error).message || '网络错误');
@@ -69,57 +127,15 @@ export function Sidebar() {
 
   return (
     <div id="side">
-      <div className="sh">闪念收集箱</div>
-      <div id="quick">
-        <div className="row">
-          <input
-            type="text"
-            value={text}
-            placeholder="随手记,回车即存"
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') submit();
-            }}
-          />
-          <button onClick={submit}>+</button>
-        </div>
-        <input
-          type="datetime-local"
-          id="qd"
-          title="可选:提醒时间"
-          value={due}
-          onChange={(e) => setDue(e.target.value)}
-        />
+      <div className="sh">
+        作品库
+        <a onClick={() => addSpace('新分类')} title="新增分类">
+          ＋ 新增
+        </a>
       </div>
-
-      <div id="inbox">
-        {inbox.map((it, i) => (
-          <div
-            className="ib"
-            key={i}
-            draggable
-            onDragStart={(e) => e.dataTransfer.setData('text/plain', String(i))}
-          >
-            <div>{it.t}</div>
-            <div className="meta">
-              {formatTime(it.ct)}
-              {it.due ? (
-                <>
-                  {' · '}
-                  <span className="due">⏰ {formatTime(it.due)}</span>
-                </>
-              ) : null}
-            </div>
-            <span
-              className="del"
-              onClick={(e) => {
-                e.stopPropagation();
-                removeInbox(i);
-              }}
-            >
-              ×
-            </span>
-          </div>
+      <div id="nav">
+        {spaceIds.map((id) => (
+          <SpaceRow key={id} id={id} />
         ))}
       </div>
 

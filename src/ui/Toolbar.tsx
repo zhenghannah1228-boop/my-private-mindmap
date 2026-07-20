@@ -21,11 +21,13 @@ export function Toolbar() {
   const setNodeDue = useStore((s) => s.setNodeDue);
   const setFilter = useStore((s) => s.setFilter);
   const setPlaceMode = useStore((s) => s.setPlaceMode);
-  const replaceDoc = useStore((s) => s.replaceDoc);
+  const replaceLibrary = useStore((s) => s.replaceLibrary);
 
   const [dueOpen, setDueOpen] = useState(false);
   const [dueVal, setDueVal] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const spaceName = useStore((s) => s.spaces.find((x) => x.id === s.activeId)?.name ?? '');
 
   const selected = nodes.find((n) => n.id === selectedId) || null;
 
@@ -38,10 +40,9 @@ export function Toolbar() {
   const onImport = async (file: File) => {
     try {
       const raw = await readJsonFile(file);
-      const n = raw.nodes?.length ?? 0;
       // P0:二次确认,不无条件覆盖(「不要丢数据」硬约束)
-      if (!confirm(`导入将覆盖当前所有内容(读到 ${n} 个节点),继续?`)) return;
-      replaceDoc(raw);
+      if (!confirm('导入将覆盖当前整个作品库(所有分类),继续?')) return;
+      replaceLibrary(raw);
     } catch (e) {
       alert((e as Error).message || '文件格式错误');
     }
@@ -50,6 +51,10 @@ export function Toolbar() {
   return (
     <>
       <div id="bar">
+        <span className="space-label" title="当前分类">
+          {spaceName}
+        </span>
+        <div className="sep" />
         {COLORS.map((c) => (
           <button
             key={c.i}
@@ -85,7 +90,7 @@ export function Toolbar() {
         >
           聚焦
         </button>
-        <button onClick={() => exportJson(useStore.getState().doc)}>导出</button>
+        <button onClick={() => exportJson(useStore.getState().snapshot())}>导出</button>
         <button onClick={() => fileRef.current?.click()}>导入</button>
         <input
           ref={fileRef}

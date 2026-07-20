@@ -11,7 +11,7 @@
  * 本文件的 pull() 已返回 updatedAt,供上层做「云端 vs 本地」时间戳比较提示 —— 这是最低限度护栏。
  */
 
-import type { Doc } from '../core/types';
+import type { Library } from '../core/types';
 
 const SB_URL =
   (import.meta.env.VITE_SUPABASE_URL as string | undefined) ||
@@ -33,12 +33,13 @@ export interface PushResult {
 }
 
 export interface PullResult {
-  doc: Partial<Doc>;
+  /** 云端存的整个作品库(旧数据可能是单文档,由调用方 normalizeLibrary 兼容) */
+  data: unknown;
   updatedAt: number;
 }
 
-/** 上传。Prefer: resolution=merge-duplicates 让 POST 变 upsert(依赖 space_key 主键) */
-export async function push(spaceKey: string, doc: Doc): Promise<PushResult> {
+/** 上传整个作品库。Prefer: resolution=merge-duplicates 让 POST 变 upsert(依赖 space_key 主键) */
+export async function push(spaceKey: string, data: Library): Promise<PushResult> {
   if (!spaceKey) throw new Error('请先填同步码');
 
   const res = await fetch(`${SB_URL}/rest/v1/${TABLE}`, {
@@ -46,7 +47,7 @@ export async function push(spaceKey: string, doc: Doc): Promise<PushResult> {
     headers: { ...headers, Prefer: 'resolution=merge-duplicates' },
     body: JSON.stringify({
       space_key: spaceKey,
-      data: doc,
+      data,
       updated_at: new Date().toISOString(),
     }),
   });
@@ -67,11 +68,11 @@ export async function pull(spaceKey: string): Promise<PullResult | null> {
   const res = await fetch(url, { headers });
   if (!res.ok) throw new Error(`下载失败 ${res.status}`);
 
-  const rows = (await res.json()) as { data: Partial<Doc>; updated_at: string }[];
+  const rows = (await res.json()) as { data: unknown; updated_at: string }[];
   if (!rows.length) return null;
 
   return {
-    doc: rows[0].data,
+    data: rows[0].data,
     updatedAt: new Date(rows[0].updated_at).getTime(),
   };
 }
