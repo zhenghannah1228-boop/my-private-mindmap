@@ -15,6 +15,12 @@ const posKey = (id: string) => 'mm_read_pos_' + id;
 const THEME_KEY = 'mm_reader_theme';
 const FS_KEY = 'mm_reader_fs';
 
+interface EpubNavItem {
+  label?: string;
+  href?: string;
+  subitems?: EpubNavItem[];
+}
+
 type ThemeId = 'sepia' | 'paper' | 'night';
 interface Theme {
   id: ThemeId;
@@ -97,7 +103,12 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
   const [theme, setTheme] = useState<ThemeId>(loadTheme);
   const [fs, setFs] = useState<number>(loadFs);
   const [flip, setFlip] = useState<'next' | 'prev' | null>(null); // 翻页动画方向
+  const [toc, setToc] = useState<{ label: string; target: string; level: number }[]>([]);
+  const [tocOpen, setTocOpen] = useState(false);
   const navRef = useRef<{ prev: () => void; next: () => void } | null>(null);
+  const tocGoRef = useRef<(target: string) => void>(() => {});
+  const tocOpenRef = useRef(false);
+  tocOpenRef.current = tocOpen;
   const reduceMotion = useRef(false);
 
   useEffect(() => {
@@ -139,8 +150,10 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
   // 键盘:Esc 关闭,←/→ 翻页
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      else if (e.key === 'ArrowLeft') turnRef.current('prev');
+      if (e.key === 'Escape') {
+        if (tocOpenRef.current) setTocOpen(false);
+        else onClose();
+      } else if (e.key === 'ArrowLeft') turnRef.current('prev');
       else if (e.key === 'ArrowRight') turnRef.current('next');
     };
     window.addEventListener('keydown', onKey);
@@ -153,6 +166,9 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
     setLoading(true);
     setErr('');
     setTxt(null);
+    setToc([]);
+    setTocOpen(false);
+    tocGoRef.current = () => {};
     renditionRef.current = null;
 
     (async () => {
@@ -207,6 +223,23 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
             }
           );
           navRef.current = { prev: () => rendition.prev(), next: () => rendition.next() };
+          tocGoRef.current = (target) => rendition.display(target);
+          // 目录:书自带的导航
+          b.loaded.navigation
+            .then((navi: { toc?: EpubNavItem[] }) => {
+              if (cancelled) return;
+              const flat: { label: string; target: string; level: number }[] = [];
+              const walk = (items: EpubNavItem[] | undefined, lvl: number) => {
+                (items || []).forEach((it) => {
+                  const label = (it.label || '').trim();
+                  if (label && it.href) flat.push({ label, target: it.href, level: lvl });
+                  if (it.subitems?.length) walk(it.subitems, lvl + 1);
+                });
+              };
+              walk(navi.toc, 0);
+              setToc(flat);
+            })
+            .catch(() => {});
           if (!cancelled) setLoading(false);
           cleanup = () => {
             renditionRef.current = null;
@@ -247,6 +280,40 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
             renderPage(cur);
           };
           navRef.current = { prev: () => go(cur - 1), next: () => go(cur + 1) };
+          tocGoRef.current = (target) => {
+            const n = Number(target);
+            if (n) go(n);
+          };
+          // 目录:PDF 大纲书签(很多 PDF 没有,则不显示目录)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          pdf
+            .getOutline()
+            .then(async (outline: any[]) => {
+              if (cancelled || !outline?.length) return;
+              const flat: { label: string; target: string; level: number }[] = [];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const pageOf = async (dest: any): Promise<number | null> => {
+                try {
+                  let d = dest;
+                  if (typeof d === 'string') d = await pdf.getDestination(d);
+                  if (!Array.isArray(d)) return null;
+                  return (await pdf.getPageIndex(d[0])) + 1;
+                } catch {
+                  return null;
+                }
+              };
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const walk = async (items: any[], lvl: number) => {
+                for (const it of items) {
+                  const pg = await pageOf(it.dest);
+                  if (pg) flat.push({ label: (it.title || '').trim(), target: String(pg), level: lvl });
+                  if (it.items?.length) await walk(it.items, lvl + 1);
+                }
+              };
+              await walk(outline, 0);
+              if (!cancelled) setToc(flat);
+            })
+            .catch(() => {});
           setPage(cur);
           setProgress(cur / pdf.numPages);
           await renderPage(cur);
@@ -278,6 +345,11 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
         <button className="rclose" onClick={onClose} title="返回(Esc)">
           ‹ 返回
         </button>
+        {toc.length > 0 && (
+          <button className="rtoc-btn" onClick={() => setTocOpen((v) => !v)} title="目录">
+            ☰ 目录
+          </button>
+        )}
         <span className="rt">
           {book.title}
           {book.author ? ' · ' + book.author : ''}
@@ -359,6 +431,36 @@ export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void 
         <div className="reader-progress">
           <div className="reader-progress-fill" style={{ width: Math.round(progress * 100) + '%' }} />
         </div>
+      )}
+
+      {/* 目录抽屉 */}
+      {tocOpen && (
+        <>
+          <div className="toc-mask" onClick={() => setTocOpen(false)} />
+          <div className="toc-drawer">
+            <div className="toc-head">
+              <span>目录</span>
+              <button onClick={() => setTocOpen(false)} title="关闭">
+                ✕
+              </button>
+            </div>
+            <div className="toc-list">
+              {toc.map((it, i) => (
+                <div
+                  key={i}
+                  className="toc-item"
+                  style={{ paddingLeft: 16 + it.level * 15 }}
+                  onClick={() => {
+                    tocGoRef.current(it.target);
+                    setTocOpen(false);
+                  }}
+                >
+                  {it.label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

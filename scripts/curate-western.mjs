@@ -62,8 +62,10 @@ function stripGutenberg(text) {
 
 /** 散文:按 CHAPTER/LETTER 等标题切章;每章按空行分段,并把硬折行合并成流动段落 */
 function proseChapters(body, title) {
-  // 只认显式关键词开头的标题行,避免正文里的罗马数字被误判为章节
-  const headingRe = /^[ \t]*((?:CHAPTER|LETTER|VOLUME|BOOK|ADVENTURE|PART)\b[^\n]{0,60})[ \t]*$/gim;
+  // 关键词 + 紧跟的编号(罗马数字/阿拉伯数字)才算章节标题,
+  // 避免正文里以 "letter,"/"part of" 等开头的普通句子被误判
+  const headingRe =
+    /^[ \t]*((?:CHAPTER|LETTER|VOLUME|BOOK|ADVENTURE|PART)\s+[IVXLCDM\d][^\n]{0,58})[ \t]*$/gim;
   const marks = [];
   let m;
   while ((m = headingRe.exec(body))) marks.push({ i: m.index, t: m[1].trim() });
@@ -86,8 +88,14 @@ function proseChapters(body, title) {
     const to = k + 1 < marks.length ? marks[k + 1].i : body.length;
     const seg = body.slice(from, to);
     const nl = seg.indexOf('\n');
-    const heading = seg.slice(0, nl < 0 ? seg.length : nl).trim();
-    const rest = nl < 0 ? '' : seg.slice(nl + 1);
+    let heading = seg.slice(0, nl < 0 ? seg.length : nl).trim();
+    let rest = nl < 0 ? '' : seg.slice(nl + 1);
+    // 把紧跟的独立短标题行并入章名(如 "CHAPTER I." 下一行 "Down the Rabbit-Hole")
+    const sub = rest.match(/^[ \t]*\n*([^\n]{1,63})[ \t]*\n[ \t]*\n/);
+    if (sub && !/[.!?。!?,]$/.test(sub[1].trim())) {
+      heading = `${heading} ${sub[1].trim()}`;
+      rest = rest.slice(sub[0].length);
+    }
     chapters.push({ title: heading || `第 ${k + 1} 节`, paragraphs: blocksToParas(rest) });
   }
   // 丢掉空章(多为目录 TOC 行产生的重复条目)
