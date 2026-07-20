@@ -13,7 +13,26 @@ import { loadManifest, manifestToBook } from './manifest';
 import type { BookFormat, BookMeta, Shelf } from './types';
 
 const SHELVES_KEY = 'mm_reading_shelves';
+const HIDDEN_KEY = 'mm_reading_hidden'; // 被用户移除的公版(repo)书 id
 const PRESET_SHELVES = ['小说', '散文集', '诗歌', '电影', '音乐'];
+
+function loadHidden(): Set<string> {
+  try {
+    const raw = localStorage.getItem(HIDDEN_KEY);
+    if (raw) return new Set(JSON.parse(raw) as string[]);
+  } catch {
+    /* ignore */
+  }
+  return new Set();
+}
+
+function saveHidden(ids: Set<string>) {
+  try {
+    localStorage.setItem(HIDDEN_KEY, JSON.stringify([...ids]));
+  } catch {
+    /* ignore */
+  }
+}
 
 function newId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -103,13 +122,16 @@ export const useReadingStore = create<ReadingStore>((set, get) => ({
     } catch {
       /* ignore */
     }
-    // 仓库策展书(manifest),按书架名匹配/自动建架
+    // 仓库策展书(manifest),按书架名匹配/自动建架;跳过被用户隐藏的
+    const hidden = loadHidden();
     const manifest = await loadManifest();
     if (manifest.length) {
       const shelves = [...get().shelves];
       const byName = new Map(shelves.map((s) => [s.name, s]));
       const repoBooks: BookMeta[] = [];
       for (const item of manifest) {
+        const bookId = 'repo:' + item.file;
+        if (hidden.has(bookId)) continue;
         let shelf = byName.get(item.shelf);
         if (!shelf) {
           shelf = { id: newId(), name: item.shelf };
@@ -203,7 +225,14 @@ export const useReadingStore = create<ReadingStore>((set, get) => ({
   async removeBook(id) {
     const book = get().books.find((b) => b.id === id);
     if (!book) return;
-    if (book.source === 'import') await idbDelete(id).catch(() => {});
+    if (book.source === 'import') {
+      await idbDelete(id).catch(() => {});
+    } else {
+      // 公版书:记入隐藏集,避免下次启动又从 manifest 冒出来
+      const hidden = loadHidden();
+      hidden.add(id);
+      saveHidden(hidden);
+    }
     set({ books: get().books.filter((b) => b.id !== id) });
   },
 

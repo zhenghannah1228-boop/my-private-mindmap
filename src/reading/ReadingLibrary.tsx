@@ -145,18 +145,20 @@ export function ReadingLibrary() {
                 </div>
                 {b.author && <div className="ba">{b.author}</div>}
                 {b.note && <div className="bn">{b.note}</div>}
-                <span
+                <button
                   className="bdel"
-                  title={b.source === 'repo' ? '策展书无法删除' : '删除'}
+                  title="删除这本书"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (b.source === 'repo') return;
-                    if (confirm(`从书架移除「${b.title}」?`)) removeBook(b.id);
+                    const msg =
+                      b.source === 'repo'
+                        ? `从书架移除公版书「${b.title}」?(之后不会再自动出现)`
+                        : `删除「${b.title}」?此操作不可撤销。`;
+                    if (confirm(msg)) removeBook(b.id);
                   }}
-                  style={{ opacity: b.source === 'repo' ? 0.25 : undefined }}
                 >
-                  ×
-                </span>
+                  删除
+                </button>
               </div>
             ))}
           </div>

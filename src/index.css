@@ -595,37 +595,49 @@ svg#edges {
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.92);
   color: #e24b4a;
-  font-size: 14px;
-  line-height: 20px;
-  text-align: center;
+  font-size: 11px;
+  padding: 3px 8px;
   cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   opacity: 0;
+  transition: opacity 0.12s;
 }
-.book-card:hover .bdel {
+.book-card:hover .bdel,
+.book-card:focus-within .bdel {
   opacity: 1;
 }
+.book-card .bdel:hover {
+  background: #e24b4a;
+  color: #fff;
+}
+/* 触摸屏没有 hover:删除键常显(半透明) */
+@media (hover: none) {
+  .book-card .bdel {
+    opacity: 0.85;
+  }
+}
 
-/* ── 阅读器 ── */
+/* ── 阅读器(护眼) ── */
 #reader {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: #faf9f7;
   display: flex;
   flex-direction: column;
+  transition: background 0.2s, color 0.2s;
 }
 .reader-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-bottom: 1px solid #d3d1c7;
-  background: #f1efe8;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(128, 120, 100, 0.22);
+  background: rgba(255, 255, 255, 0.06);
 }
 .reader-bar .rt {
   font-size: 13px;
@@ -633,28 +645,90 @@ svg#edges {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 55vw;
+  max-width: 34vw;
+  opacity: 0.85;
 }
 .reader-bar .rspacer {
   flex: 1;
 }
 .reader-bar .rpage {
   font-size: 12px;
-  color: #888780;
+  opacity: 0.55;
 }
-.reader-bar button {
-  border: 1px solid #b4b2a9;
-  background: #fff;
-  border-radius: 6px;
-  width: 30px;
-  height: 30px;
+.reader-bar .rclose {
+  border: none;
+  background: transparent;
   cursor: pointer;
-  font-size: 16px;
-  color: #444441;
+  font-size: 13px;
+  font-family: inherit;
+  color: inherit;
+  opacity: 0.75;
+  padding: 4px 6px;
 }
-.reader-bar button:hover {
-  background: #e9e6dd;
+.reader-bar .rclose:hover {
+  opacity: 1;
 }
+/* 主题小圆点 */
+.rthemes {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.rtheme-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(128, 120, 100, 0.5);
+  cursor: pointer;
+  padding: 0;
+}
+.rtheme-dot.dot-sepia {
+  background: #f4ecd8;
+}
+.rtheme-dot.dot-paper {
+  background: #ffffff;
+}
+.rtheme-dot.dot-night {
+  background: #1c1c1a;
+}
+.rtheme-dot.on {
+  box-shadow: 0 0 0 2px #534ab7;
+  border-color: #534ab7;
+}
+/* 字号 + 翻页 */
+.rfs,
+.rnav {
+  display: flex;
+  gap: 4px;
+}
+.rfs button,
+.rnav button {
+  border: 1px solid rgba(128, 120, 100, 0.4);
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  min-width: 30px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 13px;
+  color: inherit;
+  font-family: inherit;
+}
+.rnav button {
+  font-size: 17px;
+}
+.rfs button:hover,
+.rnav button:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+.rtheme-night .rfs button,
+.rtheme-night .rnav button {
+  background: rgba(255, 255, 255, 0.08);
+}
+.rtheme-night .rfs button:hover,
+.rtheme-night .rnav button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .reader-body {
   flex: 1;
   position: relative;
@@ -666,7 +740,7 @@ svg#edges {
   left: 0;
   right: 0;
   text-align: center;
-  color: #888780;
+  opacity: 0.6;
   font-size: 14px;
 }
 .reader-host {
@@ -675,25 +749,30 @@ svg#edges {
   overflow: auto;
   display: flex;
   justify-content: center;
-  padding: 12px;
+  padding: 18px;
 }
 .reader-host.epub {
-  padding: 0;
+  padding: 0 max(0px, calc((100% - 900px) / 2)); /* EPUB 窄栏,两侧留白 */
 }
 .reader-host canvas {
   max-width: 100%;
   height: max-content;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
 }
-.reader-txt {
+/* TXT 舒适窄栏 */
+.reader-scroll {
   width: 100%;
   height: 100%;
   overflow: auto;
-  padding: 24px max(24px, calc((100% - 720px) / 2));
+}
+.reader-txt {
+  max-width: 40em;
+  margin: 0 auto;
+  padding: 4vh 24px 12vh;
   white-space: pre-wrap;
   word-break: break-word;
-  font-family: inherit;
-  font-size: 16px;
-  line-height: 1.9;
-  color: #2c2c2a;
+  line-height: 2;
+  letter-spacing: 0.01em;
+  color: inherit;
 }
