@@ -1,0 +1,134 @@
+/**
+ * 顶部工具栏:颜色标记、设时间、过滤、聚焦、导入导出、放置模式(+)。
+ *
+ * P0「导入二次确认」在这里:导入前先 confirm,避免无条件覆盖丢数据。
+ */
+
+import { useRef, useState } from 'react';
+import { COLORS } from '../core/model';
+import { exportJson, readJsonFile } from '../core/storage';
+import { fromDatetimeLocal, toDatetimeLocal } from '../core/time';
+import type { ColorIndex } from '../core/types';
+import { useSizeStore } from '../store/useSizeStore';
+import { useStore } from '../store/useStore';
+
+export function Toolbar() {
+  const selectedId = useStore((s) => s.ui.selectedId);
+  const filterMode = useStore((s) => s.ui.filterMode);
+  const placeMode = useStore((s) => s.ui.placeMode);
+  const nodes = useStore((s) => s.doc.nodes);
+  const setNodeColor = useStore((s) => s.setNodeColor);
+  const setNodeDue = useStore((s) => s.setNodeDue);
+  const setFilter = useStore((s) => s.setFilter);
+  const setPlaceMode = useStore((s) => s.setPlaceMode);
+  const replaceDoc = useStore((s) => s.replaceDoc);
+
+  const [dueOpen, setDueOpen] = useState(false);
+  const [dueVal, setDueVal] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const selected = nodes.find((n) => n.id === selectedId) || null;
+
+  const openDue = () => {
+    if (!selected) return alert('先选一个节点');
+    setDueVal(toDatetimeLocal(selected.due));
+    setDueOpen(true);
+  };
+
+  const onImport = async (file: File) => {
+    try {
+      const raw = await readJsonFile(file);
+      const n = raw.nodes?.length ?? 0;
+      // P0:二次确认,不无条件覆盖(「不要丢数据」硬约束)
+      if (!confirm(`导入将覆盖当前所有内容(读到 ${n} 个节点),继续?`)) return;
+      replaceDoc(raw);
+    } catch (e) {
+      alert((e as Error).message || '文件格式错误');
+    }
+  };
+
+  return (
+    <>
+      <div id="bar">
+        {COLORS.map((c) => (
+          <button
+            key={c.i}
+            className={'sw' + (selected && selected.c === c.i ? ' on' : '')}
+            style={{ background: c.bg, borderColor: c.border }}
+            title={c.hint}
+            onClick={() => selectedId != null && setNodeColor(selectedId, c.i as ColorIndex)}
+          />
+        ))}
+        <div className="sep" />
+        <button
+          className={placeMode ? 'on' : ''}
+          title="点亮后点画布空白处新建节点(移动端友好)"
+          onClick={() => setPlaceMode(!placeMode)}
+        >
+          ＋节点
+        </button>
+        <button onClick={openDue}>设时间</button>
+        <button className={filterMode === 'time' ? 'on' : ''} onClick={() => setFilter(filterMode === 'time' ? null : 'time')}>
+          时间轴
+        </button>
+        <button className={filterMode === 'recent' ? 'on' : ''} onClick={() => setFilter(filterMode === 'recent' ? null : 'recent')}>
+          最近
+        </button>
+        <div className="sep" />
+        <button
+          onClick={() => {
+            const r = document.getElementById('canvas')!.getBoundingClientRect();
+            // 传入尺寸表让 fit 把节点自身宽高纳入 bounding box,更精确
+            useStore.getState().fit(r, useSizeStore.getState().sizes);
+          }}
+          title="聚焦全部节点"
+        >
+          聚焦
+        </button>
+        <button onClick={() => exportJson(useStore.getState().doc)}>导出</button>
+        <button onClick={() => fileRef.current?.click()}>导入</button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".json,application/json"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) onImport(f);
+            e.target.value = '';
+          }}
+        />
+      </div>
+
+      {dueOpen && (
+        <div id="dueset">
+          <div style={{ marginBottom: 6, color: '#5f5e5a' }}>提醒时间</div>
+          <input
+            type="datetime-local"
+            value={dueVal}
+            onChange={(e) => setDueVal(e.target.value)}
+          />
+          <div className="btns">
+            <button
+              onClick={() => {
+                if (selectedId != null) setNodeDue(selectedId, fromDatetimeLocal(dueVal));
+                setDueOpen(false);
+              }}
+            >
+              确定
+            </button>
+            <button
+              onClick={() => {
+                if (selectedId != null) setNodeDue(selectedId, null);
+                setDueOpen(false);
+              }}
+            >
+              清除
+            </button>
+            <button onClick={() => setDueOpen(false)}>取消</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

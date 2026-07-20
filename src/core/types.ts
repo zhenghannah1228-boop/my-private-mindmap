@@ -1,0 +1,57 @@
+/**
+ * 数据模型类型。与原型 mindmap-v2.html 的 JSON 结构完全兼容,
+ * 因此旧的 localStorage / 导出文件可以直接被新版读入。
+ *
+ * 迁移注意(见 handoff/model.js):
+ * - nid / eid 是自增游标,单机可用;多端并发会撞 ID。
+ *   正式版建议改 crypto.randomUUID(),以支持节点级合并。见 P1「同步冲突」。
+ * - x / y 是「世界坐标」,不是屏幕坐标。屏幕坐标 = 世界 * view.k + view.x/y。
+ */
+
+export type ColorIndex = 0 | 1 | 2 | 3 | 4;
+
+export interface MindNode {
+  id: number;
+  /** 世界坐标 */
+  x: number;
+  y: number;
+  /** 文本内容 */
+  t: string;
+  /** 颜色索引 0-4 */
+  c: ColorIndex;
+  /** createdAt, epoch ms — 自动写入,不可编辑 */
+  ct: number;
+  /** dueAt, epoch ms — 提醒时间,可空 */
+  due: number | null;
+}
+
+export interface Edge {
+  id: number;
+  /** 起点 node id */
+  a: number;
+  /** 终点 node id */
+  b: number;
+  ct: number;
+}
+
+export interface InboxItem {
+  t: string;
+  ct: number;
+  due: number | null;
+}
+
+export interface Doc {
+  nodes: MindNode[];
+  edges: Edge[];
+  inbox: InboxItem[];
+  /** 节点自增 ID 游标 */
+  nid: number;
+  /** 边自增 ID 游标 */
+  eid: number;
+}
+
+export interface View {
+  x: number;
+  y: number;
+  k: number;
+}

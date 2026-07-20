@@ -1,0 +1,399 @@
+/* 全局样式,移植自原型 mindmap-v2.html。保持克制配色、无动效。 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #faf9f7;
+  color: #2c2c2a;
+  overflow: hidden;
+  /* 移动端:iOS 长按弹放大镜/选择菜单会打断手势 */
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  display: flex;
+  height: 100%;
+}
+
+/* ── 侧栏 ── */
+#side {
+  width: 270px;
+  background: #f1efe8;
+  border-right: 1px solid #d3d1c7;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sh {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 12px 14px 6px;
+  color: #5f5e5a;
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#quick {
+  margin: 0 12px 8px;
+}
+#quick .row {
+  display: flex;
+  gap: 6px;
+}
+#quick input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #fff;
+  font-family: inherit;
+}
+#quick button {
+  padding: 8px 12px;
+  border: none;
+  background: #534ab7;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+#qd {
+  width: 100%;
+  margin-top: 5px;
+  padding: 6px 8px;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  font-size: 12px;
+  background: #fff;
+  font-family: inherit;
+  color: #5f5e5a;
+}
+#inbox {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px 12px;
+  min-height: 60px;
+}
+.ib {
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  padding: 8px 22px 8px 10px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  cursor: grab;
+  line-height: 1.4;
+  position: relative;
+  touch-action: none;
+}
+.ib.dragging {
+  opacity: 0.4;
+}
+.ib .meta {
+  font-size: 10px;
+  color: #888780;
+  margin-top: 4px;
+}
+.ib .due {
+  color: #993c1d;
+}
+.ib .del {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  color: #b4b2a9;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.ib .del:hover {
+  color: #e24b4a;
+}
+
+/* ── 同步 ── */
+#sync {
+  border-top: 1px solid #d3d1c7;
+  padding: 10px 14px;
+}
+#sync input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #d3d1c7;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: monospace;
+  margin-bottom: 6px;
+}
+#sync .btns {
+  display: flex;
+  gap: 5px;
+}
+#sync button {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #b4b2a9;
+  background: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: inherit;
+}
+#sync button.on {
+  background: #534ab7;
+  color: #fff;
+  border-color: #534ab7;
+}
+#syncmsg {
+  font-size: 10px;
+  color: #888780;
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+/* ── 画布 ── */
+#main {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+#canvas {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
+  /* P0 移动端关键:不写就会被浏览器抢走手势去滚页/缩放 */
+  touch-action: none;
+}
+#canvas.panning {
+  cursor: grabbing;
+}
+#canvas.placing {
+  cursor: crosshair;
+}
+#world {
+  position: absolute;
+  transform-origin: 0 0;
+}
+svg#edges {
+  position: absolute;
+  overflow: visible;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* ── 节点 ── */
+.node {
+  position: absolute;
+  min-width: 120px;
+  max-width: 230px;
+  padding: 9px 12px;
+  background: #fff;
+  border: 1px solid #b4b2a9;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  cursor: move;
+  user-select: none;
+  word-wrap: break-word;
+  touch-action: none;
+}
+.node .txt {
+  white-space: pre-wrap;
+}
+.node .nm {
+  font-size: 10px;
+  color: #888780;
+  margin-top: 5px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.node .nm .d {
+  color: #993c1d;
+  font-weight: 500;
+}
+.node .nm .d.soon {
+  color: #e24b4a;
+}
+.node.sel {
+  border-color: #534ab7;
+  box-shadow: 0 0 0 2px rgba(83, 74, 183, 0.2);
+}
+.node.linking {
+  border-color: #1d9e75;
+  box-shadow: 0 0 0 2px rgba(29, 158, 117, 0.25);
+}
+.node.dim {
+  opacity: 0.22;
+}
+.node .txt[contenteditable='true'] {
+  cursor: text;
+  outline: none;
+  display: block;
+}
+.node .port {
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  margin-top: -6px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #534ab7;
+  border: 2px solid #fff;
+  cursor: crosshair;
+  opacity: 0;
+  transition: opacity 0.12s; /* 唯一允许的动效 */
+  touch-action: none;
+}
+.node:hover .port {
+  opacity: 1;
+}
+/* 触摸屏没有 hover,靠长按进入连线模式(见 usePointerInteraction) */
+
+.c0 {
+  background: #fff;
+}
+.c1 {
+  background: #faeeda;
+  border-color: #ef9f27;
+}
+.c2 {
+  background: #e1f5ee;
+  border-color: #5dcaa5;
+}
+.c3 {
+  background: #fbeaf0;
+  border-color: #ed93b1;
+}
+.c4 {
+  background: #e6f1fb;
+  border-color: #85b7eb;
+}
+
+/* ── 工具栏 ── */
+#bar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 8px;
+  padding: 6px;
+  z-index: 10;
+  flex-wrap: wrap;
+  max-width: calc(100% - 24px);
+}
+#bar button {
+  border: none;
+  background: transparent;
+  padding: 5px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #444441;
+  font-family: inherit;
+}
+#bar button:hover {
+  background: #f1efe8;
+}
+#bar button.on {
+  background: #534ab7;
+  color: #fff;
+}
+.sw {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid #b4b2a9;
+  cursor: pointer;
+  padding: 0;
+}
+.sw.on {
+  box-shadow: 0 0 0 2px rgba(83, 74, 183, 0.35);
+}
+#bar .sep {
+  width: 1px;
+  height: 18px;
+  background: #d3d1c7;
+}
+
+/* ── 弹出与状态 ── */
+#dueset {
+  position: absolute;
+  top: 56px;
+  right: 12px;
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 8px;
+  padding: 10px;
+  z-index: 11;
+  font-size: 12px;
+}
+#dueset input {
+  padding: 5px 7px;
+  border: 1px solid #d3d1c7;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: inherit;
+}
+#dueset .btns {
+  margin-top: 7px;
+  display: flex;
+  gap: 5px;
+}
+#dueset button {
+  padding: 5px 9px;
+  border: 1px solid #b4b2a9;
+  background: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: inherit;
+}
+#status {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  font-size: 11px;
+  color: #888780;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 5px 10px;
+  border-radius: 5px;
+  pointer-events: none;
+}
+#hint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  font-size: 10px;
+  color: #a8a69e;
+  text-align: right;
+  line-height: 1.6;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  #side {
+    width: 210px;
+  }
+  #hint {
+    display: none;
+  }
+}
