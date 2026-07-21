@@ -6,8 +6,32 @@
 import { create } from 'zustand';
 import { BUILTIN_MEMES } from './builtin';
 import { MEME_PROMPT, type FactorKey, type Meme } from './types';
+import { deleteImage, newImageId, putImage } from '../core/imagedb';
 
 const IMPORT_KEY = 'mm_memes_imported';
+const PHOTO_KEY = 'mm_meme_photos'; // { "memeId:stationId": blobId }
+
+export function photoKey(memeId: string, stationId: string): string {
+  return memeId + ':' + stationId;
+}
+
+function loadPhotos(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(PHOTO_KEY);
+    const o = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    return o && typeof o === 'object' ? o : {};
+  } catch {
+    return {};
+  }
+}
+
+function savePhotos(p: Record<string, string>) {
+  try {
+    localStorage.setItem(PHOTO_KEY, JSON.stringify(p));
+  } catch {
+    /* ignore */
+  }
+}
 
 type Phase = 'explore' | 'quiz' | 'result';
 
@@ -53,8 +77,12 @@ interface MemeStore {
   phase: Phase;
   guess: FactorKey[];
   status: string;
+  /** 用户给站点贴的真图:key=memeId:stationId → IndexedDB blobId(覆盖示意插画/url) */
+  photos: Record<string, string>;
 
   init: () => void;
+  attachPhoto: (memeId: string, stationId: string, file: File) => Promise<void>;
+  removePhoto: (memeId: string, stationId: string) => void;
   selectMeme: (id: string) => void;
   exitMeme: () => void;
   goto: (stationId: string) => void;
@@ -78,6 +106,7 @@ export const useMemeStore = create<MemeStore>((set, get) => ({
   phase: 'explore',
   guess: [],
   status: '',
+  photos: {},
 
   init() {
     if (get().loaded) return;
@@ -85,7 +114,40 @@ export const useMemeStore = create<MemeStore>((set, get) => ({
     const imported = loadImported();
     const builtinIds = new Set(BUILTIN_MEMES.map((m) => m.id));
     const memes = [...imported.filter((m) => !builtinIds.has(m.id)), ...BUILTIN_MEMES];
-    set({ memes, loaded: true });
+    set({ memes, loaded: true, photos: loadPhotos() });
+  },
+
+  async attachPhoto(memeId, stationId, file) {
+    if (!file.type.startsWith('image/')) {
+      set({ status: '请选图片文件' });
+      setTimeout(() => set({ status: '' }), 2200);
+      return;
+    }
+    try {
+      const key = photoKey(memeId, stationId);
+      const prev = get().photos[key];
+      const blobId = newImageId();
+      await putImage(blobId, file);
+      if (prev) void deleteImage(prev);
+      const photos = { ...get().photos, [key]: blobId };
+      savePhotos(photos);
+      set({ photos, status: '✓ 已贴上真图' });
+      setTimeout(() => set({ status: '' }), 2000);
+    } catch (e) {
+      set({ status: '贴图失败:' + ((e as Error).message || '') });
+      setTimeout(() => set({ status: '' }), 3000);
+    }
+  },
+
+  removePhoto(memeId, stationId) {
+    const key = photoKey(memeId, stationId);
+    const blobId = get().photos[key];
+    if (!blobId) return;
+    void deleteImage(blobId);
+    const photos = { ...get().photos };
+    delete photos[key];
+    savePhotos(photos);
+    set({ photos });
   },
 
   selectMeme(id) {

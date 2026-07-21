@@ -64,6 +64,14 @@ export interface StationSource {
   url?: string;
 }
 
+export interface StationImage {
+  /** 真实图片链接(优先 Wikimedia Commons / 公有领域 / 稳定源) */
+  url?: string;
+  /** 图注/出处 */
+  credit?: string;
+  alt?: string;
+}
+
 export interface Station {
   id: string;
   kind: StationKind;
@@ -76,6 +84,10 @@ export interface Station {
   body: string;
   links: MemeLink[];
   sources?: StationSource[];
+  /** 真实配图(AI 采集/导入时填 url) */
+  image?: StationImage;
+  /** 内置手绘示意插画的 key(见 art.tsx);用户贴的真图与 image.url 优先级更高 */
+  art?: string;
 }
 
 export interface Meme {
@@ -116,6 +128,7 @@ export const MEME_PROMPT = `迷因探踪 · 采集指令
       "date": "<大致时间,如 2013 或 2013.12>",
       "platform": "<平台/场域,如 Reddit、4chan、微博、抖音>",
       "body": "<2–5 句叙述。可用内联超链接 [[目标站点id|显示文字]] 指向别的站点>",
+      "image": { "url": "<该站点的真实配图直链,优先 Wikimedia Commons/公有领域/稳定源;拿不准就省略>", "credit": "<图注/出处>" },
       "links": [
         { "to": "<目标站点id>", "rel": "back | forward | variant", "label": "<可选按钮文字>" }
       ],
@@ -128,4 +141,6 @@ export const MEME_PROMPT = `迷因探踪 · 采集指令
 
 成因因子含义:remix=可改编性,emotion=情绪强度,ingroup=圈层信号,timing=时机搭车,lowbar=参与门槛低,incongruity=反差意外,amplifier=大V助推,platform=平台适配。
 
-链条建议 5–8 个站点,至少 1 个 origin、若干 spread/mutation、1 个 peak;rel 用 back 指向更早的源头、forward 指向更晚的衍生、variant 指向并列变体。确保 startId / originId / links.to 都能在 stations 里找到。`;
+链条建议 5–8 个站点,至少 1 个 origin、若干 spread/mutation、1 个 peak;rel 用 back 指向更早的源头、forward 指向更晚的衍生、variant 指向并列变体。确保 startId / originId / links.to 都能在 stations 里找到。
+
+配图很重要(纯文字说服力不足):尽量给每个站点填 image.url 真实直链——优先选公有领域或稳定可访问的图(如 Wikimedia Commons 的 upload.wikimedia.org 直链)。拿不准链接是否有效就宁可省略,也别编造会失效的地址(导入后我也可以自己贴真图)。`;

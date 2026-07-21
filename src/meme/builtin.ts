@@ -15,6 +15,7 @@ const doge: Meme = {
     {
       id: 'now',
       kind: 'mutation',
+      art: 'doge',
       title: '你熟悉的那只 Doge',
       date: '2013',
       platform: '全网',
@@ -28,6 +29,7 @@ const doge: Meme = {
     {
       id: 'reddit',
       kind: 'spread',
+      art: 'doge',
       title: '2013:蹩脚英文「doge speak」引爆',
       date: '2013 年中',
       platform: 'Reddit / Tumblr',
@@ -41,6 +43,7 @@ const doge: Meme = {
     {
       id: 'photo',
       kind: 'origin',
+      art: 'doge',
       title: '起点:2010 年,柴犬 Kabosu',
       date: '2010.02',
       platform: '个人博客(日本)',
@@ -51,6 +54,7 @@ const doge: Meme = {
     {
       id: 'spelling',
       kind: 'spread',
+      art: 'doge',
       title: '「doge」这个拼写的来历',
       date: '2005 / 2010',
       platform: 'Homestar Runner',
@@ -60,6 +64,7 @@ const doge: Meme = {
     {
       id: 'coin',
       kind: 'mutation',
+      art: 'coin',
       title: '2013.12:Doge 变成了 Dogecoin',
       date: '2013.12',
       platform: '加密货币',
@@ -72,6 +77,7 @@ const doge: Meme = {
     {
       id: 'musk',
       kind: 'decline',
+      art: 'coin',
       title: '名人助推:一次次被拉回聚光灯',
       date: '2019 起',
       platform: 'Twitter/X',
@@ -94,6 +100,7 @@ const rickroll: Meme = {
     {
       id: 'now',
       kind: 'mutation',
+      art: 'play',
       title: '你又被 Rickroll 了',
       date: '至今',
       platform: '全网',
@@ -107,6 +114,7 @@ const rickroll: Meme = {
     {
       id: 'fourchan',
       kind: 'spread',
+      art: 'play',
       title: '2007:第一次「Rickroll」',
       date: '2007.05',
       platform: '4chan',
@@ -120,6 +128,7 @@ const rickroll: Meme = {
     {
       id: 'duckroll',
       kind: 'origin',
+      art: 'duck',
       title: '起点:duckroll(鸭子诱骗)',
       date: '2006',
       platform: '4chan',
@@ -129,6 +138,7 @@ const rickroll: Meme = {
     {
       id: 'song',
       kind: 'spread',
+      art: 'play',
       title: 'payload 本身:1987 的那首歌',
       date: '1987',
       platform: '流行音乐',
@@ -138,6 +148,7 @@ const rickroll: Meme = {
     {
       id: 'peak',
       kind: 'peak',
+      art: 'play',
       title: '2008:破圈进入主流',
       date: '2008',
       platform: '主流媒体',
@@ -150,6 +161,7 @@ const rickroll: Meme = {
     {
       id: 'evergreen',
       kind: 'decline',
+      art: 'play',
       title: '常青:十几年后依然有效',
       date: '2020s',
       platform: 'YouTube',
@@ -172,6 +184,7 @@ const thisIsFine: Meme = {
     {
       id: 'now',
       kind: 'mutation',
+      art: 'fire',
       title: '烈火中的「This is fine」',
       date: '2016 起',
       platform: '全网',
@@ -184,6 +197,7 @@ const thisIsFine: Meme = {
     {
       id: 'crop',
       kind: 'spread',
+      art: 'fire',
       title: '2014:被裁成两格',
       date: '2014',
       platform: 'Tumblr / Twitter',
@@ -196,6 +210,7 @@ const thisIsFine: Meme = {
     {
       id: 'comic',
       kind: 'origin',
+      art: 'fire',
       title: '起点:2013,KC Green 的《On Fire》',
       date: '2013.01',
       platform: '网络漫画 Gunshow',
@@ -206,6 +221,7 @@ const thisIsFine: Meme = {
     {
       id: 'politics',
       kind: 'peak',
+      art: 'fire',
       title: '2016:成为「灾难现场」的代名词',
       date: '2016',
       platform: '推特 / 新闻',
@@ -218,6 +234,7 @@ const thisIsFine: Meme = {
     {
       id: 'notfine',
       kind: 'decline',
+      art: 'fire',
       title: '复活:「This is NOT fine」',
       date: '2016 起 / 2020',
       platform: '周边 / 公益',

@@ -3,7 +3,7 @@
  * 左侧迷因列表 + 复制采集指令/导入;右侧:选迷因 → 站点探险 → 成因推理 → 结局。
  */
 
-import { Fragment, useEffect, useRef, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   FACTORS,
   FACTOR_LABEL,
@@ -13,7 +13,9 @@ import {
   type Meme,
   type Station,
 } from './types';
-import { useMemeStore } from './useMemeStore';
+import { photoKey, useMemeStore } from './useMemeStore';
+import { StationArt, hasArt } from './art';
+import { getImage } from '../core/imagedb';
 import { Sparkle, Squiggle } from '../ui/doodles';
 import { IconClip } from '../ui/icons';
 
@@ -48,11 +50,96 @@ function renderBody(body: string, onJump: (id: string) => void): ReactNode[] {
   return out;
 }
 
+/** 站点配图:优先级 用户贴的真图 > image.url 真图 > 手绘示意插画 > 无 */
+function StationFigure({ meme, station }: { meme: Meme; station: Station }) {
+  const key = photoKey(meme.id, station.id);
+  const blobId = useMemeStore((s) => s.photos[key]);
+  const attachPhoto = useMemeStore((s) => s.attachPhoto);
+  const removePhoto = useMemeStore((s) => s.removePhoto);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [urlBroken, setUrlBroken] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!blobId) {
+      setBlobUrl(null);
+      return;
+    }
+    let alive = true;
+    let obj: string | null = null;
+    void getImage(blobId).then((b) => {
+      if (!alive || !b) return;
+      obj = URL.createObjectURL(b);
+      setBlobUrl(obj);
+    });
+    return () => {
+      alive = false;
+      if (obj) URL.revokeObjectURL(obj);
+    };
+  }, [blobId]);
+
+  useEffect(() => setUrlBroken(false), [station.image?.url]);
+
+  const showUrl = !blobUrl && station.image?.url && !urlBroken;
+  const showArt = !blobUrl && !showUrl && hasArt(station.art);
+  const hasReal = !!blobUrl;
+
+  return (
+    <div className={'ms-figure' + (showArt ? ' art' : '')}>
+      {blobUrl ? (
+        <img className="ms-photo" src={blobUrl} alt={station.image?.alt || station.title} />
+      ) : showUrl ? (
+        <img
+          className="ms-photo"
+          src={station.image!.url}
+          alt={station.image?.alt || station.title}
+          referrerPolicy="no-referrer"
+          onError={() => setUrlBroken(true)}
+        />
+      ) : showArt ? (
+        <div className="ms-art">
+          <StationArt art={station.art!} />
+          <span className="ms-art-tag">示意图</span>
+        </div>
+      ) : (
+        <div className="ms-noimg">这个站点还没有图</div>
+      )}
+
+      {(station.image?.credit || hasReal) && (
+        <div className="ms-credit">{hasReal ? '你贴的图' : station.image?.credit}</div>
+      )}
+
+      <div className="ms-figbtns">
+        <button className="ms-figbtn" onClick={() => fileRef.current?.click()}>
+          {hasReal ? '换真图' : '＋ 贴真图'}
+        </button>
+        {hasReal && (
+          <button className="ms-figbtn" onClick={() => removePhoto(meme.id, station.id)}>
+            去图
+          </button>
+        )}
+      </div>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void attachPhoto(meme.id, station.id, f);
+          e.target.value = '';
+        }}
+      />
+    </div>
+  );
+}
+
 function StationCard({ meme, station }: { meme: Meme; station: Station }) {
   const goto = useMemeStore((s) => s.goto);
   const isOrigin = station.id === meme.originId;
   return (
     <div className="meme-station">
+      <StationFigure meme={meme} station={station} />
       <div className="ms-head">
         <span className={'ms-kind k-' + station.kind}>{STATION_LABEL[station.kind]}</span>
         {(station.date || station.platform) && (
