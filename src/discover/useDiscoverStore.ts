@@ -4,6 +4,7 @@
 
 import { create } from 'zustand';
 import { COLLECT_PROMPT, type FeedCard } from './types';
+import { pickSurprise } from './surprise';
 
 const base = import.meta.env.BASE_URL || '/';
 
@@ -15,6 +16,7 @@ interface DiscoverStore {
   init: () => Promise<void>;
   setCat: (c: string | null) => void;
   copyPrompt: () => Promise<void>;
+  surprise: () => void;
 }
 
 export const useDiscoverStore = create<DiscoverStore>((set, get) => ({
@@ -50,5 +52,13 @@ export const useDiscoverStore = create<DiscoverStore>((set, get) => ({
       set({ status: '复制失败,请手动选择' });
     }
     setTimeout(() => set({ status: '' }), 2600);
+  },
+
+  surprise() {
+    const site = pickSurprise();
+    // 用户点击触发,新标签页打开(不会被拦截),不丢掉当前应用
+    window.open(site.url, '_blank', 'noopener,noreferrer');
+    set({ status: '🎲 ' + site.label });
+    setTimeout(() => set({ status: '' }), 3200);
   },
 }));

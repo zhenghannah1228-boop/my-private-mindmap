@@ -706,19 +706,40 @@ svg#edges {
   border-top: 1px solid #d3d1c7;
   padding: 10px 12px;
 }
+.surprise-btn {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  background: linear-gradient(120deg, #6a4ab7, #534ab7 55%, #7a4a9e);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(83, 74, 183, 0.28);
+  margin-bottom: 8px;
+}
+.surprise-btn:hover {
+  filter: brightness(1.06);
+}
+.surprise-btn:active {
+  transform: translateY(1px);
+}
 .collect-btn {
   width: 100%;
-  padding: 9px;
-  border: 1px solid #534ab7;
-  background: #534ab7;
-  color: #fff;
+  padding: 8px;
+  border: 1px solid #c9c6ba;
+  background: #fff;
+  color: #534ab7;
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
   font-family: inherit;
 }
 .collect-btn:hover {
-  background: #453da0;
+  background: #f6f5f1;
 }
 #discover-main {
   flex: 1;

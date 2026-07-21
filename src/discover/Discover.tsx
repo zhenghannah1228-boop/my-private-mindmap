@@ -13,6 +13,7 @@ export function Discover() {
   const init = useDiscoverStore((s) => s.init);
   const setCat = useDiscoverStore((s) => s.setCat);
   const copyPrompt = useDiscoverStore((s) => s.copyPrompt);
+  const surprise = useDiscoverStore((s) => s.surprise);
 
   useEffect(() => {
     void init();
@@ -47,7 +48,18 @@ export function Discover() {
           ))}
         </div>
         <div id="discover-foot">
-          <button className="collect-btn" onClick={copyPrompt} title="复制采集指令,交给任意 AI 即可产出每日卡片">
+          <button
+            className="surprise-btn"
+            onClick={surprise}
+            title="随机打开一个有趣的网站(新标签页)"
+          >
+            🎲 Surprise Me
+          </button>
+          <button
+            className="collect-btn"
+            onClick={copyPrompt}
+            title="复制采集指令,交给任意 AI 即可产出每日卡片"
+          >
             📋 复制采集指令
           </button>
           {status && <div className="reading-status">{status}</div>}
