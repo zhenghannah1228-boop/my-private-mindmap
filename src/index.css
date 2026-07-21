@@ -2129,3 +2129,41 @@ svg#edges {
     opacity: 1;
   }
 }
+
+/* 迷因站点导航条(全部站点一览 + 直接跳,避免走到末端卡死) */
+.meme-chain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 760px;
+  margin: -6px 0 20px;
+}
+.mc-dot {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1.3px solid #b8b6ad;
+  border-style: dashed;
+  background: #fff;
+  color: #8a8880;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+}
+.mc-dot:hover {
+  border-color: #1c1b19;
+  color: #1c1b19;
+}
+.mc-dot.seen {
+  border-style: solid;
+  border-color: #1c1b19;
+  color: #1c1b19;
+}
+.mc-dot.cur {
+  background: #1c1b19;
+  border-color: #1c1b19;
+  border-style: solid;
+  color: #fff;
+}

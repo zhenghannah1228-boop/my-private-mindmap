@@ -292,11 +292,15 @@ function Explore({ meme }: { meme: Meme }) {
   const visited = useMemeStore((s) => s.visited);
   const history = useMemeStore((s) => s.history);
   const back = useMemeStore((s) => s.back);
+  const goto = useMemeStore((s) => s.goto);
   const startQuiz = useMemeStore((s) => s.startQuiz);
   const station = meme.stations.find((s) => s.id === stationId) || meme.stations[0];
   const total = meme.stations.length;
   const done = visited.length;
+  const remaining = total - done;
   const originFound = visited.includes(meme.originId);
+  // 末端:没有「衍生/变体」的往前链接,只能回退
+  const hasForward = station.links.some((l) => l.rel !== 'back');
 
   return (
     <>
@@ -315,11 +319,33 @@ function Explore({ meme }: { meme: Meme }) {
         </button>
       </div>
 
+      {/* 站点导航条:全部站点一览,直接跳,不会卡死 */}
+      <div className="meme-chain" role="tablist">
+        {meme.stations.map((s, i) => {
+          const cur = s.id === stationId;
+          const seen = visited.includes(s.id);
+          return (
+            <button
+              key={s.id}
+              className={'mc-dot' + (cur ? ' cur' : '') + (seen ? ' seen' : '')}
+              title={STATION_LABEL[s.kind] + ' · ' + s.title + (seen ? '' : '(未探)')}
+              onClick={() => goto(s.id)}
+            >
+              {s.id === meme.originId ? '起' : i + 1}
+            </button>
+          );
+        })}
+      </div>
+
       <StationCard meme={meme} station={station} />
 
       <div className="meme-tip">
-        点正文里的<span className="meme-inline">下划线链接</span>或下方按钮,在传播链里跳转。
-        {originFound ? '已找到起点,随时可以「分析成因」。' : '试着一路「溯源 ↑」挖到最初的源头。'}
+        {hasForward
+          ? '点正文里的下划线链接或下方按钮,在传播链里跳转。'
+          : '这条线到头了 —— 用「回退」或上方站点条换条线走,'}
+        {originFound
+          ? '已找到起点,随时点右上「分析成因 →」看结局。'
+          : `一路「溯源 ↑」挖到最初的源头${remaining > 0 ? `(还有 ${remaining} 个站点没探到)` : ''}。也可以随时直接「分析成因 →」。`}
       </div>
     </>
   );
