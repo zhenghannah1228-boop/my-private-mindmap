@@ -15,7 +15,8 @@ export interface FeedCard {
 }
 
 export const DISCOVER_CATEGORIES = [
-  '文化冷知识',
+  '冷知识',
+  '文化现象',
   '历史故事',
   '名人故事',
   '英语表达',
@@ -32,7 +33,8 @@ export const DISCOVER_CATEGORIES = [
 ] as const;
 
 export const CATEGORY_EMOJI: Record<string, string> = {
-  文化冷知识: '💡',
+  冷知识: '💡',
+  文化现象: '🎭',
   历史故事: '📜',
   名人故事: '👤',
   英语表达: '🔤',
@@ -57,7 +59,8 @@ export const COLLECT_PROMPT = `每日文化拾遗 · 采集指令(ADHD 友好)
 请为我采集今天一批「随手可读」的短知识卡片。风格:短小、有趣、跳跃、五花八门,适合注意力容易分散的人随手翻。
 
 类别(每类 1–2 条,总共 12–18 条,轮换着来别每天都一样):
-- 文化冷知识
+- 冷知识
+- 文化现象(社会思潮/世代/运动,如嬉皮士、婴儿潮、文艺复兴、赛博朋克等,讲清背景与影响)
 - 历史故事
 - 名人故事
 - 英语表达(表达 + 含义 + 一个例句/出处)
