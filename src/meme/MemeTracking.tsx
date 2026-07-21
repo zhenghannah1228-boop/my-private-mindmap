@@ -128,8 +128,8 @@ function StationFigure({ meme, station }: { meme: Meme; station: Station }) {
         <div className="ms-noimg">还没有图 · 点「贴真图」或直接 Ctrl/⌘+V 粘贴</div>
       )}
 
-      {(station.image?.credit || hasReal) && (
-        <div className="ms-credit">{hasReal ? '你贴的图' : station.image?.credit}</div>
+      {showUrl && station.image?.credit && (
+        <div className="ms-credit">{station.image.credit}</div>
       )}
 
       <div className="ms-figbtns">
