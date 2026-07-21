@@ -91,12 +91,34 @@ function Duck() {
   );
 }
 
+/** 彩虹猫:Pop-Tart 身体 + 猫头 + 彩虹尾迹 + 星星 */
+function Nyan() {
+  return (
+    <Frame>
+      <path d="M14 44 h26M14 51 h26M14 58 h26M14 65 h26" />
+      <rect x="46" y="40" width="44" height="30" rx="6" />
+      <circle cx="58" cy="49" r="1.6" fill="currentColor" />
+      <circle cx="70" cy="55" r="1.6" fill="currentColor" />
+      <circle cx="60" cy="62" r="1.6" fill="currentColor" />
+      <circle cx="78" cy="47" r="1.6" fill="currentColor" />
+      <path d="M96 40 L102 30 L108 42M124 40 L130 30 L120 42" />
+      <circle cx="110" cy="55" r="18" />
+      <circle cx="104" cy="53" r="1.8" fill="currentColor" />
+      <circle cx="116" cy="53" r="1.8" fill="currentColor" />
+      <path d="M106 62 q4 3 8 0" />
+      <path d="M96 56 h-6M96 60 h-6M124 56 h6M124 60 h6" />
+      <path d="M30 24 l0 8M26 28 l8 0M138 74 l0 7M134.5 77.5 l7 0" />
+    </Frame>
+  );
+}
+
 const ART: Record<string, () => ReactNode> = {
   doge: Doge,
   coin: Coin,
   fire: Fire,
   play: Play,
   duck: Duck,
+  nyan: Nyan,
 };
 
 export function StationArt({ art }: { art: string }) {

@@ -247,4 +247,93 @@ const thisIsFine: Meme = {
     'This is fine 击中的是一种普遍情绪:在失控局面里假装镇定的无力与自嘲(情绪强度)。它是一个可以套进任何糟糕处境的万能模板(可改编性),尤其在 2016 年的政治与社会动荡里踩中了集体情绪(时机搭车);用它的人彼此心照不宣地共享一种黑色幽默(圈层信号);而两格漫画的形态极适合在推特等平台一图传播(平台适配)。有趣的是,它的走红恰恰来自「断章取义」——截掉了原作更黑暗的结局。',
 };
 
-export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine];
+const nyancat: Meme = {
+  id: 'nyancat',
+  title: 'Nyan Cat(彩虹猫)',
+  summary: '身体是 Pop-Tart 饼干的像素猫,拖着彩虹在太空循环飞行,配着魔性的「nyanyan」歌声——其实是一张画和一首歌拼起来的。',
+  startId: 'now',
+  originId: 'drawing',
+  stations: [
+    {
+      id: 'now',
+      kind: 'mutation',
+      art: 'nyan',
+      title: '你熟悉的那只彩虹猫',
+      date: '2011 起',
+      platform: '全网',
+      body: '一只像素猫,身体是一块草莓味 Pop-Tart 饼干,拖着彩虹在太空里循环飞行,配着魔性的「nyanyanya」歌声。很多人不知道:它其实是两样东西拼起来的——一张[[drawing|像素画]]和一首[[song|日本洗脑曲]]。它后来还[[nft|拍出了天价]]。',
+      links: [
+        { to: 'combined', rel: 'back', label: '它是怎么拼成、爆红的' },
+        { to: 'song', rel: 'variant', label: '那首魔性的歌哪来的' },
+        { to: 'nft', rel: 'forward', label: '后来拍出天价' },
+      ],
+    },
+    {
+      id: 'drawing',
+      kind: 'origin',
+      art: 'nyan',
+      title: '起点之一:2011,Pop Tart Cat',
+      date: '2011.04',
+      platform: 'LOL-Comics(个人站)',
+      body: '2011 年 4 月,美国插画师 Christopher Torres(网名 prguitarman)在自己的站点发布了一张像素猫 GIF——猫的身体是一块 Pop-Tart 饼干,他叫它「Pop Tart Cat」。这就是彩虹猫的[[combined|视觉源头]]。',
+      links: [{ to: 'combined', rel: 'forward', label: '它如何被配上歌' }],
+      sources: [{ label: 'Wikipedia: Nyan Cat', url: 'https://en.wikipedia.org/wiki/Nyan_Cat' }],
+    },
+    {
+      id: 'song',
+      kind: 'spread',
+      art: 'nyan',
+      title: '起点之二:2010,日本的「nyanyan」曲',
+      date: '2010',
+      platform: 'Nico Nico / Vocaloid 圈',
+      body: '另一半来自日本:2010 年 Vocaloid 圈作者 daniwellP 做了一首洗脑短曲《Nyanyanyanya!》,由 UTAU 角色桃音モモ演唱。这段「nyanyan」旋律,后来成了彩虹猫的[[combined|听觉源头]]。',
+      links: [{ to: 'combined', rel: 'forward', label: '它如何被配上画' }],
+      sources: [
+        { label: 'Know Your Meme: Nyan Cat', url: 'https://knowyourmeme.com/memes/nyan-cat-pop-tart-cat' },
+      ],
+    },
+    {
+      id: 'combined',
+      kind: 'spread',
+      art: 'nyan',
+      title: '2011.04:图 + 歌拼在一起,叫「Nyan Cat」',
+      date: '2011.04',
+      platform: 'YouTube',
+      body: '2011 年 4 月,YouTube 用户 saraj00n 把 prguitarman 的[[drawing|像素猫]]和 daniwellP 的[[song|那首歌]]拼成一段循环视频,取名「Nyan Cat」。图与歌一拍即合,迅速病毒式扩散,把两件原本各自的作品变成了同一个梗。',
+      links: [
+        { to: 'drawing', rel: 'back', label: '画本身的来历' },
+        { to: 'song', rel: 'back', label: '歌本身的来历' },
+        { to: 'peak', rel: 'forward', label: '它怎么爆的' },
+      ],
+    },
+    {
+      id: 'peak',
+      kind: 'peak',
+      art: 'nyan',
+      title: '2011:年度病毒视频',
+      date: '2011',
+      platform: 'YouTube / 全网',
+      body: '2011 年,Nyan Cat 成为当年最火的病毒视频之一,YouTube 播放以千万计,催生了无数语言版本、时长恶搞(10 小时版)、翻唱与网页小游戏。这个梗[[nft|十年后又火了一次]]。',
+      links: [
+        { to: 'nft', rel: 'forward', label: '十年后的复活' },
+        { to: 'combined', rel: 'back', label: '回到它拼成的那一刻' },
+      ],
+    },
+    {
+      id: 'nft',
+      kind: 'decline',
+      art: 'nyan',
+      title: '2021:原图拍成 NFT',
+      date: '2021.02',
+      platform: 'NFT 市场',
+      body: '2021 年 2 月,原作者 Chris Torres 把最初的 Nyan Cat GIF 作为 NFT 拍卖,成交价约 300 ETH(当时约 59 万美元),成为 NFT 数字艺术热潮的标志性事件之一,让这个十年老梗重回聚光灯。',
+      links: [{ to: 'peak', rel: 'back', label: '回到它最火的时候' }],
+      sources: [{ label: 'Wikipedia: Nyan Cat', url: 'https://en.wikipedia.org/wiki/Nyan_Cat' }],
+    },
+  ],
+  factors: ['remix', 'incongruity', 'emotion', 'platform'],
+  analysis:
+    'Nyan Cat 的走红是一次完美的拼接:荒诞可爱的像素猫配上洗脑循环曲,无厘头的组合本身就抓人(反差意外),萌感与欢乐情绪一击即中(情绪强度);循环视频 / GIF 的形态天生适合在 YouTube 和网页里疯传(平台适配);而极简形象又给了网友无穷的二创空间——各种语言版、超长版、翻唱、小游戏层出不穷(可改编性)。十年后的 NFT 拍卖又给这个老梗续了一把火。',
+};
+
+export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat];
