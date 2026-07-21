@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Reader } from './Reader';
 import { useReadingStore } from './useReadingStore';
+import { BookDoodle, Sparkle, Squiggle } from '../ui/doodles';
 
 function ShelfRow({ id }: { id: string }) {
   const shelf = useReadingStore((s) => s.shelves.find((x) => x.id === id))!;
@@ -140,13 +141,17 @@ export function ReadingLibrary() {
 
       <div id="reading-main">
         <div className="lib-head">
-          <h2>{q ? `搜索「${query.trim()}」` : activeShelf?.name ?? '书架'}</h2>
+          <h2>
+            {q ? `搜索「${query.trim()}」` : activeShelf?.name ?? '书架'}
+            <Sparkle className="head-sparkle" />
+            <Squiggle className="head-squiggle" />
+          </h2>
           <span className="lib-count">{shelfBooks.length} 部作品</span>
         </div>
 
         {shelfBooks.length === 0 ? (
           <div className="empty">
-            <div className="empty-ico">{q ? '🔍' : '📖'}</div>
+            <div className="empty-ico">{q ? '🔍' : <BookDoodle className="doodle" />}</div>
             {q ? '没有匹配的作品' : '这个书架还没有作品'}
             <div className="empty-sub">
               {q

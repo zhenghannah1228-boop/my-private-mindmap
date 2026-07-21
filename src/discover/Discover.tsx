@@ -5,6 +5,7 @@
 import { useEffect } from 'react';
 import { CATEGORY_EMOJI, DISCOVER_CATEGORIES } from './types';
 import { useDiscoverStore } from './useDiscoverStore';
+import { Cat, Sparkle, Squiggle } from '../ui/doodles';
 
 export function Discover() {
   const cards = useDiscoverStore((s) => s.cards);
@@ -75,13 +76,17 @@ export function Discover() {
 
       <div id="discover-main">
         <div className="lib-head">
-          <h2>{q ? `搜索「${query.trim()}」` : activeCat ?? '每日发现'}</h2>
+          <h2>
+            {q ? `搜索「${query.trim()}」` : activeCat ?? '每日发现'}
+            <Sparkle className="head-sparkle" />
+            <Squiggle className="head-squiggle" />
+          </h2>
           <span className="lib-count">{shown.length} 条</span>
         </div>
 
         {shown.length === 0 ? (
           <div className="empty">
-            <div className="empty-ico">{q ? '🔍' : '🎲'}</div>
+            <div className="empty-ico">{q ? '🔍' : <Cat className="doodle" />}</div>
             {q ? '没有匹配的内容' : '还没有内容'}
             <div className="empty-sub">
               {q

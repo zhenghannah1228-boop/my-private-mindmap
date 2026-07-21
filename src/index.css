@@ -1,4 +1,9 @@
-/* 全局样式,移植自原型 mindmap-v2.html。保持克制配色、无动效。 */
+/* 全局样式。喜茶风:白底、黑色童趣手写字、简笔画点缀。 */
+:root {
+  /* 童趣手写字体栈:站酷快乐体优先,回退到系统手写/楷体 */
+  --font-hand: 'ZCOOL KuaiLe', 'Chalkboard SE', 'Comic Sans MS', 'Kaiti SC', 'STKaiti', 'KaiTi',
+    '楷体', sans-serif;
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -10,9 +15,9 @@ body,
   height: 100%;
 }
 body {
-  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: #faf9f7;
-  color: #2c2c2a;
+  font-family: var(--font-hand);
+  background: #ffffff;
+  color: #1c1b19;
   overflow: hidden;
   /* 移动端:iOS 长按弹放大镜/选择菜单会打断手势 */
   -webkit-touch-callout: none;
@@ -27,8 +32,8 @@ body {
 /* ── 侧栏 ── */
 #side {
   width: 270px;
-  background: #f1efe8;
-  border-right: 1px solid #d3d1c7;
+  background: #ffffff;
+  border-right: 1.5px solid #1c1b19;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -791,6 +796,54 @@ svg#edges {
 }
 .bar-search .bs-clear:hover {
   color: #e24b4a;
+}
+
+/* ── 喜茶风:手绘点缀 + 线条卡片 ── */
+.lib-head {
+  border-bottom: none;
+}
+.lib-head h2 {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 400;
+}
+.head-sparkle {
+  color: #1c1b19;
+}
+.head-squiggle {
+  position: absolute;
+  left: 0;
+  bottom: -9px;
+  color: #1c1b19;
+  opacity: 0.85;
+}
+.empty .doodle {
+  color: #1c1b19;
+  opacity: 0.85;
+}
+/* 卡片:白底 + 细黑描边 + 硬阴影(手绘贴纸感)+ 微歪圆角 */
+.feed-card {
+  border: 1.5px solid #201f1c;
+  border-radius: 20px 13px 22px 14px;
+  box-shadow: 3px 3px 0 rgba(28, 27, 25, 0.1);
+}
+.feed-card:hover {
+  border-color: #201f1c;
+  box-shadow: 4px 5px 0 rgba(28, 27, 25, 0.18);
+}
+.book .cover {
+  border: 1.5px solid #201f1c;
+}
+/* 顶栏/搜索框也用细黑线 */
+#modeswitch,
+#topsearch {
+  border: 1.5px solid #201f1c;
+  box-shadow: 2px 2px 0 rgba(28, 27, 25, 0.08);
+}
+#bar {
+  border: 1.5px solid #201f1c;
 }
 
 /* ── 每日发现 ── */
