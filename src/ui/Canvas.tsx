@@ -19,13 +19,17 @@ export function Canvas() {
   const linkingFrom = useStore((s) => s.ui.linkingFrom);
   const filterMode = useStore((s) => s.ui.filterMode);
   const placeMode = useStore((s) => s.ui.placeMode);
+  const searchQuery = useStore((s) => s.ui.searchQuery);
 
   const { linkPreview, handlers } = usePointerInteraction(canvasRef);
 
-  const isHi = (ct: number, due: number | null) => {
+  const sq = searchQuery.trim().toLowerCase();
+  const isHi = (n: { t: string; ct: number; due: number | null }) => {
+    // 搜索优先:命中关键词才高亮
+    if (sq) return n.t.toLowerCase().includes(sq);
     if (!filterMode) return true;
-    if (filterMode === 'time') return !!due;
-    return Date.now() - (ct || 0) < 3 * 86400000;
+    if (filterMode === 'time') return !!n.due;
+    return Date.now() - (n.ct || 0) < 3 * 86400000;
   };
 
   return (
@@ -44,7 +48,7 @@ export function Canvas() {
             selected={selectedId === n.id}
             linking={linkingFrom === n.id}
             editing={editingId === n.id}
-            dim={!isHi(n.ct, n.due)}
+            dim={!isHi(n)}
           />
         ))}
       </div>

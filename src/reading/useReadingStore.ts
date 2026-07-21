@@ -91,8 +91,10 @@ export interface ReadingStore {
   openBookId: string | null;
   renamingShelfId: string | null;
   status: string;
+  query: string;
 
   init: () => Promise<void>;
+  setQuery: (q: string) => void;
   switchShelf: (id: string) => void;
   addShelf: (name: string) => void;
   renameShelf: (id: string, name: string) => void;
@@ -113,6 +115,11 @@ export const useReadingStore = create<ReadingStore>((set, get) => ({
   openBookId: null,
   renamingShelfId: null,
   status: '',
+  query: '',
+
+  setQuery(q) {
+    set({ query: q });
+  },
 
   async init() {
     // 导入书(IDB)

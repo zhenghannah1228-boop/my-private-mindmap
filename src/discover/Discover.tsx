@@ -10,6 +10,7 @@ export function Discover() {
   const cards = useDiscoverStore((s) => s.cards);
   const activeCat = useDiscoverStore((s) => s.activeCat);
   const status = useDiscoverStore((s) => s.status);
+  const query = useDiscoverStore((s) => s.query);
   const init = useDiscoverStore((s) => s.init);
   const setCat = useDiscoverStore((s) => s.setCat);
   const copyPrompt = useDiscoverStore((s) => s.copyPrompt);
@@ -20,7 +21,13 @@ export function Discover() {
   }, [init]);
 
   const countOf = (c: string) => cards.filter((k) => k.category === c).length;
-  const shown = activeCat ? cards.filter((c) => c.category === activeCat) : cards;
+  const q = query.trim().toLowerCase();
+  // 搜索时跨所有类别匹配标题/正文/类别;否则按选中类别
+  const shown = q
+    ? cards.filter((c) => (c.title + ' ' + c.body + ' ' + c.category).toLowerCase().includes(q))
+    : activeCat
+      ? cards.filter((c) => c.category === activeCat)
+      : cards;
 
   return (
     <div id="discover">
@@ -68,16 +75,18 @@ export function Discover() {
 
       <div id="discover-main">
         <div className="lib-head">
-          <h2>{activeCat ?? '每日发现'}</h2>
+          <h2>{q ? `搜索「${query.trim()}」` : activeCat ?? '每日发现'}</h2>
           <span className="lib-count">{shown.length} 条</span>
         </div>
 
         {shown.length === 0 ? (
           <div className="empty">
-            <div className="empty-ico">🎲</div>
-            还没有内容
+            <div className="empty-ico">{q ? '🔍' : '🎲'}</div>
+            {q ? '没有匹配的内容' : '还没有内容'}
             <div className="empty-sub">
-              每天会自动采集一批冷知识、故事、名画与神话。点左下角「复制采集指令」也可手动采集。
+              {q
+                ? '换个关键词试试,或清空搜索框'
+                : '每天会自动采集一批冷知识、故事、名画与神话。点左下角「复制采集指令」也可手动采集。'}
             </div>
           </div>
         ) : (

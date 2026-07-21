@@ -13,8 +13,10 @@ interface DiscoverStore {
   activeCat: string | null; // null = 全部
   loaded: boolean;
   status: string;
+  query: string;
   init: () => Promise<void>;
   setCat: (c: string | null) => void;
+  setQuery: (q: string) => void;
   copyPrompt: () => Promise<void>;
   surprise: () => void;
 }
@@ -24,6 +26,11 @@ export const useDiscoverStore = create<DiscoverStore>((set, get) => ({
   activeCat: null,
   loaded: false,
   status: '',
+  query: '',
+
+  setQuery(q) {
+    set({ query: q });
+  },
 
   async init() {
     if (get().loaded) return;

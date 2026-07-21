@@ -32,6 +32,8 @@ export interface UiState {
   placeMode: boolean;
   /** 正在重命名的空间 id;null = 无 */
   renamingSpaceId: string | null;
+  /** 节点搜索关键词;非空时高亮命中、其余降透明度 */
+  searchQuery: string;
   syncKey: string;
   syncMsg: string;
   autoSync: boolean;
@@ -67,6 +69,7 @@ export interface Store {
   renameSpace: (id: string, name: string) => void;
   deleteSpace: (id: string) => void;
   setRenaming: (id: string | null) => void;
+  setSearchQuery: (q: string) => void;
   /** 取当前完整作品库(含已 commit 的活动副本) */
   snapshot: () => Library;
 
@@ -97,6 +100,7 @@ function baseUi(): UiState {
     linkingFrom: null,
     placeMode: false,
     renamingSpaceId: null,
+    searchQuery: '',
     syncKey: loadSyncKey(),
     syncMsg: '同一同步码 = 同一份数据。手机上填相同的码即可打通。',
     autoSync: false,
@@ -244,6 +248,10 @@ export const useStore = create<Store>((set, get) => ({
 
   setRenaming(id) {
     set({ ui: { ...get().ui, renamingSpaceId: id } });
+  },
+
+  setSearchQuery(q) {
+    set({ ui: { ...get().ui, searchQuery: q } });
   },
 
   snapshot() {

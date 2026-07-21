@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { MindMap } from './ui/MindMap';
 import { ReadingLibrary } from './reading/ReadingLibrary';
 import { Discover } from './discover/Discover';
+import { TopSearch } from './ui/TopSearch';
 import { installPersistence } from './store/persist';
 import { useAppStore } from './store/useAppStore';
 
@@ -37,6 +38,7 @@ export default function App() {
   return (
     <>
       <ModeSwitch />
+      {(mode === 'reading' || mode === 'discover') && <TopSearch mode={mode} />}
       {mode === 'reading' ? <ReadingLibrary /> : mode === 'discover' ? <Discover /> : <MindMap />}
     </>
   );

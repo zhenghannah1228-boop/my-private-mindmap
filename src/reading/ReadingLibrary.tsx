@@ -96,7 +96,12 @@ export function ReadingLibrary() {
     void init();
   }, [init]);
 
-  const shelfBooks = books.filter((b) => b.shelfId === activeShelfId);
+  const query = useReadingStore((s) => s.query);
+  const q = query.trim().toLowerCase();
+  // 搜索时跨所有书架匹配书名/作者;否则只看当前书架
+  const shelfBooks = q
+    ? books.filter((b) => (b.title + ' ' + (b.author || '')).toLowerCase().includes(q))
+    : books.filter((b) => b.shelfId === activeShelfId);
   const openBookMeta = openBookId ? books.find((b) => b.id === openBookId) ?? null : null;
   const activeShelf = useReadingStore((s) => s.shelves.find((x) => x.id === s.activeShelfId));
 
@@ -135,16 +140,18 @@ export function ReadingLibrary() {
 
       <div id="reading-main">
         <div className="lib-head">
-          <h2>{activeShelf?.name ?? '书架'}</h2>
+          <h2>{q ? `搜索「${query.trim()}」` : activeShelf?.name ?? '书架'}</h2>
           <span className="lib-count">{shelfBooks.length} 部作品</span>
         </div>
 
         {shelfBooks.length === 0 ? (
           <div className="empty">
-            <div className="empty-ico">📖</div>
-            这个书架还没有作品
+            <div className="empty-ico">{q ? '🔍' : '📖'}</div>
+            {q ? '没有匹配的作品' : '这个书架还没有作品'}
             <div className="empty-sub">
-              点左下角「导入」添加你的 EPUB / PDF / TXT,或等每周自动更新的公版作品
+              {q
+                ? '换个关键词试试,或清空搜索框'
+                : '点左下角「导入」添加你的 EPUB / PDF / TXT,或等每周自动更新的公版作品'}
             </div>
           </div>
         ) : (

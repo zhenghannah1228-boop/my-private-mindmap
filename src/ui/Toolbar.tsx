@@ -8,6 +8,7 @@ import { useRef, useState } from 'react';
 import { COLORS } from '../core/model';
 import { exportJson, readJsonFile } from '../core/storage';
 import { fromDatetimeLocal, toDatetimeLocal } from '../core/time';
+import { fitToNodes } from '../core/viewport';
 import type { ColorIndex } from '../core/types';
 import { useSizeStore } from '../store/useSizeStore';
 import { useStore } from '../store/useStore';
@@ -22,6 +23,18 @@ export function Toolbar() {
   const setFilter = useStore((s) => s.setFilter);
   const setPlaceMode = useStore((s) => s.setPlaceMode);
   const replaceLibrary = useStore((s) => s.replaceLibrary);
+  const searchQuery = useStore((s) => s.ui.searchQuery);
+  const setSearchQuery = useStore((s) => s.setSearchQuery);
+
+  // 回车:把视口聚焦到命中的节点
+  const fitToMatches = () => {
+    const sq = searchQuery.trim().toLowerCase();
+    if (!sq) return;
+    const matches = useStore.getState().doc.nodes.filter((n) => n.t.toLowerCase().includes(sq));
+    if (!matches.length) return;
+    const r = document.getElementById('canvas')!.getBoundingClientRect();
+    useStore.getState().setView(fitToNodes(matches, r, useSizeStore.getState().sizes));
+  };
 
   const [dueOpen, setDueOpen] = useState(false);
   const [dueVal, setDueVal] = useState('');
@@ -54,6 +67,22 @@ export function Toolbar() {
         <span className="space-label" title="当前分类">
           {spaceName}
         </span>
+        <div className="bar-search">
+          <input
+            value={searchQuery}
+            placeholder="搜索节点"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') fitToMatches();
+              else if (e.key === 'Escape') setSearchQuery('');
+            }}
+          />
+          {searchQuery && (
+            <button className="bs-clear" title="清除(Esc)" onClick={() => setSearchQuery('')}>
+              ✕
+            </button>
+          )}
+        </div>
         <div className="sep" />
         {COLORS.map((c) => (
           <button
