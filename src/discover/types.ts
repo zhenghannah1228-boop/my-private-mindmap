@@ -27,6 +27,8 @@ export const DISCOVER_CATEGORIES = [
   '影视',
   '流行音乐',
   '美学',
+  '植物',
+  '动物',
 ] as const;
 
 export const CATEGORY_EMOJI: Record<string, string> = {
@@ -42,6 +44,8 @@ export const CATEGORY_EMOJI: Record<string, string> = {
   影视: '🎬',
   流行音乐: '🎵',
   美学: '🌸',
+  植物: '🌿',
+  动物: '🐾',
 };
 
 /**
@@ -65,6 +69,8 @@ export const COLLECT_PROMPT = `每日文化拾遗 · 采集指令(ADHD 友好)
 - 影视(电影/剧集冷知识、幕后、术语、名场面解读)
 - 流行音乐(歌曲故事、乐理小知识、音乐史八卦)
 - 美学(设计/建筑/东方美学/色彩等审美观念)
+- 植物(有趣的植物、花木习性、植物冷知识)
+- 动物(动物行为、冷知识、奇特物种)
 
 每条要求:
 - 标题一句话点睛(≤20 字)

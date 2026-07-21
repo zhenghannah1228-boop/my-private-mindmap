@@ -922,6 +922,8 @@ svg#edges {
 .tag-9 { background: #e4e6f2; color: #454a80; }
 .tag-10 { background: #f7e4ee; color: #8a3566; }
 .tag-11 { background: #e4f0ec; color: #357061; }
+.tag-12 { background: #e2f0e0; color: #3a6b3a; }
+.tag-13 { background: #f2e9dc; color: #7a5a2e; }
 
 @media (max-width: 640px) {
   .feed {
