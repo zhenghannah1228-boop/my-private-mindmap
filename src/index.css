@@ -1023,10 +1023,10 @@ svg#edges {
   overflow-y: auto;
   padding: 44px 32px 48px;
 }
-/* 更窄的列 = 更短的行(舒适阅读距) + 宽屏能并排更多卡片(更高效) */
+/* 更大的列宽 = 更少的列、更大的卡片 */
 .feed {
-  columns: 320px;
-  column-gap: 26px;
+  columns: 440px;
+  column-gap: 30px;
 }
 .feed-card {
   break-inside: avoid;
@@ -1034,9 +1034,9 @@ svg#edges {
   width: 100%;
   background: #fff;
   border: 1px solid #e7e4db;
-  border-radius: 12px;
-  padding: 18px 20px 18px;
-  margin-bottom: 24px;
+  border-radius: 14px;
+  padding: 24px 28px 24px;
+  margin-bottom: 28px;
   box-shadow: 0 1px 3px rgba(40, 34, 24, 0.04);
 }
 .feed-card:hover {
@@ -1050,9 +1050,9 @@ svg#edges {
   margin-bottom: 11px;
 }
 .fc-tag {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 20px;
   background: #ffffff;
   color: #1c1b19;
@@ -1082,16 +1082,16 @@ svg#edges {
   color: #b0aea5;
 }
 .fc-title {
-  font-size: 16.5px;
+  font-size: 19px;
   font-weight: 600;
   line-height: 1.5;
   color: #1c1b19;
-  margin-bottom: 9px;
+  margin-bottom: 11px;
   letter-spacing: 0.2px;
 }
 .fc-body {
-  font-size: 14px;
-  line-height: 1.9;
+  font-size: 16px;
+  line-height: 1.95;
   color: #45443d;
   white-space: pre-wrap;
 }
