@@ -5,14 +5,14 @@
 
 import { create } from 'zustand';
 
-export type AppMode = 'reading' | 'discover' | 'mindmap';
+export type AppMode = 'reading' | 'discover' | 'mindmap' | 'meme';
 
 const MODE_KEY = 'mm_mode';
 
 function loadMode(): AppMode {
   try {
     const m = localStorage.getItem(MODE_KEY);
-    if (m === 'mindmap' || m === 'discover') return m;
+    if (m === 'mindmap' || m === 'discover' || m === 'meme') return m;
     return 'reading';
   } catch {
     return 'reading';

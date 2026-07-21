@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { MindMap } from './ui/MindMap';
 import { ReadingLibrary } from './reading/ReadingLibrary';
 import { Discover } from './discover/Discover';
+import { MemeTracking } from './meme/MemeTracking';
 import { TopSearch } from './ui/TopSearch';
 import { installPersistence } from './store/persist';
 import { useAppStore } from './store/useAppStore';
@@ -25,6 +26,9 @@ function ModeSwitch() {
       <button className={mode === 'mindmap' ? 'on' : ''} onClick={() => setMode('mindmap')}>
         思维导图
       </button>
+      <button className={mode === 'meme' ? 'on' : ''} onClick={() => setMode('meme')}>
+        迷因探踪
+      </button>
     </div>
   );
 }
@@ -39,7 +43,15 @@ export default function App() {
     <>
       <ModeSwitch />
       {(mode === 'reading' || mode === 'discover') && <TopSearch mode={mode} />}
-      {mode === 'reading' ? <ReadingLibrary /> : mode === 'discover' ? <Discover /> : <MindMap />}
+      {mode === 'reading' ? (
+        <ReadingLibrary />
+      ) : mode === 'discover' ? (
+        <Discover />
+      ) : mode === 'meme' ? (
+        <MemeTracking />
+      ) : (
+        <MindMap />
+      )}
     </>
   );
 }

@@ -1478,3 +1478,447 @@ svg#edges {
 .rtheme-sepia .reader-progress-fill {
   background: #9a6a3c;
 }
+
+/* ── 迷因探踪(超链接文本游戏) ── */
+#meme {
+  display: flex;
+  height: 100%;
+}
+#meme #side {
+  width: 220px;
+}
+#meme-foot {
+  border-top: 1px solid #d3d1c7;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#meme-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 44px 40px 56px;
+}
+#meme-main .lib-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  max-width: 760px;
+}
+.meme-exit-link {
+  border: none;
+  background: transparent;
+  color: #6b6a63;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+  font-size: 13px;
+}
+.meme-exit-link:hover {
+  color: #1c1b19;
+}
+
+/* 选迷因 */
+.meme-chooser {
+  max-width: 900px;
+}
+.mc-intro {
+  font-size: 15px;
+  line-height: 1.9;
+  color: #45443d;
+  margin-bottom: 22px;
+}
+.mc-intro b {
+  color: #1c1b19;
+}
+.mc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.mc-card {
+  text-align: left;
+  background: #fff;
+  border: 1.5px solid #1c1b19;
+  border-radius: 16px 12px 18px 12px;
+  box-shadow: 3px 3px 0 rgba(28, 27, 25, 0.1);
+  padding: 18px 20px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+  transition: transform 0.14s, box-shadow 0.14s;
+}
+.mc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 5px 6px 0 rgba(28, 27, 25, 0.18);
+}
+.mcc-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1c1b19;
+  margin-bottom: 7px;
+}
+.mcc-sum {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #55534b;
+  margin-bottom: 12px;
+}
+.mcc-foot {
+  font-size: 12px;
+  color: #8a8880;
+}
+
+/* 探险顶栏 */
+.meme-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 760px;
+  margin-bottom: 20px;
+}
+.meme-back {
+  border: 1.5px solid #1c1b19;
+  background: #fff;
+  color: #1c1b19;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+}
+.meme-back:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.meme-progress {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mp-track {
+  flex: 1;
+  height: 8px;
+  background: #eceae3;
+  border: 1.3px solid #1c1b19;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.mp-fill {
+  height: 100%;
+  background: #1c1b19;
+  transition: width 0.3s ease;
+}
+.mp-label {
+  font-size: 12px;
+  color: #55534b;
+  white-space: nowrap;
+}
+.meme-analyze {
+  border: 1.5px solid #1c1b19;
+  background: #fff;
+  color: #1c1b19;
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+  white-space: nowrap;
+}
+.meme-analyze.ready {
+  background: #1c1b19;
+  color: #fff;
+}
+
+/* 站点卡片 */
+.meme-station {
+  max-width: 760px;
+  background: #fff;
+  border: 1.5px solid #1c1b19;
+  border-radius: 18px 13px 20px 14px;
+  box-shadow: 3px 3px 0 rgba(28, 27, 25, 0.1);
+  padding: 24px 28px 26px;
+}
+.ms-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.ms-kind {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 11px;
+  border-radius: 20px;
+  border: 1.3px solid #1c1b19;
+  background: #1c1b19;
+  color: #fff;
+}
+.ms-kind.k-origin {
+  background: #fff;
+  color: #1c1b19;
+}
+.ms-meta {
+  font-size: 12px;
+  color: #8a8880;
+}
+.ms-title {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1c1b19;
+  margin-bottom: 12px;
+}
+.ms-body {
+  font-size: 16px;
+  line-height: 1.95;
+  color: #3f3e38;
+  white-space: pre-wrap;
+}
+.meme-inline {
+  color: #1c1b19;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.meme-inline:hover {
+  background: #1c1b19;
+  color: #fff;
+  text-decoration: none;
+}
+.ms-origin {
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1c1b19;
+  border: 1.3px dashed #1c1b19;
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: inline-block;
+}
+.ms-sources {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: #8a8880;
+}
+.ms-source a {
+  color: #1c1b19;
+}
+.ms-links {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ms-link {
+  text-align: left;
+  border: 1.5px solid #1c1b19;
+  background: #fff;
+  border-radius: 12px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+  min-width: 180px;
+  transition: transform 0.12s, box-shadow 0.12s;
+  box-shadow: 2px 2px 0 rgba(28, 27, 25, 0.08);
+}
+.ms-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 3px 4px 0 rgba(28, 27, 25, 0.16);
+}
+.ml-rel {
+  display: block;
+  font-size: 11px;
+  color: #8a8880;
+  margin-bottom: 2px;
+}
+.ml-text {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1c1b19;
+}
+.meme-tip {
+  max-width: 760px;
+  margin-top: 18px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #8a8880;
+}
+.meme-tip .meme-inline {
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* 成因推理 */
+.meme-quiz {
+  max-width: 760px;
+}
+.mq-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1c1b19;
+  margin-bottom: 20px;
+}
+.mq-sub {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b6a63;
+  margin-top: 6px;
+}
+.mq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.mq-factor {
+  text-align: left;
+  border: 1.5px solid #1c1b19;
+  background: #fff;
+  border-radius: 12px;
+  padding: 13px 15px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+}
+.mq-factor.on {
+  background: #1c1b19;
+  color: #fff;
+}
+.mqf-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.mqf-desc {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #7a7870;
+}
+.mq-factor.on .mqf-desc {
+  color: #cbcac4;
+}
+.mq-submit {
+  border: 1.5px solid #1c1b19;
+  background: #1c1b19;
+  color: #fff;
+  border-radius: 12px;
+  padding: 11px 26px;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+}
+.mq-submit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* 结局 */
+.meme-result {
+  max-width: 760px;
+}
+.mr-score {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1c1b19;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.mr-rate {
+  font-size: 15px;
+  color: #8a8880;
+}
+.mr-factors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.mr-chip {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1.3px solid #1c1b19;
+}
+.mr-chip.hit {
+  background: #1c1b19;
+  color: #fff;
+}
+.mr-chip.miss {
+  background: #fff;
+  color: #1c1b19;
+  border-style: dashed;
+}
+.mr-chip.over {
+  background: #fff;
+  color: #8a8880;
+  border-color: #b8b6ad;
+  text-decoration: line-through;
+}
+.mr-legend {
+  font-size: 12px;
+  color: #8a8880;
+  margin-bottom: 22px;
+}
+.mr-legend .lg-miss {
+  color: #55534b;
+}
+.mr-legend .lg-over {
+  color: #8a8880;
+}
+.mr-analysis {
+  background: #faf9f5;
+  border: 1.5px solid #1c1b19;
+  border-radius: 16px 12px 18px 12px;
+  padding: 20px 24px;
+  font-size: 15.5px;
+  line-height: 1.95;
+  color: #3f3e38;
+  margin-bottom: 22px;
+}
+.mra-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #1c1b19;
+  margin-bottom: 10px;
+}
+.mr-actions {
+  display: flex;
+  gap: 12px;
+}
+.mr-replay,
+.mr-exit {
+  border: 1.5px solid #1c1b19;
+  background: #fff;
+  color: #1c1b19;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+}
+.mr-replay:hover,
+.mr-exit:hover {
+  background: #1c1b19;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  #meme #side {
+    width: 150px;
+  }
+  #meme-main {
+    padding: 40px 18px 48px;
+  }
+}
