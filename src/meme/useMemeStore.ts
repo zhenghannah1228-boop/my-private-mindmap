@@ -10,9 +10,28 @@ import { deleteImage, newImageId, putImage } from '../core/imagedb';
 
 const IMPORT_KEY = 'mm_memes_imported';
 const PHOTO_KEY = 'mm_meme_photos'; // { "memeId:stationId": blobId }
+const NOTE_KEY = 'mm_meme_notes'; // { "memeId:stationId": text }
 
 export function photoKey(memeId: string, stationId: string): string {
   return memeId + ':' + stationId;
+}
+
+function loadNotes(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(NOTE_KEY);
+    const o = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    return o && typeof o === 'object' ? o : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveNotes(n: Record<string, string>) {
+  try {
+    localStorage.setItem(NOTE_KEY, JSON.stringify(n));
+  } catch {
+    /* ignore */
+  }
 }
 
 function loadPhotos(): Record<string, string> {
@@ -79,10 +98,13 @@ interface MemeStore {
   status: string;
   /** 用户给站点贴的真图:key=memeId:stationId → IndexedDB blobId(覆盖示意插画/url) */
   photos: Record<string, string>;
+  /** 用户给站点写的注释:key=memeId:stationId → 文本 */
+  notes: Record<string, string>;
 
   init: () => void;
   attachPhoto: (memeId: string, stationId: string, file: File) => Promise<void>;
   removePhoto: (memeId: string, stationId: string) => void;
+  setNote: (memeId: string, stationId: string, text: string) => void;
   selectMeme: (id: string) => void;
   exitMeme: () => void;
   goto: (stationId: string) => void;
@@ -107,6 +129,7 @@ export const useMemeStore = create<MemeStore>((set, get) => ({
   guess: [],
   status: '',
   photos: {},
+  notes: {},
 
   init() {
     if (get().loaded) return;
@@ -114,7 +137,17 @@ export const useMemeStore = create<MemeStore>((set, get) => ({
     const imported = loadImported();
     const builtinIds = new Set(BUILTIN_MEMES.map((m) => m.id));
     const memes = [...imported.filter((m) => !builtinIds.has(m.id)), ...BUILTIN_MEMES];
-    set({ memes, loaded: true, photos: loadPhotos() });
+    set({ memes, loaded: true, photos: loadPhotos(), notes: loadNotes() });
+  },
+
+  setNote(memeId, stationId, text) {
+    const key = photoKey(memeId, stationId);
+    const notes = { ...get().notes };
+    const clean = text.trim();
+    if (clean) notes[key] = clean;
+    else delete notes[key];
+    saveNotes(notes);
+    set({ notes });
   },
 
   async attachPhoto(memeId, stationId, file) {

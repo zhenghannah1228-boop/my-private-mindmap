@@ -161,6 +161,72 @@ function StationFigure({ meme, station }: { meme: Meme; station: Station }) {
   );
 }
 
+/** 站点注释:用户自己的批注,按站点存本地 */
+function StationNote({ meme, station }: { meme: Meme; station: Station }) {
+  const key = photoKey(meme.id, station.id);
+  const note = useMemeStore((s) => s.notes[key]);
+  const setNote = useMemeStore((s) => s.setNote);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const taRef = useRef<HTMLTextAreaElement>(null);
+
+  const startEdit = () => {
+    setDraft(note || '');
+    setEditing(true);
+  };
+  useEffect(() => {
+    if (editing) taRef.current?.focus();
+  }, [editing]);
+
+  const save = () => {
+    setNote(meme.id, station.id, draft);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="ms-note editing">
+        <textarea
+          ref={taRef}
+          className="ms-note-input"
+          value={draft}
+          placeholder="写下你的批注、疑问或补充……"
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) save();
+            else if (e.key === 'Escape') setEditing(false);
+          }}
+        />
+        <div className="ms-note-btns">
+          <button className="msn-save" onClick={save}>
+            保存
+          </button>
+          <button className="msn-cancel" onClick={() => setEditing(false)}>
+            取消
+          </button>
+          <span className="msn-hint">⌘/Ctrl+Enter 保存 · Esc 取消</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (note) {
+    return (
+      <div className="ms-note" onClick={startEdit} title="点击编辑注释">
+        <span className="msn-tag">我的注释</span>
+        <div className="msn-text">{note}</div>
+        <span className="msn-edit">编辑</span>
+      </div>
+    );
+  }
+
+  return (
+    <button className="ms-note-add" onClick={startEdit}>
+      ＋ 注释
+    </button>
+  );
+}
+
 function StationCard({ meme, station }: { meme: Meme; station: Station }) {
   const goto = useMemeStore((s) => s.goto);
   const isOrigin = station.id === meme.originId;
@@ -177,6 +243,8 @@ function StationCard({ meme, station }: { meme: Meme; station: Station }) {
       </div>
       <h3 className="ms-title">{station.title}</h3>
       <div className="ms-body">{renderBody(station.body, goto)}</div>
+
+      <StationNote meme={meme} station={station} />
 
       {isOrigin && <div className="ms-origin">✓ 你已溯源到这个迷因的起点</div>}
 
