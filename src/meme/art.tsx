@@ -112,6 +112,23 @@ function Nyan() {
   );
 }
 
+/** Pepe 青蛙脸:圆头 + 顶上大眼 + 标志性宽嘴唇 */
+function Pepe() {
+  return (
+    <Frame>
+      <path d="M44 58 C44 34 62 28 80 28 C98 28 116 34 116 58 C116 82 100 90 80 90 C60 90 44 82 44 58 Z" />
+      <circle cx="64" cy="42" r="12" />
+      <circle cx="96" cy="42" r="12" />
+      <circle cx="64" cy="45" r="3" fill="currentColor" />
+      <circle cx="96" cy="45" r="3" fill="currentColor" />
+      <path d="M54 40 Q64 32 74 40M86 40 Q96 32 106 40" />
+      <circle cx="76" cy="62" r="1.5" fill="currentColor" />
+      <circle cx="84" cy="62" r="1.5" fill="currentColor" />
+      <path d="M56 70 Q80 84 104 70M56 70 Q80 77 104 70" />
+    </Frame>
+  );
+}
+
 const ART: Record<string, () => ReactNode> = {
   doge: Doge,
   coin: Coin,
@@ -119,6 +136,7 @@ const ART: Record<string, () => ReactNode> = {
   play: Play,
   duck: Duck,
   nyan: Nyan,
+  pepe: Pepe,
 };
 
 export function StationArt({ art }: { art: string }) {

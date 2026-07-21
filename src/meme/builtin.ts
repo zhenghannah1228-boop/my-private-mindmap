@@ -336,4 +336,106 @@ const nyancat: Meme = {
     'Nyan Cat 的走红是一次完美的拼接:荒诞可爱的像素猫配上洗脑循环曲,无厘头的组合本身就抓人(反差意外),萌感与欢乐情绪一击即中(情绪强度);循环视频 / GIF 的形态天生适合在 YouTube 和网页里疯传(平台适配);而极简形象又给了网友无穷的二创空间——各种语言版、超长版、翻唱、小游戏层出不穷(可改编性)。十年后的 NFT 拍卖又给这个老梗续了一把火。',
 };
 
-export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat];
+const pepe: Meme = {
+  id: 'pepe',
+  title: 'Pepe the Frog(佩佩蛙)',
+  summary: '一只能表达任何情绪的绿青蛙,从「feels good man」的漫画,一路走到被挪用、被作者「杀死」、又被重新挪用。',
+  startId: 'now',
+  originId: 'comic',
+  stations: [
+    {
+      id: 'now',
+      kind: 'mutation',
+      art: 'pepe',
+      title: '万物皆可 Pepe',
+      date: '2015 起',
+      platform: '全网',
+      body: '一只绿色卡通青蛙,被画成各种表情——爽(feels good)、丧(feels bad)、得意、愤怒——成了万能的情绪反应图。但它的经历远比一张表情包复杂:它有一个[[comic|温和的漫画起点]],也卷进过[[controversy|一场巨大的争议]]。',
+      links: [
+        { to: 'feelsgood', rel: 'back', label: '它怎么传开的' },
+        { to: 'rare', rel: 'variant', label: '"rare Pepe" 是什么' },
+        { to: 'controversy', rel: 'forward', label: '它怎么卷入争议' },
+      ],
+    },
+    {
+      id: 'comic',
+      kind: 'origin',
+      art: 'pepe',
+      title: '起点:2005,《Boy’s Club》',
+      date: '2005',
+      platform: '漫画 / Myspace',
+      body: '源头是漫画家 Matt Furie 2005 年的漫画《Boy’s Club》。有一格里 Pepe 把裤子整个褪到脚踝上厕所,被问为什么,它答「feels good man」。正是这句[[feelsgood|「feels good man」]]日后被截成了反应图。',
+      links: [{ to: 'feelsgood', rel: 'forward', label: '它如何变成反应图' }],
+      sources: [{ label: 'Wikipedia: Pepe the Frog', url: 'https://en.wikipedia.org/wiki/Pepe_the_Frog' }],
+    },
+    {
+      id: 'feelsgood',
+      kind: 'spread',
+      art: 'pepe',
+      title: '「Feels Good Man」与它的表情家族',
+      date: '2008 起',
+      platform: '4chan / MySpace',
+      body: '2000 年代末,「feels good man」这格被单独截出,在 4chan 等论坛当反应图疯传;很快又衍生出丧脸「feels bad man」、得意脸、愤怒脸等一整个表情家族。可无限重画的特性,是它裂变的关键。它甚至催生了[[rare|"稀有 Pepe" 的收藏文化]]。',
+      links: [
+        { to: 'comic', rel: 'back', label: '这只青蛙哪来的' },
+        { to: 'rare', rel: 'forward', label: '"稀有 Pepe"' },
+      ],
+    },
+    {
+      id: 'rare',
+      kind: 'mutation',
+      art: 'pepe',
+      title: '2015:「稀有 Pepe」收藏热',
+      date: '2015–2016',
+      platform: '4chan / 区块链',
+      body: '网友开始把自制的 Pepe 变体当「收藏品」交换,戏称「rare Pepe(稀有佩佩)」,还半认真地在 eBay 挂牌。2016 年更出现了基于区块链的「Rare Pepe」卡牌,是最早的数字藏品实验之一。这份可无限二创的属性,也为它日后[[controversy|被各方挪用]]埋下伏笔。',
+      links: [
+        { to: 'feelsgood', rel: 'back', label: '回到表情家族' },
+        { to: 'controversy', rel: 'forward', label: '被卷入争议' },
+      ],
+    },
+    {
+      id: 'controversy',
+      kind: 'decline',
+      art: 'pepe',
+      title: '2016:被挪用,被列为仇恨符号',
+      date: '2016',
+      platform: '美国大选 / 网络',
+      body: '2016 年美国大选期间,Pepe 被部分极端网络群体挪用、与仇恨内容绑定。当年 9 月,反诽谤联盟(ADL)把它列入仇恨符号数据库——但同时明确指出,绝大多数 Pepe 的使用与仇恨无关。原作者对此深感痛心,于是有了[[killed|他亲手「杀死」Pepe]]。',
+      links: [
+        { to: 'rare', rel: 'back', label: '回到 rare Pepe' },
+        { to: 'killed', rel: 'forward', label: '作者的回应' },
+      ],
+      sources: [{ label: 'ADL: Pepe the Frog', url: 'https://www.adl.org/resources/hate-symbol/pepe-frog' }],
+    },
+    {
+      id: 'killed',
+      kind: 'mutation',
+      art: 'pepe',
+      title: '2017:作者亲手「杀死」Pepe',
+      date: '2017',
+      platform: '漫画 / 法律',
+      body: 'Matt Furie 2017 年画了一格让 Pepe「下葬」,象征性地终结它;并对多起仇恨或未授权的商业使用发起法律行动,试图夺回自己的角色。故事本可到此为止,但两年后它又[[reclaim|以另一种面貌复活]]。',
+      links: [
+        { to: 'controversy', rel: 'back', label: '回到争议' },
+        { to: 'reclaim', rel: 'forward', label: '它的复活' },
+      ],
+    },
+    {
+      id: 'reclaim',
+      kind: 'decline',
+      art: 'pepe',
+      title: '2019:在香港等语境被重新挪用',
+      date: '2019 / 2020',
+      platform: '街头 / 纪录片',
+      body: '2019 年,Pepe 在香港的抗议语境里被大量用作一个不带西方包袱的普通卡通形象,成了一次「再挪用」。2020 年纪录片《Feels Good Man》完整梳理了它从无害漫画到被争夺、再被重新赋义的全过程——一个空白模板可以被填进任何意义。',
+      links: [{ to: 'killed', rel: 'back', label: '回到作者的告别' }],
+      sources: [{ label: '纪录片《Feels Good Man》(2020)' }],
+    },
+  ],
+  factors: ['remix', 'emotion', 'ingroup', 'platform'],
+  analysis:
+    'Pepe 之所以成为迷因,核心是它几乎是一张「空白情绪模板」:同一张青蛙脸可以被重画成任何心情(可改编性),每一种表情都直击一种情绪(情绪强度);它长在 4chan 等图版的反应图文化里,是圈内人彼此确认的暗号(圈层信号),而反应图形态又与论坛/图版机制天然契合(平台适配)。也正因为它是一块可任意填意义的空白模板,才会在 2016 年被挪用、被列为仇恨符号,又能在 2019 年被重新赋予完全不同的含义——这既是它的生命力,也是它的争议根源。',
+};
+
+export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe];
