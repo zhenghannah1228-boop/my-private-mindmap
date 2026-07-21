@@ -129,6 +129,25 @@ function Pepe() {
   );
 }
 
+/** 暴躁猫:招牌的向下撇嘴 + 耷拉眼皮 */
+function Grumpy() {
+  return (
+    <Frame>
+      <path d="M52 34 L60 15 L74 37M108 34 L100 15 L86 37" />
+      <ellipse cx="80" cy="56" rx="40" ry="32" />
+      <circle cx="63" cy="51" r="6" />
+      <circle cx="97" cy="51" r="6" />
+      <circle cx="63" cy="52" r="2" fill="currentColor" />
+      <circle cx="97" cy="52" r="2" fill="currentColor" />
+      <path d="M54 47 Q63 42 72 48M88 48 Q97 42 106 47" />
+      <path d="M76 61 L84 61 L80 66 Z" />
+      <path d="M80 66 v5" />
+      <path d="M60 82 Q80 66 100 82" />
+      <path d="M40 56 h-15M40 63 h-15M120 56 h15M120 63 h15" />
+    </Frame>
+  );
+}
+
 const ART: Record<string, () => ReactNode> = {
   doge: Doge,
   coin: Coin,
@@ -137,6 +156,7 @@ const ART: Record<string, () => ReactNode> = {
   duck: Duck,
   nyan: Nyan,
   pepe: Pepe,
+  grumpy: Grumpy,
 };
 
 export function StationArt({ art }: { art: string }) {

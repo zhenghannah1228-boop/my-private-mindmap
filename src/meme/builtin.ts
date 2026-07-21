@@ -438,4 +438,90 @@ const pepe: Meme = {
     'Pepe 之所以成为迷因,核心是它几乎是一张「空白情绪模板」:同一张青蛙脸可以被重画成任何心情(可改编性),每一种表情都直击一种情绪(情绪强度);它长在 4chan 等图版的反应图文化里,是圈内人彼此确认的暗号(圈层信号),而反应图形态又与论坛/图版机制天然契合(平台适配)。也正因为它是一块可任意填意义的空白模板,才会在 2016 年被挪用、被列为仇恨符号,又能在 2019 年被重新赋予完全不同的含义——这既是它的生命力,也是它的争议根源。',
 };
 
-export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe];
+const grumpycat: Meme = {
+  id: 'grumpycat',
+  title: 'Grumpy Cat(暴躁猫)',
+  summary: '一只天生「臭脸」的猫 Tardar Sauce,一张 Reddit 照片让它成了全网的坏心情代言人。',
+  startId: 'now',
+  originId: 'reddit',
+  stations: [
+    {
+      id: 'now',
+      kind: 'mutation',
+      art: 'grumpy',
+      title: '全网的坏心情代言人',
+      date: '2012 起',
+      platform: '全网',
+      body: '一张永远撇着嘴、一脸嫌弃的猫脸,配上「NO」「我开心过一次,糟透了」之类的毒舌配字,成了表达坏心情的万能表情包。这张脸其实来自一只真实的猫——它[[reddit|第一次出现]]时,大家还以为是 P 的。',
+      links: [
+        { to: 'real', rel: 'back', label: '它是真猫吗' },
+        { to: 'peak', rel: 'forward', label: '它怎么火成现象的' },
+      ],
+    },
+    {
+      id: 'reddit',
+      kind: 'origin',
+      art: 'grumpy',
+      title: '起点:2012.09,一张 Reddit 照片',
+      date: '2012.09',
+      platform: 'Reddit',
+      body: '2012 年 9 月,Bryan Bundesen 把姐姐 Tabatha 养的猫「Tardar Sauce」的照片发到 Reddit。它天生的臭脸表情瞬间引爆热度。可当时很多人[[real|不相信这是真的]]。',
+      links: [{ to: 'real', rel: 'forward', label: '大家以为是P图' }],
+      sources: [{ label: 'Wikipedia: Grumpy Cat', url: 'https://en.wikipedia.org/wiki/Grumpy_Cat' }],
+    },
+    {
+      id: 'real',
+      kind: 'spread',
+      art: 'grumpy',
+      title: '「这猫是真的」+ 表情包量产',
+      date: '2012.09',
+      platform: 'Reddit / 全网',
+      body: '网友怀疑照片是 P 的,主人于是发了更多照片、视频自证——那张臭脸是猫的侏儒症与地包天造成的,真实存在。真相反而助推了热度,毒舌配字的表情包开始量产。它很快[[peak|火成了现象级]]。',
+      links: [
+        { to: 'reddit', rel: 'back', label: '第一张照片' },
+        { to: 'peak', rel: 'forward', label: '现象级爆红' },
+      ],
+    },
+    {
+      id: 'peak',
+      kind: 'peak',
+      art: 'grumpy',
+      title: '2013:年度迷因',
+      date: '2013',
+      platform: '全网 / 线下',
+      body: '2013 年,Grumpy Cat 成为现象级迷因:拿下当年 Webby 奖「年度迷因」,亮相 SXSW,登上各种媒体。它不再只是表情包,而是一个真正的[[empire|商业 IP]]。',
+      links: [
+        { to: 'empire', rel: 'forward', label: '它的商业帝国' },
+        { to: 'real', rel: 'back', label: '回到它爆红之初' },
+      ],
+    },
+    {
+      id: 'empire',
+      kind: 'mutation',
+      art: 'grumpy',
+      title: '从表情包到商业 IP',
+      date: '2013–2018',
+      platform: '出版 / 影视 / 商业',
+      body: '主人成立 Grumpy Cat 有限公司,出书、卖周边,2014 年还拍了一部电视电影《Grumpy Cat’s Worst Christmas Ever》;2018 年公司还打赢了一场商标侵权官司获赔数十万美元。一张臭脸变成了一门生意。',
+      links: [
+        { to: 'peak', rel: 'back', label: '回到现象级时刻' },
+        { to: 'death', rel: 'forward', label: '故事的结尾' },
+      ],
+    },
+    {
+      id: 'death',
+      kind: 'decline',
+      art: 'grumpy',
+      title: '2019:Tardar Sauce 离世',
+      date: '2019.05',
+      platform: '全网悼念',
+      body: '2019 年 5 月,Tardar Sauce 因病离世,享年七岁。全网集体悼念这只「不开心」却给无数人带来快乐的猫。它的臭脸表情,至今仍是坏心情的通用语言。',
+      links: [{ to: 'empire', rel: 'back', label: '回到它的巅峰' }],
+    },
+  ],
+  factors: ['emotion', 'remix', 'incongruity', 'platform'],
+  analysis:
+    'Grumpy Cat 的走红,首先赢在一张脸就是一种情绪:那副天生的臭脸精准对应了人人都有的坏心情与厌世感(情绪强度),可爱的猫却永远一脸嫌弃,这种反差本身就抓人(反差意外)。它是标准的图片表情包(image macro),谁都能套上一句毒舌配字(可改编性);而它诞生并疯传于 Reddit 的表情包文化,形态与平台机制完美契合(平台适配)。真实存在、又被精心运营成 IP,让它从一张图长成了持续多年的现象。',
+};
+
+export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe, grumpycat];
