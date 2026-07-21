@@ -524,4 +524,91 @@ const grumpycat: Meme = {
     'Grumpy Cat 的走红,首先赢在一张脸就是一种情绪:那副天生的臭脸精准对应了人人都有的坏心情与厌世感(情绪强度),可爱的猫却永远一脸嫌弃,这种反差本身就抓人(反差意外)。它是标准的图片表情包(image macro),谁都能套上一句毒舌配字(可改编性);而它诞生并疯传于 Reddit 的表情包文化,形态与平台机制完美契合(平台适配)。真实存在、又被精心运营成 IP,让它从一张图长成了持续多年的现象。',
 };
 
-export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe, grumpycat];
+const duang: Meme = {
+  id: 'duang',
+  title: 'duang(成龙 · 霸王广告)',
+  summary: '一个没有确切意思却极其传神的拟声词,来自成龙十年前的洗发水广告,被 B 站鬼畜翻红、一夜刷屏微博。',
+  startId: 'now',
+  originId: 'ad',
+  stations: [
+    {
+      id: 'now',
+      kind: 'mutation',
+      art: 'play',
+      title: '「duang」是什么意思?',
+      date: '2015 起',
+      platform: '全网',
+      body: '「duang」是一个没有确切意思、却极其传神的拟声词——形容某种「唰地一下、特效加满」的效果,网友还生造了一个字:把「成龙」的「成」摞在「龙」上来写它。它其实来自一支[[ad|十年前的洗发水广告]]。',
+      links: [
+        { to: 'viral', rel: 'back', label: '它怎么突然爆红' },
+        { to: 'ad', rel: 'variant', label: '那支老广告' },
+      ],
+    },
+    {
+      id: 'ad',
+      kind: 'origin',
+      art: 'play',
+      title: '起点:2004,成龙的霸王洗发水广告',
+      date: '2004',
+      platform: '电视广告',
+      body: '「duang」最早出自成龙 2004 年代言的霸王防脱洗发水广告。他描述头发加了特效后「很黑、很亮、很柔」,并用一声「duang~」来形容那种唰地一下的效果。这个拟声词当时并不起眼,直到[[remix|十年后被网友翻出来]]。',
+      links: [
+        { to: 'remix', rel: 'forward', label: '十年后被翻红' },
+        { to: 'bawang', rel: 'variant', label: '这广告的黑历史' },
+      ],
+      sources: [{ label: 'Wikipedia: Duang', url: 'https://en.wikipedia.org/wiki/Duang' }],
+    },
+    {
+      id: 'bawang',
+      kind: 'spread',
+      art: 'play',
+      title: '广告的黑历史:霸王风波',
+      date: '2010',
+      platform: '新闻',
+      body: '这支广告后来变得有点尴尬:2010 年有报道质疑霸王洗发水含有争议成分二噁烷,品牌陷入风波、销量下滑(公司当时予以否认)。多年后老广告被翻出来玩梗,也就多了一层反差意味。',
+      links: [{ to: 'ad', rel: 'back', label: '回到那支广告' }],
+    },
+    {
+      id: 'remix',
+      kind: 'spread',
+      art: 'play',
+      title: '2015.02:B 站鬼畜把它翻出来',
+      date: '2015.02',
+      platform: '哔哩哔哩',
+      body: '2015 年 2 月,有网友把这支老广告做成鬼畜视频,和庞麦郎的《我的滑板鞋》混剪在一起,把「duang」这个音单独拎出来反复循环。魔性的节奏让它一夜之间被无数人记住,并很快[[viral|冲上微博刷屏]]。',
+      links: [
+        { to: 'ad', rel: 'back', label: 'duang 最早哪来的' },
+        { to: 'viral', rel: 'forward', label: '它如何刷屏' },
+      ],
+    },
+    {
+      id: 'viral',
+      kind: 'peak',
+      art: 'play',
+      title: '2015.02:微博刷屏,生造一个字',
+      date: '2015.02',
+      platform: '微博',
+      body: '几天内「duang」在微博被刷了上千万次,网友还生造了一个字——把「成龙」的「成」摞在「龙」上来写它;成龙本人的微博评论区被「duang」淹没,连 BBC、卫报等外媒都来报道这个「无法翻译的中国网络词」。',
+      links: [
+        { to: 'remix', rel: 'back', label: '谁把它翻出来的' },
+        { to: 'decline', rel: 'forward', label: '后来呢' },
+      ],
+      sources: [{ label: 'BBC / The Guardian 2015 报道' }],
+    },
+    {
+      id: 'decline',
+      kind: 'decline',
+      art: 'play',
+      title: '热潮退去,沉淀成网络词',
+      date: '2015 起',
+      platform: '全网',
+      body: '作为一阵爆发式的流行,「duang」的热度很快回落,但它留在了中文网络的词库里——形容「特效感、突然一下」时,大家仍会甩出一个「duang」。',
+      links: [{ to: 'viral', rel: 'back', label: '回到刷屏时刻' }],
+    },
+  ],
+  factors: ['remix', 'platform', 'amplifier', 'incongruity', 'ingroup'],
+  analysis:
+    '「duang」的爆红是一次典型的鬼畜造梗:一段十年前广告里的无意义拟声词,被 B 站的鬼畜二创重新拼贴、循环放大(可改编性 + 平台适配),魔性到让人过耳不忘。它自带反差——严肃老广告 × 无厘头音效(反差意外);而故事的中心是成龙这样的顶级明星,天然带来话题与媒体放大(大V助推)。它也深植于中文网络的鬼畜/弹幕亚文化,是圈内人心照不宣的暗号(圈层信号)。',
+};
+
+export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe, grumpycat, duang];
