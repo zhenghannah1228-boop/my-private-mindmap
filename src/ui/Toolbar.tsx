@@ -12,19 +12,23 @@ import { fitToNodes } from '../core/viewport';
 import type { ColorIndex } from '../core/types';
 import { useSizeStore } from '../store/useSizeStore';
 import { useStore } from '../store/useStore';
+import { importImageAsSticker } from './stickerActions';
 
 export function Toolbar() {
   const selectedId = useStore((s) => s.ui.selectedId);
   const filterMode = useStore((s) => s.ui.filterMode);
   const placeMode = useStore((s) => s.ui.placeMode);
+  const autoCutout = useStore((s) => s.ui.autoCutout);
   const nodes = useStore((s) => s.doc.nodes);
   const setNodeColor = useStore((s) => s.setNodeColor);
   const setNodeDue = useStore((s) => s.setNodeDue);
   const setFilter = useStore((s) => s.setFilter);
   const setPlaceMode = useStore((s) => s.setPlaceMode);
+  const setAutoCutout = useStore((s) => s.setAutoCutout);
   const replaceLibrary = useStore((s) => s.replaceLibrary);
   const searchQuery = useStore((s) => s.ui.searchQuery);
   const setSearchQuery = useStore((s) => s.setSearchQuery);
+  const imgRef = useRef<HTMLInputElement>(null);
 
   // 回车:把视口聚焦到命中的节点
   const fitToMatches = () => {
@@ -102,6 +106,32 @@ export function Toolbar() {
           ＋节点
         </button>
         <button onClick={openDue}>设时间</button>
+        <div className="sep" />
+        <button title="上传图片(可自动抠图变贴画)。也可直接 Ctrl/⌘+V 粘贴" onClick={() => imgRef.current?.click()}>
+          贴图
+        </button>
+        <button
+          className={autoCutout ? 'on' : ''}
+          title="上传/粘贴后自动抠图变贴画(本地推理,图片不外传)"
+          onClick={() => setAutoCutout(!autoCutout)}
+        >
+          自动抠图
+        </button>
+        <input
+          ref={imgRef}
+          type="file"
+          accept="image/*"
+          multiple
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const files = e.target.files;
+            if (files) {
+              for (const f of files) void importImageAsSticker(f, { autoCutout: useStore.getState().ui.autoCutout });
+            }
+            e.target.value = '';
+          }}
+        />
+        <div className="sep" />
         <button className={filterMode === 'time' ? 'on' : ''} onClick={() => setFilter(filterMode === 'time' ? null : 'time')}>
           时间轴
         </button>

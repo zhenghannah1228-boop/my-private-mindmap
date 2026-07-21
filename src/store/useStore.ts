@@ -16,17 +16,24 @@ import {
   makeEdge,
   makeNode,
   makeSpace,
+  makeSticker,
   normalizeLibrary,
   removeNode,
+  removeSticker,
 } from '../core/model';
+import { deleteImage } from '../core/imagedb';
 import { fitToNodes, type Rect } from '../core/viewport';
 import { loadLibrary, loadSyncKey } from '../core/storage';
-import type { ColorIndex, Doc, Library, MindNode, Space, View } from '../core/types';
+import type { ColorIndex, Doc, Library, MindNode, Space, Sticker, View } from '../core/types';
 import type { FilterMode } from '../core/filter';
 
 export interface UiState {
   selectedId: number | null;
   editingId: number | null;
+  /** 选中的贴画 id;与节点选中互斥 */
+  selectedStickerId: number | null;
+  /** 正在裁剪的贴画 id;null = 无 */
+  croppingStickerId: number | null;
   filterMode: FilterMode;
   linkingFrom: number | null;
   placeMode: boolean;
@@ -34,6 +41,8 @@ export interface UiState {
   renamingSpaceId: string | null;
   /** 节点搜索关键词;非空时高亮命中、其余降透明度 */
   searchQuery: string;
+  /** 上传/粘贴图片时是否自动抠图变贴画 */
+  autoCutout: boolean;
   syncKey: string;
   syncMsg: string;
   autoSync: boolean;
@@ -59,6 +68,16 @@ export interface Store {
   addEdge: (a: number, b: number) => void;
   deleteEdge: (id: number) => void;
 
+  // ── 贴画(图片)──
+  addSticker: (x: number, y: number, w: number, h: number, blobId: string, extra?: Partial<Sticker>) => number;
+  moveSticker: (id: number, x: number, y: number) => void;
+  resizeSticker: (id: number, x: number, y: number, w: number, h: number) => void;
+  setStickerCrop: (id: number, crop: { x: number; y: number; w: number; h: number }, w: number, h: number) => void;
+  markStickerCutout: (id: number) => void;
+  deleteSticker: (id: number) => void;
+  selectSticker: (id: number | null) => void;
+  setCropping: (id: number | null) => void;
+
   // ── 视口 ──
   setView: (v: View) => void;
   fit: (rect: Rect, sizes?: Map<number, { w: number; h: number }>) => void;
@@ -79,6 +98,7 @@ export interface Store {
   setFilter: (mode: FilterMode) => void;
   setLinkingFrom: (id: number | null) => void;
   setPlaceMode: (on: boolean) => void;
+  setAutoCutout: (on: boolean) => void;
   setSyncKey: (k: string) => void;
   setSyncMsg: (m: string) => void;
   setAutoSync: (on: boolean) => void;
@@ -96,11 +116,14 @@ function baseUi(): UiState {
   return {
     selectedId: null,
     editingId: null,
+    selectedStickerId: null,
+    croppingStickerId: null,
     filterMode: null,
     linkingFrom: null,
     placeMode: false,
     renamingSpaceId: null,
     searchQuery: '',
+    autoCutout: true,
     syncKey: loadSyncKey(),
     syncMsg: '同一同步码 = 同一份数据。手机上填相同的码即可打通。',
     autoSync: false,
@@ -121,6 +144,8 @@ function resetTransientUi(ui: UiState): UiState {
     ...ui,
     selectedId: null,
     editingId: null,
+    selectedStickerId: null,
+    croppingStickerId: null,
     linkingFrom: null,
     placeMode: false,
     filterMode: null,
@@ -184,6 +209,77 @@ export const useStore = create<Store>((set, get) => ({
   deleteEdge(id) {
     const doc = get().doc;
     set({ doc: { ...doc, edges: doc.edges.filter((e) => e.id !== id) } });
+  },
+
+  // ── 贴画 ──
+  addSticker(x, y, w, h, blobId, extra = {}) {
+    const doc = get().doc;
+    const sticker = makeSticker(doc, x, y, w, h, blobId, extra);
+    set({
+      doc: { ...doc, stickers: [...(doc.stickers || []), sticker], sid: (doc.sid ?? 1) + 1 },
+      ui: { ...get().ui, selectedStickerId: sticker.id, selectedId: null, editingId: null },
+    });
+    return sticker.id;
+  },
+
+  moveSticker(id, x, y) {
+    const doc = get().doc;
+    set({
+      doc: { ...doc, stickers: (doc.stickers || []).map((s) => (s.id === id ? { ...s, x, y } : s)) },
+    });
+  },
+
+  resizeSticker(id, x, y, w, h) {
+    const doc = get().doc;
+    set({
+      doc: {
+        ...doc,
+        stickers: (doc.stickers || []).map((s) => (s.id === id ? { ...s, x, y, w, h } : s)),
+      },
+    });
+  },
+
+  setStickerCrop(id, crop, w, h) {
+    const doc = get().doc;
+    set({
+      doc: {
+        ...doc,
+        stickers: (doc.stickers || []).map((s) => (s.id === id ? { ...s, crop, w, h } : s)),
+      },
+    });
+  },
+
+  markStickerCutout(id) {
+    const doc = get().doc;
+    set({
+      doc: {
+        ...doc,
+        stickers: (doc.stickers || []).map((s) => (s.id === id ? { ...s, cutout: true } : s)),
+      },
+    });
+  },
+
+  deleteSticker(id) {
+    const doc = { ...get().doc, stickers: [...(get().doc.stickers || [])] };
+    const blobId = removeSticker(doc, id);
+    if (blobId) void deleteImage(blobId);
+    const ui = get().ui;
+    set({
+      doc,
+      ui: {
+        ...ui,
+        selectedStickerId: ui.selectedStickerId === id ? null : ui.selectedStickerId,
+        croppingStickerId: ui.croppingStickerId === id ? null : ui.croppingStickerId,
+      },
+    });
+  },
+
+  selectSticker(id) {
+    set({ ui: { ...get().ui, selectedStickerId: id, selectedId: null, editingId: null, croppingStickerId: null } });
+  },
+
+  setCropping(id) {
+    set({ ui: { ...get().ui, croppingStickerId: id } });
   },
 
   setView(v) {
@@ -261,7 +357,8 @@ export const useStore = create<Store>((set, get) => ({
 
   // ── UI ──
   select(id) {
-    set({ ui: { ...get().ui, selectedId: id } });
+    // 选中节点(或点空白)时清掉贴画选中/裁剪,保持二者互斥
+    set({ ui: { ...get().ui, selectedId: id, selectedStickerId: null, croppingStickerId: null } });
   },
   setEditing(id) {
     set({ ui: { ...get().ui, editingId: id } });
@@ -274,6 +371,9 @@ export const useStore = create<Store>((set, get) => ({
   },
   setPlaceMode(on) {
     set({ ui: { ...get().ui, placeMode: on } });
+  },
+  setAutoCutout(on) {
+    set({ ui: { ...get().ui, autoCutout: on } });
   },
   setSyncKey(k) {
     set({ ui: { ...get().ui, syncKey: k } });

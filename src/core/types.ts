@@ -36,6 +36,28 @@ export interface Edge {
   ct: number;
 }
 
+/**
+ * 图片贴画。可粘贴 / 上传,自由摆放、缩放、裁剪,上传后可自动抠图变贴画。
+ * 真正的图片二进制存在 IndexedDB(键=blobId),这里只存元数据 —— 与书籍一致,
+ * 避免把大图塞进 localStorage / 云同步。跨端只同步元数据,图片留在本地。
+ */
+export interface Sticker {
+  id: number;
+  /** 世界坐标(左上角) */
+  x: number;
+  y: number;
+  /** 显示尺寸(世界像素) */
+  w: number;
+  h: number;
+  /** IndexedDB 里的图片 blob 键 */
+  blobId: string;
+  /** 裁剪区域,归一化 0–1(相对原图);缺省=整图 */
+  crop?: { x: number; y: number; w: number; h: number };
+  /** 是否已抠图(透明背景),渲染时加投影做「贴画」效果 */
+  cutout?: boolean;
+  ct: number;
+}
+
 export interface InboxItem {
   t: string;
   ct: number;
@@ -46,10 +68,14 @@ export interface Doc {
   nodes: MindNode[];
   edges: Edge[];
   inbox: InboxItem[];
+  /** 图片贴画(老数据无此字段=空) */
+  stickers?: Sticker[];
   /** 节点自增 ID 游标 */
   nid: number;
   /** 边自增 ID 游标 */
   eid: number;
+  /** 贴画自增 ID 游标(老数据无=1) */
+  sid?: number;
 }
 
 export interface View {

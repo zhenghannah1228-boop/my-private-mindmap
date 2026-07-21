@@ -361,6 +361,142 @@ svg#edges {
   border-color: #1c1b19;
 }
 
+/* ── 图片贴画 ── */
+.sticker {
+  position: absolute;
+  box-sizing: border-box;
+  touch-action: none;
+  cursor: move;
+}
+.sticker-clip {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+}
+/* 普通图片:白底细黑框,像一张照片贴上去 */
+.sticker:not(.cut) .sticker-clip {
+  background: #fff;
+  border: 1.3px solid #1c1b19;
+  box-shadow: 3px 3px 0 rgba(28, 27, 25, 0.12);
+}
+/* 抠图贴画:透明背景 + 柔和投影,浮在画布上 */
+.sticker.cut .sticker-clip {
+  overflow: visible;
+  filter: drop-shadow(2px 3px 2px rgba(28, 27, 25, 0.35));
+}
+.sticker.dim {
+  opacity: 0.3;
+}
+.sticker.sel .sticker-clip {
+  outline: 2px solid #1c1b19;
+  outline-offset: 1px;
+}
+.sticker-loading {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(45deg, #f0efe9, #f0efe9 8px, #e4e2da 8px, #e4e2da 16px);
+}
+.sk-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 1.5px solid #1c1b19;
+  border-radius: 2px;
+  z-index: 3;
+}
+.sk-handle.tl { left: -6px; top: -6px; cursor: nwse-resize; }
+.sk-handle.tr { right: -6px; top: -6px; cursor: nesw-resize; }
+.sk-handle.bl { left: -6px; bottom: -6px; cursor: nesw-resize; }
+.sk-handle.br { right: -6px; bottom: -6px; cursor: nwse-resize; }
+.sk-del,
+.sk-crop {
+  position: absolute;
+  z-index: 4;
+  border: 1.5px solid #1c1b19;
+  background: #fff;
+  color: #1c1b19;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  font-family: var(--font-hand), sans-serif;
+}
+.sk-del {
+  top: -12px;
+  right: -12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  padding: 0;
+}
+.sk-del:hover {
+  background: #1c1b19;
+  color: #fff;
+}
+.sk-crop {
+  bottom: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+.sk-crop:hover {
+  background: #1c1b19;
+  color: #fff;
+}
+/* 裁剪浮层 */
+.crop-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 5;
+}
+.crop-rect {
+  position: absolute;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 9999px rgba(20, 19, 17, 0.5);
+  cursor: move;
+}
+.crop-h {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 1.5px solid #1c1b19;
+  border-radius: 2px;
+}
+.crop-h.tl { left: -6px; top: -6px; cursor: nwse-resize; }
+.crop-h.tr { right: -6px; top: -6px; cursor: nesw-resize; }
+.crop-h.bl { left: -6px; bottom: -6px; cursor: nesw-resize; }
+.crop-h.br { right: -6px; bottom: -6px; cursor: nwse-resize; }
+.crop-actions {
+  position: absolute;
+  left: 50%;
+  bottom: -34px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 6;
+}
+.crop-actions button {
+  border: 1.5px solid #1c1b19;
+  background: #fff;
+  color: #1c1b19;
+  border-radius: 12px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+  white-space: nowrap;
+}
+.crop-actions .crop-ok {
+  background: #1c1b19;
+  color: #fff;
+}
+
 /* ── 工具栏 ── */
 #bar {
   position: absolute;

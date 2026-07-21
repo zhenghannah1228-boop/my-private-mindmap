@@ -18,9 +18,14 @@ export function MindMap() {
       const t = e.target as HTMLElement;
       if (t.tagName === 'INPUT' || t.isContentEditable) return;
       const st = useStore.getState();
-      if ((e.key === 'Delete' || e.key === 'Backspace') && st.ui.selectedId != null) {
-        e.preventDefault();
-        st.deleteNode(st.ui.selectedId);
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (st.ui.selectedStickerId != null) {
+          e.preventDefault();
+          st.deleteSticker(st.ui.selectedStickerId);
+        } else if (st.ui.selectedId != null) {
+          e.preventDefault();
+          st.deleteNode(st.ui.selectedId);
+        }
       }
     };
     window.addEventListener('keydown', onKey);
@@ -48,7 +53,7 @@ export function MindMap() {
         <div id="hint">
           双击空白=新节点 · 拖端口/长按节点=连线 · Del=删除
           <br />
-          双指捏合缩放 · 滚轮缩放 · 拖空白平移
+          双指捏合缩放 · 滚轮缩放 · 拖空白平移 · ⌘/Ctrl+V 或「贴图」加图片
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@
  * 这里的函数都是纯函数,不改动全局状态 —— ID 游标由 store 统一管理。
  */
 
-import type { ColorIndex, Doc, Edge, InboxItem, Library, MindNode, Space, View } from './types';
+import type { ColorIndex, Doc, Edge, InboxItem, Library, MindNode, Space, Sticker, View } from './types';
 
 /** 颜色索引 → 语义。UI 不强制含义,由用户自己约定,默认建议如下 */
 export const COLORS: { i: ColorIndex; bg: string; border: string; hint: string }[] = [
@@ -29,9 +29,9 @@ export const ZOOM_MAX = 2.5;
 /** 气泡形状数量(对应 CSS 的 .node.shape-0 … shape-N) */
 export const NODE_SHAPES = 8;
 
-/** 空文档。nid/eid 从 1 开始,0 保留为「无」 */
+/** 空文档。nid/eid/sid 从 1 开始,0 保留为「无」 */
 export function emptyDoc(): Doc {
-  return { nodes: [], edges: [], inbox: [], nid: 1, eid: 1 };
+  return { nodes: [], edges: [], inbox: [], stickers: [], nid: 1, eid: 1, sid: 1 };
 }
 
 /** 兼容 v1 的裸字符串 inbox */
@@ -82,9 +82,26 @@ export function normalizeDoc(raw: Partial<Doc> | null | undefined): Doc {
 
   doc.edges = (doc.edges || []) as Edge[];
 
+  // 贴画(老数据无此字段=空)。补默认、过滤缺 blob 的脏数据
+  const rawStickers = (doc.stickers || []) as Partial<Sticker>[];
+  doc.stickers = rawStickers
+    .filter((s) => typeof s.blobId === 'string' && s.blobId)
+    .map((s) => ({
+      id: s.id ?? 0,
+      x: s.x ?? 0,
+      y: s.y ?? 0,
+      w: s.w ?? 160,
+      h: s.h ?? 160,
+      blobId: s.blobId as string,
+      ct: s.ct ?? 0,
+      ...(s.crop ? { crop: s.crop } : {}),
+      ...(s.cutout ? { cutout: true } : {}),
+    }));
+
   // 防御:ID 游标可能落后于实际数据(手动导入外部 JSON 时会发生)
   doc.nid = Math.max(doc.nid || 1, ...doc.nodes.map((n) => n.id + 1), 1);
   doc.eid = Math.max(doc.eid || 1, ...doc.edges.map((e) => e.id + 1), 1);
+  doc.sid = Math.max(doc.sid || 1, ...doc.stickers.map((s) => s.id + 1), 1);
 
   return doc;
 }
@@ -112,6 +129,25 @@ export function makeNode(
 
 export function makeEdge(doc: Doc, a: number, b: number): Edge {
   return { id: doc.eid, a, b, ct: Date.now() };
+}
+
+export function makeSticker(
+  doc: Doc,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  blobId: string,
+  extra: Partial<Sticker> = {}
+): Sticker {
+  return { id: doc.sid ?? 1, x, y, w, h, blobId, ct: Date.now(), ...extra };
+}
+
+/** 删除贴画(返回被删对象的 blobId,供上层清理 IndexedDB) */
+export function removeSticker(doc: Doc, id: number): string | null {
+  const s = (doc.stickers || []).find((k) => k.id === id) || null;
+  doc.stickers = (doc.stickers || []).filter((k) => k.id !== id);
+  return s ? s.blobId : null;
 }
 
 // ─────────────────────────────────────────────────────────────
