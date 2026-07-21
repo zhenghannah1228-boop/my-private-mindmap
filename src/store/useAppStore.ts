@@ -5,13 +5,15 @@
 
 import { create } from 'zustand';
 
-export type AppMode = 'reading' | 'mindmap';
+export type AppMode = 'reading' | 'discover' | 'mindmap';
 
 const MODE_KEY = 'mm_mode';
 
 function loadMode(): AppMode {
   try {
-    return localStorage.getItem(MODE_KEY) === 'mindmap' ? 'mindmap' : 'reading';
+    const m = localStorage.getItem(MODE_KEY);
+    if (m === 'mindmap' || m === 'discover') return m;
+    return 'reading';
   } catch {
     return 'reading';
   }

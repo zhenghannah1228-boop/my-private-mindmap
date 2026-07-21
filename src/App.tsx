@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { MindMap } from './ui/MindMap';
 import { ReadingLibrary } from './reading/ReadingLibrary';
+import { Discover } from './discover/Discover';
 import { installPersistence } from './store/persist';
 import { useAppStore } from './store/useAppStore';
 
@@ -16,6 +17,9 @@ function ModeSwitch() {
     <div id="modeswitch">
       <button className={mode === 'reading' ? 'on' : ''} onClick={() => setMode('reading')}>
         阅读
+      </button>
+      <button className={mode === 'discover' ? 'on' : ''} onClick={() => setMode('discover')}>
+        发现
       </button>
       <button className={mode === 'mindmap' ? 'on' : ''} onClick={() => setMode('mindmap')}>
         思维导图
@@ -33,7 +37,7 @@ export default function App() {
   return (
     <>
       <ModeSwitch />
-      {mode === 'reading' ? <ReadingLibrary /> : <MindMap />}
+      {mode === 'reading' ? <ReadingLibrary /> : mode === 'discover' ? <Discover /> : <MindMap />}
     </>
   );
 }

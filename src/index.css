@@ -694,6 +694,120 @@ svg#edges {
   background: linear-gradient(150deg, #545a63, #454a53);
 }
 
+/* ── 每日发现 ── */
+#discover {
+  display: flex;
+  height: 100%;
+}
+#discover #side {
+  width: 210px;
+}
+#discover-foot {
+  border-top: 1px solid #d3d1c7;
+  padding: 10px 12px;
+}
+.collect-btn {
+  width: 100%;
+  padding: 9px;
+  border: 1px solid #534ab7;
+  background: #534ab7;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+}
+.collect-btn:hover {
+  background: #453da0;
+}
+#discover-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 26px 40px;
+}
+.feed {
+  columns: 300px 3;
+  column-gap: 18px;
+}
+.feed-card {
+  break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e6e3da;
+  border-radius: 10px;
+  padding: 14px 16px 15px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 3px rgba(40, 34, 24, 0.05);
+}
+.feed-card:hover {
+  border-color: #d3d1c7;
+  box-shadow: 0 3px 10px rgba(40, 34, 24, 0.08);
+}
+.fc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.fc-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #f1efe8;
+  color: #5f5e5a;
+}
+.fc-date {
+  font-size: 10px;
+  color: #b0aea5;
+}
+.fc-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #2c2c2a;
+  margin-bottom: 6px;
+}
+.fc-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #47463f;
+  white-space: pre-wrap;
+}
+.fc-source {
+  margin-top: 9px;
+  font-size: 11px;
+}
+.fc-source a {
+  color: #534ab7;
+  text-decoration: none;
+}
+.fc-source a:hover {
+  text-decoration: underline;
+}
+.fc-source span {
+  color: #a8a69e;
+}
+/* 类别标签配色 */
+.tag-0 { background: #efe9d6; color: #8a6d2f; }
+.tag-1 { background: #e6e0f0; color: #5a4a86; }
+.tag-2 { background: #e1eef7; color: #35618a; }
+.tag-3 { background: #e2f1e9; color: #37734f; }
+.tag-4 { background: #f7e6ea; color: #8a3550; }
+.tag-5 { background: #e0eff0; color: #2f7073; }
+.tag-6 { background: #f7ede1; color: #8a5a34; }
+.tag-7 { background: #eee7d6; color: #7a5f2f; }
+
+@media (max-width: 640px) {
+  .feed {
+    columns: 1;
+  }
+  #discover #side {
+    width: 150px;
+  }
+}
+
 /* ── 阅读器(护眼) ── */
 #reader {
   position: fixed;
