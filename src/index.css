@@ -68,7 +68,7 @@ body {
 #quick button {
   padding: 8px 12px;
   border: none;
-  background: #534ab7;
+  background: #1c1b19;
   color: #fff;
   border-radius: 6px;
   cursor: pointer;
@@ -109,7 +109,7 @@ body {
   background: #e9e6dd;
 }
 .navitem.on {
-  background: #534ab7;
+  background: #1c1b19;
   color: #fff;
 }
 .navitem .nm {
@@ -127,7 +127,7 @@ body {
   border-radius: 10px;
 }
 .navitem.on .cnt {
-  color: #e7e4ff;
+  color: #ffffff;
   background: rgba(255, 255, 255, 0.18);
 }
 .navitem .del {
@@ -142,7 +142,7 @@ body {
   opacity: 1;
 }
 .navitem.on .del {
-  color: #d8d5f2;
+  color: rgba(255, 255, 255, 0.8);
   opacity: 0.85;
 }
 .navitem .del:hover {
@@ -154,7 +154,7 @@ body {
 .navitem.renaming input {
   width: 100%;
   padding: 6px 8px;
-  border: 1px solid #534ab7;
+  border: 1px solid #1c1b19;
   border-radius: 5px;
   font-size: 14px;
   font-family: inherit;
@@ -194,9 +194,9 @@ body {
   font-family: inherit;
 }
 #sync button.on {
-  background: #534ab7;
+  background: #1c1b19;
   color: #fff;
-  border-color: #534ab7;
+  border-color: #1c1b19;
 }
 #syncmsg {
   font-size: 10px;
@@ -298,12 +298,12 @@ svg#edges {
   color: #e24b4a;
 }
 .node.sel {
-  border-color: #534ab7;
-  box-shadow: 0 0 0 2px rgba(83, 74, 183, 0.2);
+  border-color: #1c1b19;
+  box-shadow: 0 0 0 2px rgba(28, 27, 25, 0.2);
 }
 .node.linking {
-  border-color: #1d9e75;
-  box-shadow: 0 0 0 2px rgba(29, 158, 117, 0.25);
+  border-color: #1c1b19;
+  box-shadow: 0 0 0 2px rgba(28, 27, 25, 0.25);
 }
 .node.dim {
   opacity: 0.22;
@@ -321,7 +321,7 @@ svg#edges {
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  background: #534ab7;
+  background: #1c1b19;
   border: 2px solid #fff;
   cursor: crosshair;
   opacity: 0;
@@ -383,13 +383,13 @@ svg#edges {
   background: #f1efe8;
 }
 #bar button.on {
-  background: #534ab7;
+  background: #1c1b19;
   color: #fff;
 }
 #bar .space-label {
   font-size: 13px;
   font-weight: 500;
-  color: #534ab7;
+  color: #1c1b19;
   padding: 0 4px;
   max-width: 90px;
   overflow: hidden;
@@ -405,7 +405,7 @@ svg#edges {
   padding: 0;
 }
 .sw.on {
-  box-shadow: 0 0 0 2px rgba(83, 74, 183, 0.35);
+  box-shadow: 0 0 0 2px rgba(28, 27, 25, 0.35);
 }
 #bar .sep {
   width: 1px;
@@ -499,11 +499,11 @@ svg#edges {
   border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
-  color: #5f5e5a;
+  color: #1c1b19;
   font-family: inherit;
 }
 #modeswitch button.on {
-  background: #534ab7;
+  background: #1c1b19;
   color: #fff;
 }
 
@@ -528,7 +528,7 @@ svg#edges {
   cursor: pointer;
   font-size: 12px;
   font-family: inherit;
-  color: #534ab7;
+  color: #1c1b19;
 }
 .import-btn:hover {
   background: #f6f5f1;
@@ -862,7 +862,7 @@ svg#edges {
   width: 100%;
   padding: 11px;
   border: none;
-  background: linear-gradient(120deg, #6a4ab7, #534ab7 55%, #7a4a9e);
+  background: #1c1b19;
   color: #fff;
   border-radius: 8px;
   cursor: pointer;
@@ -870,7 +870,7 @@ svg#edges {
   font-weight: 600;
   font-family: inherit;
   letter-spacing: 0.3px;
-  box-shadow: 0 2px 8px rgba(83, 74, 183, 0.28);
+  box-shadow: 0 2px 8px rgba(28, 27, 25, 0.28);
   margin-bottom: 8px;
 }
 .surprise-btn:hover {
@@ -882,9 +882,9 @@ svg#edges {
 .collect-btn {
   width: 100%;
   padding: 8px;
-  border: 1px solid #c9c6ba;
+  border: 1.5px solid #1c1b19;
   background: #fff;
-  color: #534ab7;
+  color: #1c1b19;
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
@@ -928,8 +928,9 @@ svg#edges {
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 20px;
-  background: #f1efe8;
-  color: #5f5e5a;
+  background: #ffffff;
+  color: #1c1b19;
+  border: 1.3px solid #1c1b19;
 }
 .fc-date {
   font-size: 10px;
@@ -953,7 +954,7 @@ svg#edges {
   font-size: 11px;
 }
 .fc-source a {
-  color: #534ab7;
+  color: #1c1b19;
   text-decoration: none;
 }
 .fc-source a:hover {
@@ -962,22 +963,7 @@ svg#edges {
 .fc-source span {
   color: #a8a69e;
 }
-/* 类别标签配色 */
-.tag-0 { background: #efe9d6; color: #8a6d2f; }
-.tag-1 { background: #e6e0f0; color: #5a4a86; }
-.tag-2 { background: #e1eef7; color: #35618a; }
-.tag-3 { background: #e2f1e9; color: #37734f; }
-.tag-4 { background: #f7e6ea; color: #8a3550; }
-.tag-5 { background: #e0eff0; color: #2f7073; }
-.tag-6 { background: #f7ede1; color: #8a5a34; }
-.tag-7 { background: #eee7d6; color: #7a5f2f; }
-.tag-8 { background: #ece4d7; color: #7a5a30; }
-.tag-9 { background: #e4e6f2; color: #454a80; }
-.tag-10 { background: #f7e4ee; color: #8a3566; }
-.tag-11 { background: #e4f0ec; color: #357061; }
-.tag-12 { background: #e2f0e0; color: #3a6b3a; }
-.tag-13 { background: #f2e9dc; color: #7a5a2e; }
-.tag-14 { background: #eae3ef; color: #5e4a78; }
+/* 严格黑白:类别标签统一白底黑字黑描边(靠 emoji 区分类别) */
 
 @media (max-width: 640px) {
   .feed {
@@ -1117,7 +1103,7 @@ svg#edges {
 }
 .toc-item:hover {
   background: rgba(128, 120, 100, 0.12);
-  border-left-color: #534ab7;
+  border-left-color: #1c1b19;
 }
 /* 主题小圆点 */
 .rthemes {
@@ -1143,8 +1129,8 @@ svg#edges {
   background: #1c1c1a;
 }
 .rtheme-dot.on {
-  box-shadow: 0 0 0 2px #534ab7;
-  border-color: #534ab7;
+  box-shadow: 0 0 0 2px #1c1b19;
+  border-color: #1c1b19;
 }
 /* 字号 + 翻页 */
 .rfs,
@@ -1337,7 +1323,7 @@ svg#edges {
 }
 .reader-progress-fill {
   height: 100%;
-  background: #534ab7;
+  background: #1c1b19;
   transition: width 0.2s ease;
 }
 .rtheme-night .reader-progress-fill {
