@@ -1933,12 +1933,21 @@ svg#edges {
   background: #faf9f5;
   min-height: 60px;
 }
+/* 真图:画框自适应图片比例(inline-block 收紧到图片大小,无留白边条) */
+.ms-figure.photo {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  background: transparent;
+  min-height: 0;
+  line-height: 0;
+}
 .ms-photo {
   display: block;
-  width: 100%;
-  max-height: 400px;
-  object-fit: contain;
-  background: #faf9f5;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 60vh;
 }
 .ms-figure.art .ms-art {
   display: flex;

@@ -80,12 +80,35 @@ function StationFigure({ meme, station }: { meme: Meme; station: Station }) {
 
   useEffect(() => setUrlBroken(false), [station.image?.url]);
 
+  // 当前站点直接粘贴图片 → 贴成真图(仅此站点图卡挂载时生效)
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const it of items) {
+        if (it.type.startsWith('image/')) {
+          const f = it.getAsFile();
+          if (f) {
+            e.preventDefault();
+            void attachPhoto(meme.id, station.id, f);
+          }
+          return;
+        }
+      }
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, [meme.id, station.id, attachPhoto]);
+
   const showUrl = !blobUrl && station.image?.url && !urlBroken;
   const showArt = !blobUrl && !showUrl && hasArt(station.art);
   const hasReal = !!blobUrl;
+  const isPhoto = !!blobUrl || !!showUrl;
 
   return (
-    <div className={'ms-figure' + (showArt ? ' art' : '')}>
+    <div className={'ms-figure' + (isPhoto ? ' photo' : showArt ? ' art' : ' noimg')}>
       {blobUrl ? (
         <img className="ms-photo" src={blobUrl} alt={station.image?.alt || station.title} />
       ) : showUrl ? (
@@ -102,7 +125,7 @@ function StationFigure({ meme, station }: { meme: Meme; station: Station }) {
           <span className="ms-art-tag">示意图</span>
         </div>
       ) : (
-        <div className="ms-noimg">这个站点还没有图</div>
+        <div className="ms-noimg">还没有图 · 点「贴真图」或直接 Ctrl/⌘+V 粘贴</div>
       )}
 
       {(station.image?.credit || hasReal) && (
@@ -110,7 +133,11 @@ function StationFigure({ meme, station }: { meme: Meme; station: Station }) {
       )}
 
       <div className="ms-figbtns">
-        <button className="ms-figbtn" onClick={() => fileRef.current?.click()}>
+        <button
+          className="ms-figbtn"
+          title="上传图片,或直接 Ctrl/⌘+V 粘贴"
+          onClick={() => fileRef.current?.click()}
+        >
           {hasReal ? '换真图' : '＋ 贴真图'}
         </button>
         {hasReal && (
