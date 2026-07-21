@@ -23,6 +23,8 @@ export interface MindNode {
   ct: number;
   /** dueAt, epoch ms — 提醒时间,可空 */
   due: number | null;
+  /** 气泡形状索引(新建时随机;老节点无此字段=默认圆角矩形) */
+  shape?: number;
 }
 
 export interface Edge {

@@ -26,6 +26,9 @@ export const SOON_WINDOW = 1 * DAY;
 export const ZOOM_MIN = 0.25;
 export const ZOOM_MAX = 2.5;
 
+/** 气泡形状数量(对应 CSS 的 .node.shape-0 … shape-N) */
+export const NODE_SHAPES = 8;
+
 /** 空文档。nid/eid 从 1 开始,0 保留为「无」 */
 export function emptyDoc(): Doc {
   return { nodes: [], edges: [], inbox: [], nid: 1, eid: 1 };
@@ -73,6 +76,8 @@ export function normalizeDoc(raw: Partial<Doc> | null | undefined): Doc {
     c: (n.c ?? 0) as ColorIndex,
     ct: n.ct ?? 0,
     due: n.due ?? null,
+    // 保留形状(老数据无此字段则不设,渲染为默认圆角)
+    ...(n.shape != null ? { shape: n.shape } : {}),
   }));
 
   doc.edges = (doc.edges || []) as Edge[];
@@ -99,6 +104,8 @@ export function makeNode(
     c: 0,
     ct: Date.now(),
     due: null,
+    // 每次新建随机气泡形状(extra 可覆盖,如从收集箱/导入沿用)
+    shape: Math.floor(Math.random() * NODE_SHAPES),
     ...extra,
   };
 }

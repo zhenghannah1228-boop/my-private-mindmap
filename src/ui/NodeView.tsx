@@ -56,6 +56,7 @@ function NodeViewImpl({ node, selected, linking, editing, dim }: Props) {
   const cls = [
     'node',
     'c' + (node.c || 0),
+    node.shape != null ? 'shape-' + node.shape : '',
     selected ? 'sel' : '',
     linking ? 'linking' : '',
     dim ? 'dim' : '',

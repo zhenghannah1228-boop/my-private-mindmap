@@ -251,6 +251,32 @@ svg#edges {
 .node .txt {
   white-space: pre-wrap;
 }
+
+/* 随机气泡形状(仅改圆角,文字始终清晰。老节点无 shape 类=默认 8px) */
+.node.shape-0 {
+  border-radius: 22px;
+}
+.node.shape-1 {
+  border-radius: 4px;
+}
+.node.shape-2 {
+  border-radius: 26px 6px 26px 6px;
+}
+.node.shape-3 {
+  border-radius: 6px 26px 6px 26px;
+}
+.node.shape-4 {
+  border-radius: 30px 30px 8px 8px;
+}
+.node.shape-5 {
+  border-radius: 8px 8px 30px 30px;
+}
+.node.shape-6 {
+  border-radius: 40px 16px 34px 14px;
+}
+.node.shape-7 {
+  border-radius: 16px 40px 14px 34px;
+}
 .node .nm {
   font-size: 10px;
   color: #888780;
