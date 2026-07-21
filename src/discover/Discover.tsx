@@ -3,9 +3,10 @@
  */
 
 import { useEffect } from 'react';
-import { CATEGORY_EMOJI, DISCOVER_CATEGORIES } from './types';
+import { DISCOVER_CATEGORIES } from './types';
 import { useDiscoverStore } from './useDiscoverStore';
 import { Cat, Sparkle, Squiggle } from '../ui/doodles';
+import { CategoryIcon, IconDice, IconClip, IconSearch } from '../ui/icons';
 
 export function Discover() {
   const cards = useDiscoverStore((s) => s.cards);
@@ -39,7 +40,7 @@ export function Discover() {
             className={'navitem' + (activeCat === null ? ' on' : '')}
             onClick={() => setCat(null)}
           >
-            <span className="nm">✨ 全部</span>
+            <span className="nm"><CategoryIcon name="全部" /> 全部</span>
             <span className="cnt">{cards.length}</span>
           </div>
           {DISCOVER_CATEGORIES.map((c) => (
@@ -49,7 +50,7 @@ export function Discover() {
               onClick={() => setCat(c)}
             >
               <span className="nm">
-                {CATEGORY_EMOJI[c]} {c}
+                <CategoryIcon name={c} /> {c}
               </span>
               {countOf(c) > 0 && <span className="cnt">{countOf(c)}</span>}
             </div>
@@ -61,14 +62,14 @@ export function Discover() {
             onClick={surprise}
             title="随机打开一个有趣的网站(新标签页)"
           >
-            🎲 Surprise Me
+            <IconDice size={16} /> Surprise Me
           </button>
           <button
             className="collect-btn"
             onClick={copyPrompt}
             title="复制采集指令,交给任意 AI 即可产出每日卡片"
           >
-            📋 复制采集指令
+            <IconClip size={16} /> 复制采集指令
           </button>
           {status && <div className="reading-status">{status}</div>}
         </div>
@@ -86,7 +87,7 @@ export function Discover() {
 
         {shown.length === 0 ? (
           <div className="empty">
-            <div className="empty-ico">{q ? '🔍' : <Cat className="doodle" />}</div>
+            <div className="empty-ico">{q ? <IconSearch size={48} /> : <Cat className="doodle" />}</div>
             {q ? '没有匹配的内容' : '还没有内容'}
             <div className="empty-sub">
               {q
@@ -100,7 +101,7 @@ export function Discover() {
               <div className="feed-card" key={c.id}>
                 <div className="fc-head">
                   <span className={'fc-tag tag-' + (DISCOVER_CATEGORIES as readonly string[]).indexOf(c.category)}>
-                    {CATEGORY_EMOJI[c.category] || '•'} {c.category}
+                    <CategoryIcon name={c.category} size={15} /> {c.category}
                   </span>
                   <span className="fc-date">{c.date}</span>
                 </div>

@@ -8,11 +8,11 @@ import type { ColorIndex, Doc, Edge, InboxItem, Library, MindNode, Space, View }
 
 /** 颜色索引 → 语义。UI 不强制含义,由用户自己约定,默认建议如下 */
 export const COLORS: { i: ColorIndex; bg: string; border: string; hint: string }[] = [
-  { i: 0, bg: '#ffffff', border: '#b4b2a9', hint: '默认' },
-  { i: 1, bg: '#FAEEDA', border: '#EF9F27', hint: '待办' },
-  { i: 2, bg: '#E1F5EE', border: '#5DCAA5', hint: '已想通' },
-  { i: 3, bg: '#FBEAF0', border: '#ED93B1', hint: '灵感' },
-  { i: 4, bg: '#E6F1FB', border: '#85B7EB', hint: '疑问' },
+  { i: 0, bg: '#ffffff', border: '#1c1b19', hint: '默认' },
+  { i: 1, bg: '#efeeea', border: '#1c1b19', hint: '待办' },
+  { i: 2, bg: '#d7d5cf', border: '#1c1b19', hint: '已想通' },
+  { i: 3, bg: '#a9a7a0', border: '#1c1b19', hint: '灵感' },
+  { i: 4, bg: '#1c1b19', border: '#1c1b19', hint: '疑问' },
 ];
 
 export const DAY = 86400000;

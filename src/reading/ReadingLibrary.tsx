@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Reader } from './Reader';
 import { useReadingStore } from './useReadingStore';
 import { BookDoodle, Sparkle, Squiggle } from '../ui/doodles';
+import { IconSearch } from '../ui/icons';
 
 function ShelfRow({ id }: { id: string }) {
   const shelf = useReadingStore((s) => s.shelves.find((x) => x.id === id))!;
@@ -151,7 +152,7 @@ export function ReadingLibrary() {
 
         {shelfBooks.length === 0 ? (
           <div className="empty">
-            <div className="empty-ico">{q ? '🔍' : <BookDoodle className="doodle" />}</div>
+            <div className="empty-ico">{q ? <IconSearch size={48} /> : <BookDoodle className="doodle" />}</div>
             {q ? '没有匹配的作品' : '这个书架还没有作品'}
             <div className="empty-sub">
               {q

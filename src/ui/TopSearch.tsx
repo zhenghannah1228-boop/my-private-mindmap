@@ -5,6 +5,7 @@
 
 import { useReadingStore } from '../reading/useReadingStore';
 import { useDiscoverStore } from '../discover/useDiscoverStore';
+import { IconSearch } from './icons';
 
 export function TopSearch({ mode }: { mode: 'reading' | 'discover' }) {
   const rQuery = useReadingStore((s) => s.query);
@@ -18,7 +19,7 @@ export function TopSearch({ mode }: { mode: 'reading' | 'discover' }) {
 
   return (
     <div id="topsearch">
-      <span className="ts-ico">🔍</span>
+      <span className="ts-ico"><IconSearch size={16} /></span>
       <input
         value={query}
         placeholder={placeholder}

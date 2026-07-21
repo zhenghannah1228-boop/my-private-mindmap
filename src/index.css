@@ -244,7 +244,7 @@ svg#edges {
   max-width: 230px;
   padding: 9px 12px;
   background: #fff;
-  border: 1px solid #b4b2a9;
+  border: 1.3px solid #1c1b19;
   border-radius: 8px;
   font-size: 13px;
   line-height: 1.45;
@@ -291,11 +291,13 @@ svg#edges {
   flex-wrap: wrap;
 }
 .node .nm .d {
-  color: #993c1d;
+  color: #1c1b19;
   font-weight: 500;
 }
 .node .nm .d.soon {
-  color: #e24b4a;
+  color: #1c1b19;
+  font-weight: 700;
+  text-decoration: underline;
 }
 .node.sel {
   border-color: #1c1b19;
@@ -333,24 +335,30 @@ svg#edges {
 }
 /* 触摸屏没有 hover,靠长按进入连线模式(见 usePointerInteraction) */
 
+/* 节点配色:严格黑白灰阶(白 → 浅灰 → 中灰 → 深灰 → 黑底白字) */
 .c0 {
   background: #fff;
 }
 .c1 {
-  background: #faeeda;
-  border-color: #ef9f27;
+  background: #efeeea;
 }
 .c2 {
-  background: #e1f5ee;
-  border-color: #5dcaa5;
+  background: #d7d5cf;
 }
 .c3 {
-  background: #fbeaf0;
-  border-color: #ed93b1;
+  background: #a9a7a0;
 }
 .c4 {
-  background: #e6f1fb;
-  border-color: #85b7eb;
+  background: #1c1b19;
+  color: #fff;
+}
+.c4 .nm,
+.c4 .nm .d {
+  color: #fff;
+}
+.c4 .port {
+  background: #fff;
+  border-color: #1c1b19;
 }
 
 /* ── 工具栏 ── */
@@ -598,26 +606,25 @@ svg#edges {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  color: #f4efe2;
-  box-shadow: 0 3px 10px rgba(40, 34, 24, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --paper: #fff;
+  --ink: #1c1b19;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 3px 3px 0 rgba(28, 27, 25, 0.12);
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 .book:hover .cover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(40, 34, 24, 0.24), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  box-shadow: 4px 6px 0 rgba(28, 27, 25, 0.2);
 }
 .book .cover .spine {
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 7px;
-  background: linear-gradient(
-    to right,
-    rgba(0, 0, 0, 0.28),
-    rgba(0, 0, 0, 0.06) 60%,
-    rgba(255, 255, 255, 0.08)
-  );
+  left: 6px;
+  top: 10px;
+  bottom: 10px;
+  width: 0;
+  border-left: 1.5px solid currentColor;
+  opacity: 0.55;
 }
 .book .cover .cover-tags {
   display: flex;
@@ -631,21 +638,20 @@ svg#edges {
   letter-spacing: 0.5px;
   padding: 2px 6px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(2px);
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
 }
 .book .cover .pub-tag {
-  background: rgba(255, 255, 255, 0.9);
-  color: #3c5a44;
+  background: var(--ink);
+  color: var(--paper);
 }
 .book .cover .cover-title {
-  font-family: 'Songti SC', 'STSong', Georgia, serif;
+  font-family: var(--font-hand), 'Songti SC', 'STSong', Georgia, serif;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: 0.3px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
@@ -691,7 +697,7 @@ svg#edges {
   opacity: 1;
 }
 .book .cover .bdel:hover {
-  background: #e24b4a;
+  background: #1c1b19;
 }
 @media (hover: none) {
   .book .cover .bdel {
@@ -699,30 +705,13 @@ svg#edges {
   }
 }
 
-/* 封面配色(雅致深色书封,暖白字) */
-.cover-0 {
-  background: linear-gradient(150deg, #3a7373, #2b5757);
-}
-.cover-1 {
-  background: linear-gradient(150deg, #874550, #6c3540);
-}
-.cover-2 {
-  background: linear-gradient(150deg, #3f5680, #35486e);
-}
-.cover-3 {
-  background: linear-gradient(150deg, #6b6f45, #565a38);
-}
-.cover-4 {
-  background: linear-gradient(150deg, #66497a, #513a66);
-}
-.cover-5 {
-  background: linear-gradient(150deg, #a5643f, #8a5334);
-}
-.cover-6 {
-  background: linear-gradient(150deg, #446a50, #385a44);
-}
+/* 封面配色:严格黑白。奇数号书封反相(黑底白字),制造书架上的黑白节奏 */
+.cover-1,
+.cover-3,
+.cover-5,
 .cover-7 {
-  background: linear-gradient(150deg, #545a63, #454a53);
+  --paper: #1c1b19;
+  --ink: #fff;
 }
 
 /* ── 右上角搜索(阅读 / 发现) ── */
@@ -931,6 +920,25 @@ svg#edges {
   background: #ffffff;
   color: #1c1b19;
   border: 1.3px solid #1c1b19;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+/* 内嵌黑白小图标的对齐 */
+.navitem .nm svg {
+  vertical-align: -3px;
+  margin-right: 1px;
+}
+.surprise-btn,
+.collect-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+#topsearch .ts-ico {
+  display: inline-flex;
+  align-items: center;
 }
 .fc-date {
   font-size: 10px;
