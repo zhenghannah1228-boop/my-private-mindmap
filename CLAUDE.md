@@ -29,3 +29,11 @@
 - 状态:`src/meme/useMemeStore.ts`（内置 + 导入迷因、真图覆盖、注释、进度）
 - 界面:`src/meme/MemeTracking.tsx`
 - 全站严格黑白 + 手绘风;图片二进制存 IndexedDB,元数据/注释存 localStorage
+
+## 笑点解析模块速览(与迷因探踪并列的「解析类」玩法)
+
+- 拆解欧美情景喜剧笑点:铺垫 → 揭晓笑点 → 猜喜剧技巧 → 对照解析
+- 数据模型 / 采集指令:`src/meme/... ` 无关,见 `src/comedy/types.ts`
+- 内置笑点:`src/comedy/builtin.ts`(只做短引用 + 描述,不搬长台词)
+- 状态:`src/comedy/useComedyStore.ts`;界面:`src/comedy/Comedy.tsx`
+- 复用迷因的选单/推理/结局样式(`.mc-/.mq-/.mr-`)

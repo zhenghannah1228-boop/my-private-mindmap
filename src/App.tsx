@@ -8,6 +8,7 @@ import { MindMap } from './ui/MindMap';
 import { ReadingLibrary } from './reading/ReadingLibrary';
 import { Discover } from './discover/Discover';
 import { MemeTracking } from './meme/MemeTracking';
+import { Comedy } from './comedy/Comedy';
 import { TopSearch } from './ui/TopSearch';
 import { installPersistence } from './store/persist';
 import { useAppStore } from './store/useAppStore';
@@ -29,6 +30,9 @@ function ModeSwitch() {
       <button className={mode === 'meme' ? 'on' : ''} onClick={() => setMode('meme')}>
         迷因探踪
       </button>
+      <button className={mode === 'comedy' ? 'on' : ''} onClick={() => setMode('comedy')}>
+        笑点解析
+      </button>
     </div>
   );
 }
@@ -49,6 +53,8 @@ export default function App() {
         <Discover />
       ) : mode === 'meme' ? (
         <MemeTracking />
+      ) : mode === 'comedy' ? (
+        <Comedy />
       ) : (
         <MindMap />
       )}
