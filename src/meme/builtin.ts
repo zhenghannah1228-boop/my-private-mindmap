@@ -524,4 +524,91 @@ const grumpycat: Meme = {
     'Grumpy Cat 的走红,首先赢在一张脸就是一种情绪:那副天生的臭脸精准对应了人人都有的坏心情与厌世感(情绪强度),可爱的猫却永远一脸嫌弃,这种反差本身就抓人(反差意外)。它是标准的图片表情包(image macro),谁都能套上一句毒舌配字(可改编性);而它诞生并疯传于 Reddit 的表情包文化,形态与平台机制完美契合(平台适配)。真实存在、又被精心运营成 IP,让它从一张图长成了持续多年的现象。',
 };
 
-export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe, grumpycat];
+const harlemshake: Meme = {
+  id: 'harlemshake',
+  title: 'Harlem Shake(哈林摇)',
+  summary: '一人独自乱舞、鼓点一炸全员疯狂换装——2013 年初席卷全网的 30 秒视频挑战。',
+  startId: 'now',
+  originId: 'song',
+  stations: [
+    {
+      id: 'now',
+      kind: 'mutation',
+      art: 'play',
+      title: '你见过的那种「哈林摇」视频',
+      date: '2013 起',
+      platform: '全网',
+      body: '一个人戴着头盔独自抽搐乱舞,周围人无动于衷;等低音鼓点一炸(bass drop),画面一切——所有人瞬间换上奇装异服疯狂乱蹦。这个 30 秒的固定套路,2013 年初席卷全网。它其实来自[[song|一首同名电子乐]]。',
+      links: [
+        { to: 'format', rel: 'back', label: '这个套路谁定的' },
+        { to: 'song', rel: 'variant', label: '那首歌哪来的' },
+        { to: 'peak', rel: 'forward', label: '它有多疯狂' },
+      ],
+    },
+    {
+      id: 'song',
+      kind: 'origin',
+      art: 'play',
+      title: '起点:2012,Baauer 的《Harlem Shake》',
+      date: '2012.05',
+      platform: '电子音乐',
+      body: '源头是美国制作人 Baauer 2012 年发布的电子单曲《Harlem Shake》,里面「and do the Harlem shake」的采样人声,日后成了整个梗的引信。(注:它与 1980 年代 Harlem 街头的真实舞蹈几乎无关。)它如何[[filthyfrank|变成一个视频梗]]?',
+      links: [{ to: 'filthyfrank', rel: 'forward', label: '它如何变成视频梗' }],
+      sources: [{ label: 'Wikipedia: Harlem Shake (meme)', url: 'https://en.wikipedia.org/wiki/Harlem_Shake_(meme)' }],
+    },
+    {
+      id: 'filthyfrank',
+      kind: 'spread',
+      art: 'play',
+      title: '2013.02:第一支恶搞视频',
+      date: '2013.02',
+      platform: 'YouTube',
+      body: '2013 年 2 月初,YouTube 恶搞博主 Filthy Frank(后来的歌手 Joji)发了一段几个人戴面具随鼓点乱舞的视频。它点燃了火花,但真正把玩法定型的,是[[format|几天后的另一支视频]]。',
+      links: [
+        { to: 'song', rel: 'back', label: '这首歌哪来的' },
+        { to: 'format', rel: 'forward', label: '固定套路的诞生' },
+      ],
+    },
+    {
+      id: 'format',
+      kind: 'mutation',
+      art: 'play',
+      title: '套路定型:独舞 → 全员爆发',
+      date: '2013.02',
+      platform: 'YouTube',
+      body: '澳大利亚几个少年(The Sunny Coast Skate)的版本确立了如今的标准结构:前半段一人独自乱舞、旁人无视;鼓点一炸,下一秒全员换装疯狂。这个「反差 + 极易复制」的模板,让它[[peak|瞬间病毒化]]。',
+      links: [
+        { to: 'filthyfrank', rel: 'back', label: '第一支视频' },
+        { to: 'peak', rel: 'forward', label: '全网模仿' },
+      ],
+    },
+    {
+      id: 'peak',
+      kind: 'peak',
+      art: 'play',
+      title: '2013.02:一天上传数千支',
+      date: '2013.02',
+      platform: '全网 / 线下',
+      body: '整个 2013 年 2 月,从学生宿舍、办公室到球队甚至挪威军队都在拍自己的哈林摇,高峰期 YouTube 每天新增数千支。海量视频还把 Baauer 的原曲顶上了 Billboard 单曲榜冠军。',
+      links: [
+        { to: 'format', rel: 'back', label: '套路怎么来的' },
+        { to: 'decline', rel: 'forward', label: '然后呢' },
+      ],
+    },
+    {
+      id: 'decline',
+      kind: 'decline',
+      art: 'play',
+      title: '一个月后:退烧 + 真·哈林的抗议',
+      date: '2013.03',
+      platform: '全网',
+      body: '作为典型的一阵风迷因,哈林摇的热度在大约一个月内迅速退去。与此同时,真正的 Harlem 居民拍视频指出:这根本不是他们那支有几十年历史的真实「Harlem Shake」舞蹈。',
+      links: [{ to: 'peak', rel: 'back', label: '回到它最疯的时候' }],
+    },
+  ],
+  factors: ['remix', 'lowbar', 'incongruity', 'platform'],
+  analysis:
+    '哈林摇是「参与式迷因」的教科书案例:30 秒、一段现成配乐、几件奇装异服,任何人、任何团体都能拍出自己的版本(可改编性 + 参与门槛极低)。它的结构自带强反差——前半段沉闷的独舞与鼓点炸裂后的全员失控形成戏剧性反转(反差意外);而 YouTube「上传即回应」的机制,让一支支模仿视频指数级堆叠、彼此助燃(平台适配)。也正因门槛太低、花样有限,它来得快、去得也快。',
+};
+
+export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe, grumpycat, harlemshake];
