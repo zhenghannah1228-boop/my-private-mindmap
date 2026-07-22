@@ -524,4 +524,104 @@ const grumpycat: Meme = {
     'Grumpy Cat 的走红,首先赢在一张脸就是一种情绪:那副天生的臭脸精准对应了人人都有的坏心情与厌世感(情绪强度),可爱的猫却永远一脸嫌弃,这种反差本身就抓人(反差意外)。它是标准的图片表情包(image macro),谁都能套上一句毒舌配字(可改编性);而它诞生并疯传于 Reddit 的表情包文化,形态与平台机制完美契合(平台适配)。真实存在、又被精心运营成 IP,让它从一张图长成了持续多年的现象。',
 };
 
-export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe, grumpycat];
+const trollface: Meme = {
+  id: 'trollface',
+  title: 'Trollface(巨魔脸)',
+  summary: '一张咧到耳根、笑容欠揍的手绘脸,配一句「Problem?」,成了整个网络巨魔文化的图腾。',
+  startId: 'now',
+  originId: 'comic',
+  stations: [
+    {
+      id: 'now',
+      kind: 'mutation',
+      art: 'troll',
+      title: '「Problem?」那张欠揍的笑脸',
+      date: '2008 起',
+      platform: '全网',
+      body: '一张咧到耳根、笑容欠揍的手绘脸,配一句「Problem?」或「U mad?」,用来表示「我就是在逗你玩」。它是整个网络「巨魔文化(trolling)」的表情图腾,而它诞生于[[comic|一格 MS 画图涂鸦]]。',
+      links: [
+        { to: 'trolling', rel: 'back', label: '这张脸代表什么' },
+        { to: 'comic', rel: 'variant', label: '它最早的样子' },
+        { to: 'peak', rel: 'forward', label: '它有多泛滥' },
+      ],
+    },
+    {
+      id: 'comic',
+      kind: 'origin',
+      art: 'troll',
+      title: '起点:2008,一格 MS 画图涂鸦',
+      date: '2008.09',
+      platform: 'DeviantArt',
+      body: '2008 年 9 月,美国网友 Carlos Ramirez(ID:Whynne)用 MS 画图画了一格漫画,讽刺论坛上那种「纯粹为了惹人烦」的钓鱼式捣乱,里面就有这张咧嘴坏笑的脸。它很快[[trolling|成了 trolling 的官方表情]]。',
+      links: [{ to: 'trolling', rel: 'forward', label: '它如何成为巨魔的脸' }],
+      sources: [{ label: 'Know Your Meme: Trollface / Coolface' }],
+    },
+    {
+      id: 'trolling',
+      kind: 'spread',
+      art: 'troll',
+      title: '「Coolface / Problem?」:巨魔的脸',
+      date: '2009 起',
+      platform: '4chan / 论坛',
+      body: '这张脸被叫作 Coolface 或 Trollface,配上「Problem?」成了网络钓鱼、恶意逗弄的通用符号:贴上它,就等于宣告「刚才是我在耍你」。它也顺势成了[[rage|rage comics 的一员]]。',
+      links: [
+        { to: 'comic', rel: 'back', label: '它最早哪来的' },
+        { to: 'rage', rel: 'forward', label: '它与 rage comics' },
+      ],
+    },
+    {
+      id: 'rage',
+      kind: 'mutation',
+      art: 'troll',
+      title: 'rage comics 的台柱之一',
+      date: '2010 起',
+      platform: 'Reddit / 4chan',
+      body: '2010 年前后,网友用一套固定的手绘表情(暴怒脸 FFFUUUU、Forever Alone、Me Gusta 等)拼成四格「rage comics」讲糗事,Trollface 是其中最招牌的一张。这种人人都能拼的模板,让它[[peak|铺天盖地]]。',
+      links: [
+        { to: 'trolling', rel: 'back', label: '回到它的含义' },
+        { to: 'peak', rel: 'forward', label: '它有多泛滥' },
+      ],
+    },
+    {
+      id: 'peak',
+      kind: 'peak',
+      art: 'troll',
+      title: '2010–2012:铺天盖地',
+      date: '2010–2012',
+      platform: 'Reddit / 9GAG / Facebook',
+      body: '那几年,Trollface 出现在 Reddit、9GAG、Facebook、贴吧的每一个角落,是当时最泛滥的迷因之一。可它的作者做了一件别的迷因作者很少做的事——[[money|靠它赚到了钱]]。',
+      links: [
+        { to: 'rage', rel: 'back', label: '它怎么来的' },
+        { to: 'money', rel: 'forward', label: '作者赚到钱了吗' },
+      ],
+    },
+    {
+      id: 'money',
+      kind: 'mutation',
+      art: 'troll',
+      title: '罕见:作者靠它赚到了钱',
+      date: '2010 起',
+      platform: '版权 / 授权',
+      body: '与大多数「无主」迷因不同,Ramirez 为 Trollface 登记了版权,并通过授权与多起侵权和解拿到了可观收入(据报道达数万美元级)。一张随手涂鸦,成了少数能给创作者变现的迷因。',
+      links: [
+        { to: 'peak', rel: 'back', label: '回到它最火的时候' },
+        { to: 'decline', rel: 'forward', label: '后来呢' },
+      ],
+    },
+    {
+      id: 'decline',
+      kind: 'decline',
+      art: 'troll',
+      title: 'rage comics 退潮,它成了「土味回忆」',
+      date: '2013 起',
+      platform: '全网',
+      body: '2013 年后,随着反应图与新格式接管,rage comics 整体退潮,Trollface 也从「潮」变成了略显尴尬的「土味 / 时代眼泪」。但作为一个时代的符号,懂的人一看仍会心一笑。',
+      links: [{ to: 'money', rel: 'back', label: '回到它变现的时候' }],
+    },
+  ],
+  factors: ['remix', 'ingroup', 'emotion', 'platform'],
+  analysis:
+    'Trollface 的流行,靠的是它把一种情绪固化成了一张脸:那种「我逗到你了」的得意与坏笑,一图胜千言(情绪强度)。它是可无限重画、拼进任意四格漫画的模板(可改编性),又是网络巨魔与图版亚文化里彼此确认的暗号(圈层信号);而它生长于 rage comics 和反应图文化,形态与论坛的传播机制天然契合(平台适配)。当这套图版文化退潮,它也随之从潮流变成了一代人的怀旧符号。',
+};
+
+export const BUILTIN_MEMES: Meme[] = [doge, rickroll, thisIsFine, nyancat, pepe, grumpycat, trollface];

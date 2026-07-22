@@ -148,6 +148,23 @@ function Grumpy() {
   );
 }
 
+/** 巨魔脸:眯眼坏笑 + 咧到耳根的大嘴 */
+function Troll() {
+  return (
+    <Frame>
+      <path d="M42 52 C42 28 60 22 80 22 C100 22 118 28 118 52 C118 76 104 94 80 98 C56 94 42 76 42 52 Z" />
+      <path d="M54 40 L72 36M88 36 L106 40" />
+      <path d="M57 47 Q64 40 71 47M59 48 Q64 52 69 48" />
+      <path d="M89 47 Q96 40 103 47M91 48 Q96 52 101 48" />
+      <circle cx="64" cy="47" r="1.5" fill="currentColor" />
+      <circle cx="96" cy="47" r="1.5" fill="currentColor" />
+      <path d="M48 64 Q80 98 112 64" />
+      <path d="M48 64 Q80 76 112 64" />
+      <path d="M62 67 v7M74 68 v9M86 68 v9M98 67 v7" />
+    </Frame>
+  );
+}
+
 const ART: Record<string, () => ReactNode> = {
   doge: Doge,
   coin: Coin,
@@ -157,6 +174,7 @@ const ART: Record<string, () => ReactNode> = {
   nyan: Nyan,
   pepe: Pepe,
   grumpy: Grumpy,
+  troll: Troll,
 };
 
 export function StationArt({ art }: { art: string }) {
