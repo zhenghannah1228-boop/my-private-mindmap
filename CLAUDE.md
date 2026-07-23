@@ -37,3 +37,10 @@
 - 内置笑点:`src/comedy/builtin.ts`(只做短引用 + 描述,不搬长台词)
 - 状态:`src/comedy/useComedyStore.ts`;界面:`src/comedy/Comedy.tsx`
 - 复用迷因的选单/推理/结局样式(`.mc-/.mq-/.mr-`)
+
+## 大厂黑话看板速览(语料库,非游戏)
+
+- 收集互联网大厂黑话:黑话词 →「人话」翻译 + 例句 + 分类,可分类/搜索/导入
+- 数据模型 / 采集指令:`src/jargon/types.ts`;内置词条:`src/jargon/builtin.ts`
+- 状态:`src/jargon/useJargonStore.ts`;界面:`src/jargon/Jargon.tsx`
+- 复用发现看板的卡片流样式(`.feed`);导入词条存 localStorage

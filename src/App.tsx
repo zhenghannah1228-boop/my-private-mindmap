@@ -9,6 +9,7 @@ import { ReadingLibrary } from './reading/ReadingLibrary';
 import { Discover } from './discover/Discover';
 import { MemeTracking } from './meme/MemeTracking';
 import { Comedy } from './comedy/Comedy';
+import { Jargon } from './jargon/Jargon';
 import { TopSearch } from './ui/TopSearch';
 import { installPersistence } from './store/persist';
 import { useAppStore } from './store/useAppStore';
@@ -33,6 +34,9 @@ function ModeSwitch() {
       <button className={mode === 'comedy' ? 'on' : ''} onClick={() => setMode('comedy')}>
         笑点解析
       </button>
+      <button className={mode === 'jargon' ? 'on' : ''} onClick={() => setMode('jargon')}>
+        大厂黑话
+      </button>
     </div>
   );
 }
@@ -55,6 +59,8 @@ export default function App() {
         <MemeTracking />
       ) : mode === 'comedy' ? (
         <Comedy />
+      ) : mode === 'jargon' ? (
+        <Jargon />
       ) : (
         <MindMap />
       )}
