@@ -43,6 +43,33 @@ export const BUILTIN_JARGON: Jargon[] = [
   { id: 'dui-jiao', term: '对焦', category: '万能动词', plain: '把注意力聚焦到重点上。', example: '我们先对焦一下核心问题。' },
   { id: 'ji-chuan', term: '击穿 / 打爆', category: '万能动词', plain: '集中资源把一个点做爆。', example: '把这个爆品一次性打爆。' },
 
+  // ── 第二批(2026-07-22 采集) ──
+  // 战略愿景
+  { id: 'hu-cheng-he', term: '护城河', category: '战略愿景', plain: '别人短期抄不走的竞争优势。', example: '我们的数据就是最深的护城河。' },
+  { id: 'di-er-qu-xian', term: '第二曲线', category: '战略愿景', plain: '主业到顶了,得找下一个增长点。', example: '要在主业见顶前找到第二曲线。' },
+  { id: 'fei-lun', term: '飞轮', category: '战略愿景', plain: '各环节互相促进、越转越快的正循环——常用来把普通业务说得很宏大。', example: '用户越多内容越好,形成增长飞轮。' },
+  { id: 'sheng-tai', term: '生态', category: '战略愿景', plain: '围绕自家产品拉起的一圈相关业务;什么都能叫生态。', example: '我们做的不是产品,是生态。' },
+
+  // 组织协作
+  { id: 'dao-pai', term: '倒排', category: '组织协作', plain: '先定死上线日期,再倒着挤排期——通常意味着要加班。', example: '时间紧,按上线日倒排一下。' },
+  { id: 'bei-shu', term: '背书', category: '组织协作', plain: '拉个有分量的人或部门给方案站台担保。', example: '这个方案需要老板背书。' },
+  { id: 'shou-kou', term: '收口', category: '组织协作', plain: '把散着的事项归拢到一个出口统一处理。', example: '需求太散,由产品统一收口。' },
+
+  // 增长运营
+  { id: 'lie-bian', term: '裂变', category: '增长运营', plain: '让老用户拉新用户,一传十、十传百(常靠砍一刀)。', example: '设计一个裂变活动拉新。' },
+  { id: 'zhong-cao', term: '种草', category: '增长运营', plain: '通过内容让人产生「我也想买」的念头;反义词是拔草。', example: '找 KOL 种草这款新品。' },
+  { id: 'bei-ji-xing', term: '北极星指标', category: '增长运营', plain: '全团队唯一最重要的那个指标,别的都为它服务。', example: '我们的北极星指标是周活跃。' },
+
+  // 效率提升
+  { id: 'zhong-tai', term: '中台', category: '效率提升', plain: '把各业务通用的能力抽出来共建共用;一度人人都建,后来又纷纷拆掉。', example: '把风控能力沉淀到中台。' },
+  { id: 'dou-di', term: '兜底', category: '效率提升', plain: '最坏情况下的保底方案,出了事有人接着。', example: '这个链路要有兜底逻辑。' },
+
+  // 万能动词
+  { id: 'pan-yi-pan', term: '盘一盘', category: '万能动词', plain: '把现状捋一遍、理清楚。', example: '我们先把手里的资源盘一盘。' },
+
+  // 画饼鸡汤
+  { id: 'ge-ju-da-kai', term: '格局打开', category: '画饼鸡汤', plain: '劝你别计较眼前得失——通常在让你吃亏时说。', example: '别只看这点绩效,格局打开。' },
+
   // 画饼鸡汤
   { id: 'chang-qi-zhu-yi', term: '长期主义', category: '画饼鸡汤', plain: '现在没回报也得忍着干,别计较眼前。', example: '我们要坚持长期主义。' },
   { id: 'yong-bao-bian-hua', term: '拥抱变化', category: '画饼鸡汤', plain: '接受(通常对你不利的)变动,别抱怨。', example: '年轻人要学会拥抱变化。' },
