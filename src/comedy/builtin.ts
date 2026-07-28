@@ -61,4 +61,60 @@ const arrested: Joke = {
     '这是回旋镖式笑点的教科书:一句反复出现、被当成废话的台词,在很久之后突然「字面成真」,前面所有的重复都成了铺垫(回旋镖)。观众和 Michael 一样把它当比喻,真相却是字面意义,制造了强烈的反讽与颠覆预期——你以为的空话,原来是最实在的提示。',
 };
 
-export const BUILTIN_JOKES: Joke[] = [office, friends, b99, arrested];
+const seinfeld: Joke = {
+  id: 'seinfeld-yada-yada',
+  show: 'Seinfeld(宋飞正传)',
+  episode: 'S8E19《The Yada Yada》',
+  title: '「yada yada yada」略过一切',
+  setup:
+    'George 的新女友讲话有个习惯:讲到一半就用「yada yada yada(如此这般)」把后半段一笔带过。起初 George 觉得这很省事,还挺欣赏——直到她开始用它略过一些关键得可怕的内容。',
+  punchline:
+    '她轻描淡写地说「我前男友来过,yada yada yada,我现在累得不行」——George 呆住:被「yada yada」略过去的,到底是什么?!',
+  factors: ['subvert', 'irony', 'running', 'timing'],
+  analysis:
+    '笑点藏在「省略」里:一个用来跳过废话的口头禅,被用来跳过最不能跳过的信息(颠覆预期)。观众和 George 一起脑补空白,想象比明说更好笑(反讽——信息落差全靠听者自己填)。这个短语在整集反复出现、每次略过的内容越来越离谱(重复梗),而每次「yada yada」之后的停顿正是爆笑点(喜剧时机)。这集还把这个词送进了美式日常英语。',
+};
+
+const parks: Joke = {
+  id: 'parks-whole-ass',
+  show: 'Parks and Recreation(公园与游憩)',
+  episode: 'Ron Swanson 语录',
+  title: '「Never half-ass two things」',
+  setup:
+    'Ron Swanson 是个极简主义硬汉主管,讨厌政府、热爱木工和早餐肉,说话永远言简意赅。有人同时忙活两件事、两头都没做好,向他讨教。',
+  punchline:
+    'Ron 面无表情地给出人生箴言:「Never half-ass two things. Whole-ass one thing.(别用半个屁股干两件事,用整个屁股干好一件事。)」',
+  factors: ['wordplay', 'deadpan', 'character'],
+  analysis:
+    '这句笑点是语言游戏的典范:把俚语「half-ass(敷衍)」拆开,顺势造出根本不存在的「whole-ass」,荒唐却逻辑自洽(谐音双关)。Ron 用宣读格言的庄重口吻说出「屁股」,一本正经与内容粗俗的落差(一本正经)正中笑点;而这句话又完美浓缩了 Ron 专注、硬核、不废话的人设(角色反差)——换任何人说都差点意思。',
+};
+
+const modernfamily: Joke = {
+  id: 'modernfamily-wtf',
+  show: 'Modern Family(摩登家庭)',
+  episode: 'S1,Phil 的「酷爸爸」宣言',
+  title: '「WTF: Why the face?」',
+  setup:
+    'Phil Dunphy 自封「酷老爸」,坚信自己精通年轻人的一切:会发短信、懂流行语、能和孩子们打成一片。他对着镜头骄傲地展示自己有多懂网络缩写。',
+  punchline:
+    '他自信满满地解释:「WTF——Why the face?(为啥拉着脸?)」——完美避开正确答案,还浑然不觉。',
+  factors: ['irony', 'character', 'cringe'],
+  analysis:
+    '典型的认知落差笑点:观众都知道 WTF 是什么,唯独最自信的 Phil 不知道(反讽)。他越是笃定地展示「懂」,暴露的就越是「不懂」,这种自我感觉良好的错位正是 Phil 人设的核心(角色反差);屏幕外的我们替他脚趾抠地,又忍不住喜欢这个真诚的傻爸爸(尴尬喜剧)。',
+};
+
+const fawlty: Joke = {
+  id: 'fawlty-dont-mention-the-war',
+  show: 'Fawlty Towers(弗尔蒂旅馆)',
+  episode: 'S1E6《The Germans》',
+  title: '「Don’t mention the war!」',
+  setup:
+    '英国旅馆老板 Basil Fawlty 接待一批德国客人。他脑震荡未愈,反复叮嘱员工和自己:千万别提战争,别冒犯客人。',
+  punchline:
+    '结果他自己每开口一次就「战争」脱口而出一次,一边说「我提了一次,但我觉得我圆回去了」,一边越描越黑,最后干脆踢着正步模仿起希特勒——把「别提」执行成了灾难现场。',
+  factors: ['irony', 'escalation', 'running', 'cringe'],
+  analysis:
+    '这是「越不让做越做」的经典结构:满脑子想着「别提」,反而句句都提(反讽)。同一个失误在几分钟里反复发生、一次比一次严重,从口误一路升级到正步走(重复梗 + 荒诞加码);客人们的表情越来越僵,观众替 Basil 尴尬到窒息(尴尬喜剧)。它常年入选英国喜剧史最佳场面。',
+};
+
+export const BUILTIN_JOKES: Joke[] = [office, friends, b99, arrested, seinfeld, parks, modernfamily, fawlty];
