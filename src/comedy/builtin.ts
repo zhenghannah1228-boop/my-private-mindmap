@@ -117,4 +117,60 @@ const fawlty: Joke = {
     '这是「越不让做越做」的经典结构:满脑子想着「别提」,反而句句都提(反讽)。同一个失误在几分钟里反复发生、一次比一次严重,从口误一路升级到正步走(重复梗 + 荒诞加码);客人们的表情越来越僵,观众替 Basil 尴尬到窒息(尴尬喜剧)。它常年入选英国喜剧史最佳场面。',
 };
 
-export const BUILTIN_JOKES: Joke[] = [office, friends, b99, arrested, seinfeld, parks, modernfamily, fawlty];
+const himym: Joke = {
+  id: 'himym-legendary',
+  show: 'How I Met Your Mother(老爸老妈的浪漫史)',
+  episode: 'Barney 的招牌口头禅',
+  title: '「Legen—wait for it—dary」',
+  setup:
+    'Barney Stinson 是个西装革履、永远浮夸的自封「传奇」。每当他要宣布一个(通常很馊的)主意,都不会好好把话说完。',
+  punchline:
+    '他把 legendary 硬生生劈成两半:「This is gonna be legen—wait for it—dary!」——在词中间强行插入悬念,逼所有人陪他等那个「dary」。',
+  factors: ['wordplay', 'running', 'character', 'timing'],
+  analysis:
+    '这个梗把「悬念」缩小到一个单词内部:在词中间断开、强行吊胃口,是对语言本身的玩弄(谐音双关);那句「wait for it」就是一次人为制造的喜剧停顿(喜剧时机)。它作为口头禅贯穿全剧、衍生出无数变体——包括跨集悬挂的超长版(重复梗);而这种把自我营销刻进每个音节的浮夸,正是 Barney 这个角色的浓缩(角色反差)。',
+};
+
+const tbbt: Joke = {
+  id: 'tbbt-knock-penny',
+  show: 'The Big Bang Theory(生活大爆炸)',
+  episode: '贯穿全剧的重复梗',
+  title: '敲三下门:「Penny! Penny! Penny!」',
+  setup:
+    'Sheldon 是个凡事必须遵循固定流程的物理学家。他敲邻居 Penny 的门,永远是同一套仪式,一次都不能少。',
+  punchline:
+    '「(敲敲敲)Penny!(敲敲敲)Penny!(敲敲敲)Penny!」——必须整整三轮,哪怕 Penny 中途开门,他也要对着空气把剩下的敲完。',
+  factors: ['running', 'character', 'ruleofthree', 'timing'],
+  analysis:
+    '这个笑点建立在仪式感上:三敲三唤的固定结构自带节奏(三段式 + 喜剧时机),重复到观众能跟着一起数(重复梗)。它好笑的根源是 Sheldon 的强迫式秩序感——流程高于目的,门开了也得敲完(角色反差)。后期各种变奏(别人替他敲、他忍着不敲)都在拿这个既定预期做文章。',
+};
+
+const blackadder: Joke = {
+  id: 'blackadder-cunning-plan',
+  show: 'Blackadder(黑爵士)',
+  episode: '贯穿全剧的重复梗',
+  title: '「I have a cunning plan」',
+  setup:
+    '每当主仆二人陷入绝境,忠厚愚钝的仆人 Baldrick 都会满怀信心地宣布同一句话:「I have a cunning plan(我有一个妙计)。」',
+  punchline:
+    '而他的「妙计」永远蠢得惊天动地——刻薄的 Blackadder 每次都要先讽刺一句再听,比如淡淡地问:「这个计划,有没有妙到像一只在牛津教书的狐狸?」',
+  factors: ['running', 'irony', 'character', 'deadpan'],
+  analysis:
+    '「cunning plan」的笑点是期望与现实的恒定落差:词越自信,计划越蠢(反讽)。它作为全剧重复梗,观众一听到就开始期待这次能蠢出什么新高度(重复梗);Blackadder 那些面不改色的花式毒舌比喻,是英式冷嘲的教科书(一本正经);一个自作聪明、一个刻薄冷峻,主仆性格的碰撞让这句话百用不腻(角色反差)。',
+};
+
+const rock30: Joke = {
+  id: '30rock-shark-week',
+  show: '30 Rock(我为喜剧狂)',
+  episode: 'Tracy Jordan 的人生建议',
+  title: '「Live every week like it’s Shark Week」',
+  setup:
+    '大明星 Tracy Jordan 以语出惊人著称,他的话永远介于疯话和禅机之间。这天他向 Kenneth 传授人生哲学。',
+  punchline:
+    '他无比郑重地说:「Live every week like it’s Shark Week.(把每一周都当鲨鱼周来活。)」——像宣读格言一样,说了一句毫无信息量的话。',
+  factors: ['deadpan', 'character', 'subvert'],
+  analysis:
+    '这句台词模仿了励志格言的全部外形——句式、腔调、庄重感——内核却是电视台的「鲨鱼周」栏目,完全没有可执行的含义(颠覆预期)。Tracy 说得越真诚,荒谬感越强(一本正经);而这种自信满满的胡言乱语正是他的角色底色(角色反差)。它后来真的被观众当成了半认真的口号,是「假格言」式笑点的代表。',
+};
+
+export const BUILTIN_JOKES: Joke[] = [office, friends, b99, arrested, seinfeld, parks, modernfamily, fawlty, himym, tbbt, blackadder, rock30];
