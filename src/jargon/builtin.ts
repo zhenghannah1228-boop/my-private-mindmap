@@ -76,4 +76,7 @@ export const BUILTIN_JARGON: Jargon[] = [
   { id: 'huo-de-gan', term: '获得感 / 幸福感', category: '画饼鸡汤', plain: '让员工或用户「觉得」有收获——精神画饼。', example: '要提升员工的获得感和幸福感。' },
   { id: 'yan-chi-man-zu', term: '延迟满足', category: '画饼鸡汤', plain: '好处以后再说,先干活别急。', example: '成长需要延迟满足。' },
   { id: 'all-in', term: 'All in', category: '画饼鸡汤', plain: '把全部资源押注到某个方向。', example: '公司决定 All in AI。' },
+
+  // 考核体系
+  { id: 'okr', term: 'OKR', category: '考核体系', plain: '目标(O)+ 关键结果(KR)的目标管理框架;季末打分 0.7 是政治正确答案,1.0 说明你目标定低了。', example: '本季度 OKR 对焦一下,看看大家方向有没有拉齐。' },
 ];
