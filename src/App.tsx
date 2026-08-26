@@ -11,6 +11,7 @@ import { MemeTracking } from './meme/MemeTracking';
 import { Comedy } from './comedy/Comedy';
 import { Jargon } from './jargon/Jargon';
 import { NetCopy } from './netcopy/NetCopy';
+import { Unwind } from './unwind/Unwind';
 import { TopSearch } from './ui/TopSearch';
 import { installPersistence } from './store/persist';
 import { useAppStore } from './store/useAppStore';
@@ -41,6 +42,9 @@ function ModeSwitch() {
       <button className={mode === 'netcopy' ? 'on' : ''} onClick={() => setMode('netcopy')}>
         网感文案
       </button>
+      <button className={mode === 'unwind' ? 'on' : ''} onClick={() => setMode('unwind')}>
+        掌控圈
+      </button>
     </div>
   );
 }
@@ -67,6 +71,8 @@ export default function App() {
         <Jargon />
       ) : mode === 'netcopy' ? (
         <NetCopy />
+      ) : mode === 'unwind' ? (
+        <Unwind />
       ) : (
         <MindMap />
       )}

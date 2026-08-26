@@ -70,6 +70,18 @@ export function Bulb({ size = 60, className }: D) {
   );
 }
 
+/** 松开的手掌,指头微张——放下的意思 */
+export function OpenHand({ size = 88, className }: D) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" className={className} {...base}>
+      <path d="M30 56V27c0-3 2-5 5-5s5 2 5 5v19" />
+      <path d="M40 46V18c0-3 2-5 5-5s5 2 5 5v27" />
+      <path d="M50 46V22c0-3 2-5 5-5s5 2 5 5v23" />
+      <path d="M60 49V30c0-3 2-5 5-5s5 2 5 5v27c0 14-9 24-22 24-9 0-14-4-19-11l-8-12c-2-3-1-6 2-7 2-1 5 0 7 2l5 6" />
+    </svg>
+  );
+}
+
 /** 简单的书本 */
 export function BookDoodle({ size = 72, className }: D) {
   return (

@@ -2562,3 +2562,310 @@ svg#edges {
   .nc-text { font-size: 18px; }
   .nc-feed { columns: 1; }
 }
+
+/* ── 掌控圈(治愈解气小游戏) ── */
+#unwind {
+  height: 100%;
+  overflow-y: auto;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 56px 24px 80px;
+}
+#unwind .lib-head {
+  max-width: none;
+}
+.uw-sub {
+  font-size: 14px;
+  color: #6b6a63;
+  margin-bottom: 30px;
+}
+
+/* 写 */
+.uw-write {
+  max-width: 560px;
+}
+.uw-intro {
+  font-size: 15px;
+  line-height: 1.9;
+  color: #45443d;
+  margin-bottom: 14px;
+}
+.uw-textarea {
+  width: 100%;
+  border: 1.5px solid #1c1b19;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 15px;
+  line-height: 1.7;
+  font-family: var(--font-hand), sans-serif;
+  color: #1c1b19;
+  background: #fff;
+  resize: vertical;
+}
+.uw-textarea:focus {
+  outline: none;
+  box-shadow: 2px 2px 0 rgba(28, 27, 25, 0.12);
+}
+.uw-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 20px;
+}
+.uw-tag {
+  border: 1.3px solid #1c1b19;
+  background: #fff;
+  color: #1c1b19;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+}
+.uw-tag.on {
+  background: #1c1b19;
+  color: #fff;
+}
+.uw-submit {
+  border: 1.5px solid #1c1b19;
+  background: #1c1b19;
+  color: #fff;
+  border-radius: 12px;
+  padding: 11px 24px;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+}
+.uw-submit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* 分类卡片(分类 / 转成行动阶段共用) */
+.uw-card {
+  max-width: 560px;
+  background: #fff;
+  border: 1.5px solid #1c1b19;
+  border-radius: 18px 13px 20px 14px;
+  box-shadow: 3px 3px 0 rgba(28, 27, 25, 0.1);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.uw-card-tag {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 11px;
+  border-radius: 20px;
+  background: #1c1b19;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.uw-card-text {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #1c1b19;
+  white-space: pre-wrap;
+}
+.uw-ask {
+  font-size: 15px;
+  color: #45443d;
+  margin-bottom: 14px;
+}
+.uw-sort-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.uw-sort-btn {
+  text-align: left;
+  border: 1.5px solid #1c1b19;
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c1b19;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.uw-sort-btn span {
+  font-size: 12px;
+  font-weight: 400;
+  color: #8a8880;
+}
+.uw-sort-btn:hover {
+  background: #1c1b19;
+  color: #fff;
+}
+.uw-sort-btn:hover span {
+  color: #cbcac4;
+}
+.uw-cancel {
+  border: none;
+  background: transparent;
+  color: #8a8880;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+  font-size: 13px;
+}
+.uw-cancel:hover {
+  color: #1c1b19;
+}
+
+/* 松绑(呼吸) */
+.uw-release {
+  max-width: 480px;
+  text-align: center;
+  padding: 20px 0;
+}
+.uw-hand {
+  color: #1c1b19;
+  margin-bottom: 18px;
+}
+.uw-breath-label {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1c1b19;
+  margin-bottom: 6px;
+}
+.uw-breath-hint {
+  font-size: 14px;
+  color: #6b6a63;
+  margin-bottom: 22px;
+}
+.uw-release-line {
+  font-size: 16px;
+  line-height: 1.95;
+  color: #3f3e38;
+  margin-bottom: 22px;
+}
+.uw-breath-btn {
+  border: 1.5px solid #1c1b19;
+  background: #1c1b19;
+  color: #fff;
+  border-radius: 12px;
+  padding: 11px 26px;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: var(--font-hand), sans-serif;
+  margin-bottom: 14px;
+}
+
+/* 转成行动 */
+.uw-act {
+  max-width: 560px;
+}
+
+/* 戾气来源地图 */
+.uw-map {
+  max-width: 560px;
+  margin-top: 44px;
+  padding-top: 28px;
+  border-top: 1px dashed #d3d1c7;
+}
+.uw-map-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1c1b19;
+  margin-bottom: 8px;
+}
+.uw-map-note {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #6b6a63;
+  margin-bottom: 18px;
+}
+.uw-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 26px;
+}
+.uw-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.uw-bar-label {
+  width: 84px;
+  flex-shrink: 0;
+  font-size: 12.5px;
+  color: #45443d;
+}
+.uw-bar-track {
+  flex: 1;
+  height: 10px;
+  background: #eceae3;
+  border: 1.3px solid #1c1b19;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.uw-bar-fill {
+  height: 100%;
+  background: #1c1b19;
+}
+.uw-bar-count {
+  width: 18px;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 12.5px;
+  color: #8a8880;
+}
+.uw-history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.uw-hist-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eeece5;
+}
+.uw-hist-badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1.3px solid #1c1b19;
+}
+.uw-hist-badge.unc {
+  background: #fff;
+  color: #1c1b19;
+}
+.uw-hist-badge.ctl {
+  background: #1c1b19;
+  color: #fff;
+}
+.uw-hist-text {
+  flex: 1;
+  color: #45443d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uw-hist-tag {
+  flex-shrink: 0;
+  color: #8a8880;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  #unwind {
+    padding: 44px 16px 60px;
+  }
+  .uw-sort-btns {
+    grid-template-columns: 1fr;
+  }
+  .uw-bar-label {
+    width: 60px;
+  }
+}
