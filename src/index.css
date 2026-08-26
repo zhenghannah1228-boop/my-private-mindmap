@@ -2430,3 +2430,135 @@ svg#edges {
     margin-left: 0;
   }
 }
+
+/* ── 网感文案 ── */
+#netcopy {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+}
+
+.nc-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.nc-search {
+  width: 100%;
+  max-width: 480px;
+  padding: 10px 14px;
+  border: 1.5px solid #111;
+  border-radius: 0;
+  background: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+}
+.nc-search:focus { border-color: #111; box-shadow: 2px 2px 0 #111; }
+
+.nc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nc-lang-group,
+.nc-cat-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nc-lang-group button,
+.nc-cat-group button {
+  padding: 5px 13px;
+  border: 1.5px solid #111;
+  background: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.12s, color 0.12s;
+}
+.nc-lang-group button.on,
+.nc-cat-group button.on {
+  background: #111;
+  color: #fff;
+}
+
+.nc-feed {
+  columns: 480px;
+  column-gap: 24px;
+}
+
+.nc-card {
+  break-inside: avoid;
+  border: 1.5px solid #111;
+  padding: 22px 22px 18px;
+  margin-bottom: 20px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nc-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.nc-cat-tag {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  border: 1px solid #111;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.nc-lang-tag {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+}
+.nc-lang-zh { background: #111; color: #fff; }
+.nc-lang-en { border: 1px solid #111; }
+
+.nc-text {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  border-left: 3px solid #111;
+  padding-left: 14px;
+}
+
+.nc-source {
+  font-size: 13px;
+  color: #555;
+  letter-spacing: 0.03em;
+}
+
+.nc-analysis {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #333;
+  border-top: 1px dashed #ccc;
+  padding-top: 10px;
+}
+
+.nc-empty {
+  color: #888;
+  font-size: 15px;
+  padding: 40px 0;
+}
+
+@media (max-width: 640px) {
+  #netcopy { padding: 20px 14px 60px; }
+  .nc-text { font-size: 18px; }
+  .nc-feed { columns: 1; }
+}

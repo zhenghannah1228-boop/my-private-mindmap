@@ -10,6 +10,7 @@ import { Discover } from './discover/Discover';
 import { MemeTracking } from './meme/MemeTracking';
 import { Comedy } from './comedy/Comedy';
 import { Jargon } from './jargon/Jargon';
+import { NetCopy } from './netcopy/NetCopy';
 import { TopSearch } from './ui/TopSearch';
 import { installPersistence } from './store/persist';
 import { useAppStore } from './store/useAppStore';
@@ -37,6 +38,9 @@ function ModeSwitch() {
       <button className={mode === 'jargon' ? 'on' : ''} onClick={() => setMode('jargon')}>
         大厂黑话
       </button>
+      <button className={mode === 'netcopy' ? 'on' : ''} onClick={() => setMode('netcopy')}>
+        网感文案
+      </button>
     </div>
   );
 }
@@ -61,6 +65,8 @@ export default function App() {
         <Comedy />
       ) : mode === 'jargon' ? (
         <Jargon />
+      ) : mode === 'netcopy' ? (
+        <NetCopy />
       ) : (
         <MindMap />
       )}
