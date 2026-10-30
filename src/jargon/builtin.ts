@@ -87,6 +87,7 @@ export const BUILTIN_JARGON: Jargon[] = [
   // 增长运营(补充)
   { id: 'sku', term: 'SKU', category: '增长运营', plain: '最小库存单位,指一个具体规格的商品。大厂泛化成「产品/功能的具体形态」,随便什么都叫 SKU。', example: '这个方向我们先上几个 SKU 试试水。' },
   { id: 'gmv', term: 'GMV', category: '增长运营', plain: '平台总交易额,含未付款、退款、刷单水分。电商大厂爱拿它对外展示,因为比实际营收好看很多。', example: '双十一 GMV 破了新高,但利润另说。' },
+  { id: 'campaign-desk', term: 'Campaign Desk', category: '增长运营', plain: '广告投放操盘台——盯着实时花费、ROI,随时调预算、换素材的那拨人(优化师),说法借自金融的 trading desk。', example: '这波大促的投放交给 campaign desk 盯着,预算随时准备加。' },
 
   // 效率提升(补充)
   { id: 'gao-bing-fa', term: '高并发', category: '效率提升', plain: '系统同一时刻处理大量请求的场景(如双十一秒杀)。非技术人员也爱用来装专业。', example: '这个方案能抗高并发吗?' },
