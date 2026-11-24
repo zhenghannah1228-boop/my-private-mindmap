@@ -2562,3 +2562,43 @@ svg#edges {
   .nc-text { font-size: 18px; }
   .nc-feed { columns: 1; }
 }
+
+/* ── 雅思错题集(复用笑点解析的 .mc-/.mq-/.mr-/.joke-card 样式) ── */
+#ielts {
+  display: flex;
+  height: 100%;
+}
+#ielts #side {
+  width: 220px;
+}
+#ielts-foot {
+  border-top: 1px solid #d3d1c7;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#ielts-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 44px 40px 56px;
+}
+#ielts-main .lib-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  max-width: 760px;
+}
+#ielts .meme-tip,
+#ielts .mc-intro {
+  max-width: 720px;
+}
+
+@media (max-width: 640px) {
+  #ielts #side {
+    width: 150px;
+  }
+  #ielts-main {
+    padding: 40px 18px 48px;
+  }
+}

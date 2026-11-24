@@ -5,14 +5,23 @@
 
 import { create } from 'zustand';
 
-export type AppMode = 'reading' | 'discover' | 'mindmap' | 'meme' | 'comedy' | 'jargon' | 'netcopy';
+export type AppMode = 'reading' | 'discover' | 'mindmap' | 'meme' | 'comedy' | 'jargon' | 'netcopy' | 'ielts';
 
 const MODE_KEY = 'mm_mode';
 
 function loadMode(): AppMode {
   try {
     const m = localStorage.getItem(MODE_KEY);
-    if (m === 'mindmap' || m === 'discover' || m === 'meme' || m === 'comedy' || m === 'jargon' || m === 'netcopy') return m;
+    if (
+      m === 'mindmap' ||
+      m === 'discover' ||
+      m === 'meme' ||
+      m === 'comedy' ||
+      m === 'jargon' ||
+      m === 'netcopy' ||
+      m === 'ielts'
+    )
+      return m;
     return 'reading';
   } catch {
     return 'reading';

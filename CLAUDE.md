@@ -44,3 +44,11 @@
 - 数据模型 / 采集指令:`src/jargon/types.ts`;内置词条:`src/jargon/builtin.ts`
 - 状态:`src/jargon/useJargonStore.ts`;界面:`src/jargon/Jargon.tsx`
 - 复用发现看板的卡片流样式(`.feed`);导入词条存 localStorage
+
+## 雅思错题集速览(与笑点解析同源的「解析类」玩法)
+
+- 按听力/阅读/写作/口语收集错题:原题 → 揭晓正确答案 → 猜错因/知识点 → 对照解析
+- 数据模型 / 采集指令:`src/ielts/types.ts`;内置错题示例:`src/ielts/builtin.ts`
+- 状态:`src/ielts/useIeltsStore.ts`(内置 + 导入错题、按技能筛选、已掌握标记)
+- 界面:`src/ielts/Ielts.tsx`;复用笑点解析的选单/推理/结局样式(`.mc-/.mq-/.mr-`)
+- 导入错题和「已掌握」标记都存 localStorage

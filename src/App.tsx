@@ -11,6 +11,7 @@ import { MemeTracking } from './meme/MemeTracking';
 import { Comedy } from './comedy/Comedy';
 import { Jargon } from './jargon/Jargon';
 import { NetCopy } from './netcopy/NetCopy';
+import { Ielts } from './ielts/Ielts';
 import { TopSearch } from './ui/TopSearch';
 import { installPersistence } from './store/persist';
 import { useAppStore } from './store/useAppStore';
@@ -41,6 +42,9 @@ function ModeSwitch() {
       <button className={mode === 'netcopy' ? 'on' : ''} onClick={() => setMode('netcopy')}>
         网感文案
       </button>
+      <button className={mode === 'ielts' ? 'on' : ''} onClick={() => setMode('ielts')}>
+        雅思错题集
+      </button>
     </div>
   );
 }
@@ -67,6 +71,8 @@ export default function App() {
         <Jargon />
       ) : mode === 'netcopy' ? (
         <NetCopy />
+      ) : mode === 'ielts' ? (
+        <Ielts />
       ) : (
         <MindMap />
       )}
