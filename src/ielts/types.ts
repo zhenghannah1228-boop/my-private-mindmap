@@ -17,6 +17,23 @@ export const SKILL_LABEL: Record<IeltsSkill, string> = Object.fromEntries(
   SKILLS.map((s) => [s.key, s.label])
 ) as Record<IeltsSkill, string>;
 
+/** 每个技能常见的题型,给新建表单做下拉选项用;列表之外的用「其他(自定义)」 */
+export const QTYPES_BY_SKILL: Record<IeltsSkill, string[]> = {
+  listening: ['表格填空', '单句填空', '笔记填空', '流程图填空', '选择题', '配对题', '地图/位置题', '简答题'],
+  reading: [
+    'True/False/Not Given',
+    'Yes/No/Not Given',
+    'Matching Headings',
+    '选择题',
+    '配对信息',
+    '摘要填空',
+    '表格/流程图填空',
+    '简答题',
+  ],
+  writing: ['Task 1 图表描述', 'Task 1 书信', 'Task 2 议论文'],
+  speaking: ['Part 1 日常问答', 'Part 2 长题', 'Part 3 讨论题'],
+};
+
 export type ErrorTag =
   | 'detail'
   | 'paraphrase'
