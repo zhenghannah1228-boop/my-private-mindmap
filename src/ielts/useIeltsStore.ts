@@ -12,6 +12,35 @@ const MASTERED_KEY = 'mm_ielts_mastered';
 
 type Phase = 'read' | 'quiz' | 'result';
 
+interface Draft {
+  skill: IeltsSkill;
+  qtype: string;
+  source: string;
+  stem: string;
+  yourAnswer: string;
+  correctAnswer: string;
+  tags: ErrorTag[];
+  analysis: string;
+}
+
+const EMPTY_DRAFT: Draft = {
+  skill: 'listening',
+  qtype: '',
+  source: '',
+  stem: '',
+  yourAnswer: '',
+  correctAnswer: '',
+  tags: [],
+  analysis: '',
+};
+
+function newId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return 'manual-' + crypto.randomUUID();
+  }
+  return 'manual-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
 export function isValidWrongQuestion(j: unknown): j is WrongQuestion {
   const x = j as Partial<WrongQuestion>;
   return !!(
@@ -73,6 +102,9 @@ interface IeltsStore {
   guess: ErrorTag[];
   mastered: Set<string>;
   status: string;
+  creating: boolean;
+  draft: Draft;
+  createError: string;
 
   init: () => void;
   setSkill: (s: IeltsSkill | null) => void;
@@ -87,6 +119,11 @@ interface IeltsStore {
   toggleMastered: (id: string) => void;
   copyPrompt: () => Promise<void>;
   importFile: (file: File) => Promise<void>;
+  startCreate: () => void;
+  cancelCreate: () => void;
+  updateDraft: (patch: Partial<Draft>) => void;
+  toggleDraftTag: (k: ErrorTag) => void;
+  saveCreate: () => void;
 }
 
 export const useIeltsStore = create<IeltsStore>((set, get) => ({
@@ -100,6 +137,9 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
   guess: [],
   mastered: new Set(),
   status: '',
+  creating: false,
+  draft: EMPTY_DRAFT,
+  createError: '',
 
   init() {
     if (get().loaded) return;
@@ -183,5 +223,67 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
       set({ status: '导入失败:' + ((e as Error).message || 'JSON 解析错误') });
       setTimeout(() => set({ status: '' }), 3600);
     }
+  },
+
+  startCreate() {
+    set({ creating: true, activeId: null, draft: EMPTY_DRAFT, createError: '' });
+  },
+
+  cancelCreate() {
+    set({ creating: false, createError: '' });
+  },
+
+  updateDraft(patch) {
+    set((st) => ({ draft: { ...st.draft, ...patch }, createError: '' }));
+  },
+
+  toggleDraftTag(k) {
+    const tags = get().draft.tags;
+    set((st) => ({
+      draft: { ...st.draft, tags: tags.includes(k) ? tags.filter((x) => x !== k) : [...tags, k] },
+      createError: '',
+    }));
+  },
+
+  saveCreate() {
+    const d = get().draft;
+    const qtype = d.qtype.trim();
+    const stem = d.stem.trim();
+    const correctAnswer = d.correctAnswer.trim();
+    const analysis = d.analysis.trim();
+    if (!qtype || !stem || !correctAnswer || !analysis) {
+      set({ createError: '题型 / 原题 / 正确答案 / 解析都是必填项' });
+      return;
+    }
+    if (!d.tags.length) {
+      set({ createError: '至少选一个错因标签' });
+      return;
+    }
+    const id = newId();
+    const item: WrongQuestion = {
+      id,
+      skill: d.skill,
+      qtype,
+      source: d.source.trim() || undefined,
+      stem,
+      yourAnswer: d.yourAnswer.trim() || undefined,
+      correctAnswer,
+      tags: d.tags,
+      analysis,
+    };
+    const builtinIds = new Set(BUILTIN_WRONG_QUESTIONS.map((j) => j.id));
+    const prev = loadImported().filter((j) => !builtinIds.has(j.id));
+    const next = [item, ...prev];
+    saveImported(next);
+    set({
+      items: [...next, ...BUILTIN_WRONG_QUESTIONS],
+      creating: false,
+      activeId: id,
+      revealed: false,
+      phase: 'read',
+      guess: [],
+      status: '✓ 已添加错题',
+    });
+    setTimeout(() => set({ status: '' }), 2600);
   },
 }));

@@ -136,6 +136,124 @@ function Result({ item }: { item: WrongQuestion }) {
   );
 }
 
+function CreateForm() {
+  const draft = useIeltsStore((s) => s.draft);
+  const createError = useIeltsStore((s) => s.createError);
+  const updateDraft = useIeltsStore((s) => s.updateDraft);
+  const toggleDraftTag = useIeltsStore((s) => s.toggleDraftTag);
+  const saveCreate = useIeltsStore((s) => s.saveCreate);
+  const cancelCreate = useIeltsStore((s) => s.cancelCreate);
+
+  return (
+    <div className="joke-card ielts-form">
+      <div className="jk-block">
+        <div className="jk-label">技能</div>
+        <div className="ielts-skill-row">
+          {SKILLS.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              className={'mq-factor ielts-skill-btn' + (draft.skill === s.key ? ' on' : '')}
+              onClick={() => updateDraft({ skill: s.key })}
+            >
+              <span className="mqf-label">{s.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="jk-block">
+        <div className="jk-label">题型 *</div>
+        <input
+          className="ielts-input"
+          value={draft.qtype}
+          onChange={(e) => updateDraft({ qtype: e.target.value })}
+          placeholder="如 填空题 / Matching Headings / Task 2 议论文 / Part 2 长题"
+        />
+      </div>
+
+      <div className="jk-block">
+        <div className="jk-label">来源(可选)</div>
+        <input
+          className="ielts-input"
+          value={draft.source}
+          onChange={(e) => updateDraft({ source: e.target.value })}
+          placeholder="如 剑16 Test 2;拿不准就留空"
+        />
+      </div>
+
+      <div className="jk-block">
+        <div className="jk-label">原题 *</div>
+        <textarea
+          className="ielts-textarea"
+          rows={3}
+          value={draft.stem}
+          onChange={(e) => updateDraft({ stem: e.target.value })}
+          placeholder="题干或场景描述,交代清楚上下文"
+        />
+      </div>
+
+      <div className="jk-block">
+        <div className="jk-label">你当时的答案(可选)</div>
+        <input
+          className="ielts-input"
+          value={draft.yourAnswer}
+          onChange={(e) => updateDraft({ yourAnswer: e.target.value })}
+        />
+      </div>
+
+      <div className="jk-block">
+        <div className="jk-label">正确答案 *</div>
+        <textarea
+          className="ielts-textarea"
+          rows={2}
+          value={draft.correctAnswer}
+          onChange={(e) => updateDraft({ correctAnswer: e.target.value })}
+        />
+      </div>
+
+      <div className="jk-block">
+        <div className="jk-label">错因标签(至少选 1 个) *</div>
+        <div className="mq-grid">
+          {ERROR_TAGS.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              className={'mq-factor' + (draft.tags.includes(t.key) ? ' on' : '')}
+              onClick={() => toggleDraftTag(t.key)}
+            >
+              <span className="mqf-label">{t.label}</span>
+              <span className="mqf-desc">{t.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="jk-block">
+        <div className="jk-label">解析 *</div>
+        <textarea
+          className="ielts-textarea"
+          rows={3}
+          value={draft.analysis}
+          onChange={(e) => updateDraft({ analysis: e.target.value })}
+          placeholder="为什么错、下次怎么避免"
+        />
+      </div>
+
+      {createError && <div className="ielts-form-error">{createError}</div>}
+
+      <div className="mr-actions">
+        <button className="jk-reveal" onClick={saveCreate}>
+          保存错题
+        </button>
+        <button className="mr-exit" onClick={cancelCreate}>
+          取消
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Chooser() {
   const items = useIeltsStore((s) => s.items);
   const activeSkill = useIeltsStore((s) => s.activeSkill);
@@ -186,12 +304,15 @@ export function Ielts() {
   const activeId = useIeltsStore((s) => s.activeId);
   const phase = useIeltsStore((s) => s.phase);
   const status = useIeltsStore((s) => s.status);
+  const creating = useIeltsStore((s) => s.creating);
   const init = useIeltsStore((s) => s.init);
   const setSkill = useIeltsStore((s) => s.setSkill);
   const toggleOnlyUnmastered = useIeltsStore((s) => s.toggleOnlyUnmastered);
   const exitItem = useIeltsStore((s) => s.exitItem);
   const copyPrompt = useIeltsStore((s) => s.copyPrompt);
   const importFile = useIeltsStore((s) => s.importFile);
+  const startCreate = useIeltsStore((s) => s.startCreate);
+  const cancelCreate = useIeltsStore((s) => s.cancelCreate);
 
   useEffect(() => {
     init();
@@ -221,6 +342,9 @@ export function Ielts() {
           </div>
         </div>
         <div id="ielts-foot">
+          <button className="import-btn" onClick={startCreate}>
+            ＋ 手动新建错题
+          </button>
           <button className="collect-btn" onClick={copyPrompt} title="复制采集指令,交给任意 AI 整理更多错题">
             <IconClip size={16} /> 复制采集指令
           </button>
@@ -244,18 +368,26 @@ export function Ielts() {
       <div id="ielts-main">
         <div className="lib-head">
           <h2>
-            {active ? active.qtype : '雅思错题集'}
+            {creating ? '新建错题' : active ? active.qtype : '雅思错题集'}
             <Sparkle className="head-sparkle" />
             <Squiggle className="head-squiggle" />
           </h2>
-          {active && (
-            <button className="meme-exit-link" onClick={exitItem}>
+          {creating ? (
+            <button className="meme-exit-link" onClick={cancelCreate}>
               ← 全部错题
             </button>
+          ) : (
+            active && (
+              <button className="meme-exit-link" onClick={exitItem}>
+                ← 全部错题
+              </button>
+            )
           )}
         </div>
 
-        {!active ? (
+        {creating ? (
+          <CreateForm />
+        ) : !active ? (
           <Chooser />
         ) : phase === 'quiz' ? (
           <Quiz />
