@@ -113,11 +113,17 @@ function saveImages(m: Record<string, string>) {
   }
 }
 
+export interface QtypeKey {
+  skill: IeltsSkill;
+  qtype: string;
+}
+
 interface IeltsStore {
   items: WrongQuestion[];
   loaded: boolean;
   activeSkill: IeltsSkill | null; // null = 全部
   onlyUnmastered: boolean;
+  activeQtype: QtypeKey | null; // 当前展开的题型合集
   activeId: string | null;
   revealed: boolean;
   phase: Phase;
@@ -133,6 +139,8 @@ interface IeltsStore {
   init: () => void;
   setSkill: (s: IeltsSkill | null) => void;
   toggleOnlyUnmastered: () => void;
+  selectQtype: (skill: IeltsSkill, qtype: string) => void;
+  exitQtype: () => void;
   selectItem: (id: string) => void;
   exitItem: () => void;
   reveal: () => void;
@@ -157,6 +165,7 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
   loaded: false,
   activeSkill: null,
   onlyUnmastered: false,
+  activeQtype: null,
   activeId: null,
   revealed: false,
   phase: 'read',
@@ -178,15 +187,30 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
   },
 
   setSkill(s) {
-    set({ activeSkill: s });
+    set({ activeSkill: s, activeQtype: null });
   },
   toggleOnlyUnmastered() {
     set((st) => ({ onlyUnmastered: !st.onlyUnmastered }));
   },
 
+  selectQtype(skill, qtype) {
+    set({ activeQtype: { skill, qtype }, activeId: null });
+  },
+
+  exitQtype() {
+    set({ activeQtype: null });
+  },
+
   selectItem(id) {
-    if (!get().items.some((j) => j.id === id)) return;
-    set({ activeId: id, revealed: false, phase: 'read', guess: [] });
+    const item = get().items.find((j) => j.id === id);
+    if (!item) return;
+    set({
+      activeId: id,
+      activeQtype: { skill: item.skill, qtype: item.qtype },
+      revealed: false,
+      phase: 'read',
+      guess: [],
+    });
   },
 
   exitItem() {
@@ -317,6 +341,7 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
       items: [...next, ...BUILTIN_WRONG_QUESTIONS],
       creating: false,
       activeId: id,
+      activeQtype: { skill: item.skill, qtype: item.qtype },
       revealed: false,
       phase: 'read',
       guess: [],

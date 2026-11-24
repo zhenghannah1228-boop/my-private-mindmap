@@ -399,44 +399,87 @@ function CreateForm() {
   );
 }
 
+/** 题型合集:一个题型 = 一张卡片,新题归进已有合集,不在首页里不停新增方块 */
 function Chooser() {
   const items = useIeltsStore((s) => s.items);
   const activeSkill = useIeltsStore((s) => s.activeSkill);
   const onlyUnmastered = useIeltsStore((s) => s.onlyUnmastered);
   const mastered = useIeltsStore((s) => s.mastered);
-  const selectItem = useIeltsStore((s) => s.selectItem);
+  const selectQtype = useIeltsStore((s) => s.selectQtype);
 
   const shown = items
     .filter((j) => !activeSkill || j.skill === activeSkill)
     .filter((j) => !onlyUnmastered || !mastered.has(j.id));
 
+  const groups = new Map<string, { skill: IeltsSkill; qtype: string; items: WrongQuestion[] }>();
+  for (const j of shown) {
+    const key = j.skill + '|' + j.qtype;
+    const g = groups.get(key);
+    if (g) g.items.push(j);
+    else groups.set(key, { skill: j.skill, qtype: j.qtype, items: [j] });
+  }
+  const groupList = [...groups.values()];
+
   return (
     <div className="meme-chooser">
       <p className="mc-intro">
-        选一道错题:先看<b>原题</b>,揭晓<b>正确答案</b>,再推理它踩了哪些
-        <b>错因</b>,最后对照解析——顺手标记是否已经<b>掌握</b>。
+        选一个<b>题型</b>,打开它的错题合集:每道题都是先看<b>原题</b>,揭晓
+        <b>正确答案</b>,再推理<b>错因</b>,最后对照解析——同一题型的新题会自动并进这张卡片,不会另开新的。
       </p>
-      {shown.length === 0 ? (
+      {groupList.length === 0 ? (
         <div className="empty">
           <div className="empty-sub">这个筛选下还没有错题,换个技能看看,或导入 / 复制采集指令收集几道。</div>
         </div>
       ) : (
         <div className="mc-grid">
-          {shown.map((j) => (
-            <button key={j.id} className="mc-card" onClick={() => selectItem(j.id)}>
-              <div className="mcc-title">
-                {j.qtype}
-                {mastered.has(j.id) && <span className="fc-tag" style={{ marginLeft: 8 }}>✓ 已掌握</span>}
-              </div>
-              <div className="mcc-sum">
-                {SKILL_LABEL[j.skill]}
-                {j.source ? ` · ${j.source}` : ''}
-              </div>
-              <div className="mcc-foot">复盘 →</div>
-            </button>
-          ))}
+          {groupList.map((g) => {
+            const allMastered = g.items.every((it) => mastered.has(it.id));
+            return (
+              <button key={g.skill + '|' + g.qtype} className="mc-card" onClick={() => selectQtype(g.skill, g.qtype)}>
+                <div className="mcc-title">
+                  {g.qtype}
+                  {allMastered && <span className="fc-tag" style={{ marginLeft: 8 }}>✓ 已掌握</span>}
+                </div>
+                <div className="mcc-sum">
+                  {SKILL_LABEL[g.skill]} · 共 {g.items.length} 题
+                </div>
+                <div className="mcc-foot">查看 →</div>
+              </button>
+            );
+          })}
         </div>
       )}
+    </div>
+  );
+}
+
+/** 某个题型合集里的题目列表 */
+function QtypeList() {
+  const items = useIeltsStore((s) => s.items);
+  const activeQtype = useIeltsStore((s) => s.activeQtype);
+  const mastered = useIeltsStore((s) => s.mastered);
+  const selectItem = useIeltsStore((s) => s.selectItem);
+
+  if (!activeQtype) return null;
+  const list = items.filter((j) => j.skill === activeQtype.skill && j.qtype === activeQtype.qtype);
+
+  return (
+    <div className="meme-chooser">
+      <p className="mc-intro">
+        「{activeQtype.qtype}」合集里的 {list.length} 道错题,点一道开始复盘。
+      </p>
+      <div className="mc-grid">
+        {list.map((j) => (
+          <button key={j.id} className="mc-card" onClick={() => selectItem(j.id)}>
+            <div className="mcc-title">
+              {j.source || '未标注来源'}
+              {mastered.has(j.id) && <span className="fc-tag" style={{ marginLeft: 8 }}>✓ 已掌握</span>}
+            </div>
+            <div className="mcc-sum">{j.stem.length > 50 ? j.stem.slice(0, 50) + '…' : j.stem}</div>
+            <div className="mcc-foot">复盘 →</div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -446,6 +489,7 @@ export function Ielts() {
   const activeSkill = useIeltsStore((s) => s.activeSkill);
   const onlyUnmastered = useIeltsStore((s) => s.onlyUnmastered);
   const mastered = useIeltsStore((s) => s.mastered);
+  const activeQtype = useIeltsStore((s) => s.activeQtype);
   const activeId = useIeltsStore((s) => s.activeId);
   const phase = useIeltsStore((s) => s.phase);
   const status = useIeltsStore((s) => s.status);
@@ -454,6 +498,7 @@ export function Ielts() {
   const setSkill = useIeltsStore((s) => s.setSkill);
   const toggleOnlyUnmastered = useIeltsStore((s) => s.toggleOnlyUnmastered);
   const exitItem = useIeltsStore((s) => s.exitItem);
+  const exitQtype = useIeltsStore((s) => s.exitQtype);
   const copyPrompt = useIeltsStore((s) => s.copyPrompt);
   const importFile = useIeltsStore((s) => s.importFile);
   const startCreate = useIeltsStore((s) => s.startCreate);
@@ -513,7 +558,7 @@ export function Ielts() {
       <div id="ielts-main">
         <div className="lib-head">
           <h2>
-            {creating ? '新建错题' : active ? active.qtype : '雅思错题集'}
+            {creating ? '新建错题' : active ? active.qtype : activeQtype ? activeQtype.qtype : '雅思错题集'}
             <Sparkle className="head-sparkle" />
             <Squiggle className="head-squiggle" />
           </h2>
@@ -521,10 +566,14 @@ export function Ielts() {
             <button className="meme-exit-link" onClick={cancelCreate}>
               ← 全部错题
             </button>
+          ) : active ? (
+            <button className="meme-exit-link" onClick={exitItem}>
+              ← {activeQtype?.qtype ?? '全部错题'}
+            </button>
           ) : (
-            active && (
-              <button className="meme-exit-link" onClick={exitItem}>
-                ← 全部错题
+            activeQtype && (
+              <button className="meme-exit-link" onClick={exitQtype}>
+                ← 全部题型
               </button>
             )
           )}
@@ -532,14 +581,18 @@ export function Ielts() {
 
         {creating ? (
           <CreateForm />
-        ) : !active ? (
-          <Chooser />
-        ) : phase === 'quiz' ? (
-          <Quiz />
-        ) : phase === 'result' ? (
-          <Result item={active} />
+        ) : active ? (
+          phase === 'quiz' ? (
+            <Quiz />
+          ) : phase === 'result' ? (
+            <Result item={active} />
+          ) : (
+            <QuestionRead item={active} />
+          )
+        ) : activeQtype ? (
+          <QtypeList />
         ) : (
-          <QuestionRead item={active} />
+          <Chooser />
         )}
       </div>
     </div>
