@@ -1,0 +1,467 @@
+/**
+ * 阅读器覆盖层。支持 EPUB(epubjs)/ PDF(pdfjs)/ TXT。
+ *
+ * 护眼:三种阅读主题(护眼米黄 / 纸白 / 夜间)+ 字号调节,舒适排版
+ *(衬线字体、宽松行距、居中窄栏)。主题/字号全局记忆。
+ * 记住每本书上次阅读位置(EPUB 存 CFI,PDF 存页码)。
+ */
+
+import { useEffect, useRef, useState } from 'react';
+import { getBookBlob } from './db';
+import { repoFileUrl } from './manifest';
+import type { BookMeta } from './types';
+
+const posKey = (id: string) => 'mm_read_pos_' + id;
+const THEME_KEY = 'mm_reader_theme';
+const FS_KEY = 'mm_reader_fs';
+
+interface EpubNavItem {
+  label?: string;
+  href?: string;
+  subitems?: EpubNavItem[];
+}
+
+type ThemeId = 'sepia' | 'paper' | 'night';
+interface Theme {
+  id: ThemeId;
+  name: string;
+  bg: string;
+  text: string;
+}
+const THEMES: Record<ThemeId, Theme> = {
+  sepia: { id: 'sepia', name: '护眼', bg: '#f4ecd8', text: '#4a4436' },
+  paper: { id: 'paper', name: '纸白', bg: '#faf9f7', text: '#2c2c2a' },
+  night: { id: 'night', name: '夜间', bg: '#1c1c1a', text: '#c6c1b4' },
+};
+const SERIF =
+  '"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun",Georgia,"Times New Roman",serif';
+
+/** 自生成的纸张颗粒纹理(SVG 分形噪声,做旧质感,不外链图片) */
+const GRAIN =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)' opacity='0.38'/%3E%3C/svg%3E\")";
+
+function loadTheme(): ThemeId {
+  const t = (localStorage.getItem(THEME_KEY) || 'sepia') as ThemeId;
+  return THEMES[t] ? t : 'sepia';
+}
+function loadFs(): number {
+  const n = Number(localStorage.getItem(FS_KEY));
+  return n >= 14 && n <= 28 ? n : 19;
+}
+
+/** 按需加载 pdfjs(约 350kB),避免拖慢初始加载 */
+async function loadPdfjs() {
+  const pdfjsLib = await import('pdfjs-dist');
+  const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+  return pdfjsLib;
+}
+
+async function resolveBlob(book: BookMeta): Promise<Blob> {
+  if (book.source === 'repo' && book.file) {
+    const res = await fetch(repoFileUrl(book.file));
+    if (!res.ok) throw new Error('无法加载文件 ' + res.status);
+    return res.blob();
+  }
+  const blob = await getBookBlob(book.id);
+  if (!blob) throw new Error('文件不存在(可能已删除)');
+  return blob;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function applyEpubTheme(rendition: any, theme: Theme, fs: number) {
+  rendition.themes.register('reader', {
+    html: { background: theme.bg + ' !important' },
+    body: {
+      'background-color': theme.bg + ' !important',
+      'background-image': GRAIN + ' !important',
+      'background-size': '170px 170px !important',
+      color: theme.text + ' !important',
+      'font-family': SERIF + ' !important',
+      'line-height': '1.9 !important',
+      'padding': '0.5em 0.2em !important',
+    },
+    'p, li, div, span': { color: theme.text + ' !important' },
+    p: { 'text-align': 'justify', 'letter-spacing': '0.01em' },
+    'h1,h2,h3,h4': { color: theme.text + ' !important', 'line-height': '1.4 !important' },
+    a: { color: theme.text + ' !important' },
+    img: { 'max-width': '100% !important', height: 'auto !important' },
+  });
+  rendition.themes.select('reader');
+  rendition.themes.fontSize(fs + 'px');
+}
+
+export function Reader({ book, onClose }: { book: BookMeta; onClose: () => void }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [txt, setTxt] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+  const [progress, setProgress] = useState(0); // 0–1,阅读进度
+  const [theme, setTheme] = useState<ThemeId>(loadTheme);
+  const [fs, setFs] = useState<number>(loadFs);
+  const [flip, setFlip] = useState<'next' | 'prev' | null>(null); // 翻页动画方向
+  const [toc, setToc] = useState<{ label: string; target: string; level: number }[]>([]);
+  const [tocOpen, setTocOpen] = useState(false);
+  const navRef = useRef<{ prev: () => void; next: () => void } | null>(null);
+  const tocGoRef = useRef<(target: string) => void>(() => {});
+  const tocOpenRef = useRef(false);
+  tocOpenRef.current = tocOpen;
+  const reduceMotion = useRef(false);
+
+  useEffect(() => {
+    reduceMotion.current =
+      typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  // 翻页:先亮起翻页纸,再在下一帧真正换页(新页在纸背后就绪,翻走后露出)
+  const turnRef = useRef<(dir: 'next' | 'prev') => void>(() => {});
+  turnRef.current = (dir) => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const doTurn = () => (dir === 'next' ? nav.next() : nav.prev());
+    if (reduceMotion.current) {
+      doTurn();
+      return;
+    }
+    setFlip(dir);
+    requestAnimationFrame(doTurn);
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renditionRef = useRef<any>(null);
+
+  const t = THEMES[theme];
+
+  // 持久化主题 / 字号
+  useEffect(() => {
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+  useEffect(() => {
+    localStorage.setItem(FS_KEY, String(fs));
+  }, [fs]);
+
+  // 主题 / 字号变化时,重新应用到 EPUB
+  useEffect(() => {
+    if (renditionRef.current) applyEpubTheme(renditionRef.current, t, fs);
+  }, [theme, fs, t]);
+
+  // 键盘:Esc 关闭,←/→ 翻页
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (tocOpenRef.current) setTocOpen(false);
+        else onClose();
+      } else if (e.key === 'ArrowLeft') turnRef.current('prev');
+      else if (e.key === 'ArrowRight') turnRef.current('next');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+    setLoading(true);
+    setErr('');
+    setTxt(null);
+    setToc([]);
+    setTocOpen(false);
+    tocGoRef.current = () => {};
+    renditionRef.current = null;
+
+    (async () => {
+      try {
+        const blob = await resolveBlob(book);
+        if (cancelled) return;
+
+        if (book.format === 'txt') {
+          const text = await blob.text();
+          if (!cancelled) {
+            setTxt(text);
+            setLoading(false);
+          }
+          return;
+        }
+
+        if (book.format === 'epub') {
+          const ePub = (await import('epubjs')).default;
+          const buf = await blob.arrayBuffer();
+          if (cancelled) return;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const b: any = ePub(buf as ArrayBuffer);
+          const rendition = b.renderTo(hostRef.current!, {
+            width: '100%',
+            height: '100%',
+            spread: 'none',
+            flow: 'paginated',
+          });
+          renditionRef.current = rendition;
+          applyEpubTheme(rendition, THEMES[loadTheme()], loadFs());
+          const saved = localStorage.getItem(posKey(book.id)) || undefined;
+          await rendition.display(saved);
+          // 后台生成 locations,让进度百分比精确(大书需一两秒)
+          b.ready
+            .then(() => b.locations.generate(1600))
+            .catch(() => {});
+          rendition.on(
+            'relocated',
+            (loc: {
+              start?: {
+                cfi?: string;
+                percentage?: number;
+                displayed?: { page: number; total: number };
+              };
+            }) => {
+              if (loc?.start?.cfi) localStorage.setItem(posKey(book.id), loc.start.cfi);
+              // 优先用精确百分比;未就绪则用当前章的页码比例兜底
+              let pct = loc?.start?.percentage || 0;
+              const d = loc?.start?.displayed;
+              if (!pct && d && d.total) pct = d.page / d.total;
+              setProgress(pct);
+            }
+          );
+          navRef.current = { prev: () => rendition.prev(), next: () => rendition.next() };
+          tocGoRef.current = (target) => rendition.display(target);
+          // 目录:书自带的导航
+          b.loaded.navigation
+            .then((navi: { toc?: EpubNavItem[] }) => {
+              if (cancelled) return;
+              const flat: { label: string; target: string; level: number }[] = [];
+              const walk = (items: EpubNavItem[] | undefined, lvl: number) => {
+                (items || []).forEach((it) => {
+                  const label = (it.label || '').trim();
+                  if (label && it.href) flat.push({ label, target: it.href, level: lvl });
+                  if (it.subitems?.length) walk(it.subitems, lvl + 1);
+                });
+              };
+              walk(navi.toc, 0);
+              setToc(flat);
+            })
+            .catch(() => {});
+          if (!cancelled) setLoading(false);
+          cleanup = () => {
+            renditionRef.current = null;
+            b.destroy();
+          };
+          return;
+        }
+
+        if (book.format === 'pdf') {
+          const pdfjsLib = await loadPdfjs();
+          const buf = await blob.arrayBuffer();
+          if (cancelled) return;
+          const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+          if (cancelled) return;
+          setPageCount(pdf.numPages);
+          const saved = Number(localStorage.getItem(posKey(book.id)) || '1');
+          let cur = Math.min(Math.max(1, saved), pdf.numPages);
+
+          const renderPage = async (n: number) => {
+            const p = await pdf.getPage(n);
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const host = hostRef.current!;
+            const unscaled = p.getViewport({ scale: 1 });
+            const scale = Math.min((host.clientWidth - 48) / unscaled.width, 2);
+            const viewport = p.getViewport({ scale: Math.max(scale, 0.4) });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d')!;
+            await p.render({ canvasContext: ctx, viewport }).promise;
+          };
+
+          const go = (n: number) => {
+            cur = Math.min(Math.max(1, n), pdf.numPages);
+            setPage(cur);
+            setProgress(cur / pdf.numPages);
+            localStorage.setItem(posKey(book.id), String(cur));
+            renderPage(cur);
+          };
+          navRef.current = { prev: () => go(cur - 1), next: () => go(cur + 1) };
+          tocGoRef.current = (target) => {
+            const n = Number(target);
+            if (n) go(n);
+          };
+          // 目录:PDF 大纲书签(很多 PDF 没有,则不显示目录)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          pdf
+            .getOutline()
+            .then(async (outline: any[]) => {
+              if (cancelled || !outline?.length) return;
+              const flat: { label: string; target: string; level: number }[] = [];
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const pageOf = async (dest: any): Promise<number | null> => {
+                try {
+                  let d = dest;
+                  if (typeof d === 'string') d = await pdf.getDestination(d);
+                  if (!Array.isArray(d)) return null;
+                  return (await pdf.getPageIndex(d[0])) + 1;
+                } catch {
+                  return null;
+                }
+              };
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const walk = async (items: any[], lvl: number) => {
+                for (const it of items) {
+                  const pg = await pageOf(it.dest);
+                  if (pg) flat.push({ label: (it.title || '').trim(), target: String(pg), level: lvl });
+                  if (it.items?.length) await walk(it.items, lvl + 1);
+                }
+              };
+              await walk(outline, 0);
+              if (!cancelled) setToc(flat);
+            })
+            .catch(() => {});
+          setPage(cur);
+          setProgress(cur / pdf.numPages);
+          await renderPage(cur);
+          if (!cancelled) setLoading(false);
+          cleanup = () => pdf.destroy();
+          return;
+        }
+
+        setErr('不支持的格式');
+        setLoading(false);
+      } catch (e) {
+        if (!cancelled) {
+          setErr((e as Error).message || '打开失败');
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      navRef.current = null;
+      cleanup?.();
+    };
+  }, [book]);
+
+  return (
+    <div id="reader" className={'rtheme-' + theme} style={{ background: t.bg, color: t.text }}>
+      <div className="reader-bar">
+        <button className="rclose" onClick={onClose} title="返回(Esc)">
+          ‹ 返回
+        </button>
+        {toc.length > 0 && (
+          <button className="rtoc-btn" onClick={() => setTocOpen((v) => !v)} title="目录">
+            ☰ 目录
+          </button>
+        )}
+        <span className="rt">
+          {book.title}
+          {book.author ? ' · ' + book.author : ''}
+        </span>
+        <span className="rspacer" />
+
+        {/* 主题切换(护眼) */}
+        <div className="rthemes" title="阅读主题">
+          {(Object.keys(THEMES) as ThemeId[]).map((id) => (
+            <button
+              key={id}
+              className={'rtheme-dot dot-' + id + (theme === id ? ' on' : '')}
+              onClick={() => setTheme(id)}
+              title={THEMES[id].name}
+            />
+          ))}
+        </div>
+
+        {/* 字号 */}
+        <div className="rfs" title="字号">
+          <button onClick={() => setFs((v) => Math.max(14, v - 1))}>A-</button>
+          <button onClick={() => setFs((v) => Math.min(28, v + 1))}>A+</button>
+        </div>
+
+        {book.format === 'pdf' && pageCount > 0 && (
+          <span className="rpage">
+            {page} / {pageCount}
+          </span>
+        )}
+        {book.format !== 'txt' && (
+          <div className="rnav">
+            <button onClick={() => turnRef.current('prev')} title="上一页(←)">
+              ‹
+            </button>
+            <button onClick={() => turnRef.current('next')} title="下一页(→)">
+              ›
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="reader-body">
+        {err && <div className="reader-msg">打开失败:{err}</div>}
+        {loading && !err && <div className="reader-msg">加载中…</div>}
+        {txt != null ? (
+          <div className="reader-scroll">
+            <pre className="reader-txt" style={{ fontSize: fs, fontFamily: SERIF }}>
+              {txt}
+            </pre>
+          </div>
+        ) : book.format === 'pdf' ? (
+          <div className="reader-host" ref={hostRef}>
+            <canvas ref={canvasRef} />
+          </div>
+        ) : (
+          <div className="reader-host epub" ref={hostRef} />
+        )}
+
+        {/* 点击左右边缘翻页(中间留白供选词/点链接)*/}
+        {book.format !== 'txt' && !loading && !err && (
+          <>
+            <div className="tap-zone tap-left" onClick={() => turnRef.current('prev')} />
+            <div className="tap-zone tap-right" onClick={() => turnRef.current('next')} />
+          </>
+        )}
+
+        {/* 拟态翻页纸 */}
+        {flip && (
+          <div
+            className={'page-flip flip-' + flip}
+            style={{ backgroundColor: t.bg }}
+            onAnimationEnd={() => setFlip(null)}
+          />
+        )}
+      </div>
+
+      {/* 阅读进度条 */}
+      {book.format !== 'txt' && (
+        <div className="reader-progress">
+          <div className="reader-progress-fill" style={{ width: Math.round(progress * 100) + '%' }} />
+        </div>
+      )}
+
+      {/* 目录抽屉 */}
+      {tocOpen && (
+        <>
+          <div className="toc-mask" onClick={() => setTocOpen(false)} />
+          <div className="toc-drawer">
+            <div className="toc-head">
+              <span>目录</span>
+              <button onClick={() => setTocOpen(false)} title="关闭">
+                ✕
+              </button>
+            </div>
+            <div className="toc-list">
+              {toc.map((it, i) => (
+                <div
+                  key={i}
+                  className="toc-item"
+                  style={{ paddingLeft: 16 + it.level * 15 }}
+                  onClick={() => {
+                    tocGoRef.current(it.target);
+                    setTocOpen(false);
+                  }}
+                >
+                  {it.label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

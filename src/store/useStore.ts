@@ -1,0 +1,405 @@
+/**
+ * 全局状态(Zustand)。
+ *
+ * 作品库(多空间)模型:
+ * - `spaces` 是所有分类空间(小说/电影/音乐…),每个有独立 doc + view。
+ * - 顶层 `doc` / `view` 是**当前活动空间的工作副本**。所有节点/边/视口 action 都直接
+ *   改这份工作副本(逻辑与单空间时期完全一致,零改动)。
+ * - 切换 / 增删空间时,先把工作副本 commit 回 spaces,再载入目标空间。
+ * - 持久化与同步用 `snapshot()` 取「已 commit 活动副本」的完整作品库(见 persist.ts)。
+ */
+
+import { create } from 'zustand';
+import {
+  canConnect,
+  emptyDoc,
+  makeEdge,
+  makeNode,
+  makeSpace,
+  makeSticker,
+  normalizeLibrary,
+  removeNode,
+  removeSticker,
+} from '../core/model';
+import { deleteImage } from '../core/imagedb';
+import { fitToNodes, type Rect } from '../core/viewport';
+import { loadLibrary, loadSyncKey } from '../core/storage';
+import type { ColorIndex, Doc, Library, MindNode, Space, Sticker, View } from '../core/types';
+import type { FilterMode } from '../core/filter';
+
+export interface UiState {
+  selectedId: number | null;
+  editingId: number | null;
+  /** 选中的贴画 id;与节点选中互斥 */
+  selectedStickerId: number | null;
+  /** 正在裁剪的贴画 id;null = 无 */
+  croppingStickerId: number | null;
+  filterMode: FilterMode;
+  linkingFrom: number | null;
+  placeMode: boolean;
+  /** 正在重命名的空间 id;null = 无 */
+  renamingSpaceId: string | null;
+  /** 节点搜索关键词;非空时高亮命中、其余降透明度 */
+  searchQuery: string;
+  /** 上传/粘贴图片时是否自动抠图变贴画 */
+  autoCutout: boolean;
+  syncKey: string;
+  syncMsg: string;
+  autoSync: boolean;
+  status: string;
+}
+
+export interface Store {
+  spaces: Space[];
+  activeId: string;
+  doc: Doc; // 活动空间工作副本
+  view: View; // 活动空间工作副本
+  ui: UiState;
+
+  // ── 节点 ──
+  addNode: (x: number, y: number, t?: string, extra?: Partial<MindNode>) => number;
+  updateNodeText: (id: number, t: string) => void;
+  moveNode: (id: number, x: number, y: number) => void;
+  setNodeColor: (id: number, c: ColorIndex) => void;
+  setNodeDue: (id: number, due: number | null) => void;
+  deleteNode: (id: number) => void;
+
+  // ── 边 ──
+  addEdge: (a: number, b: number) => void;
+  deleteEdge: (id: number) => void;
+
+  // ── 贴画(图片)──
+  addSticker: (x: number, y: number, w: number, h: number, blobId: string, extra?: Partial<Sticker>) => number;
+  moveSticker: (id: number, x: number, y: number) => void;
+  resizeSticker: (id: number, x: number, y: number, w: number, h: number) => void;
+  setStickerCrop: (id: number, crop: { x: number; y: number; w: number; h: number }, w: number, h: number) => void;
+  markStickerCutout: (id: number) => void;
+  deleteSticker: (id: number) => void;
+  selectSticker: (id: number | null) => void;
+  setCropping: (id: number | null) => void;
+
+  // ── 视口 ──
+  setView: (v: View) => void;
+  fit: (rect: Rect, sizes?: Map<number, { w: number; h: number }>) => void;
+
+  // ── 空间(作品库导航)──
+  switchSpace: (id: string) => void;
+  addSpace: (name: string) => void;
+  renameSpace: (id: string, name: string) => void;
+  deleteSpace: (id: string) => void;
+  setRenaming: (id: string | null) => void;
+  setSearchQuery: (q: string) => void;
+  /** 取当前完整作品库(含已 commit 的活动副本) */
+  snapshot: () => Library;
+
+  // ── UI ──
+  select: (id: number | null) => void;
+  setEditing: (id: number | null) => void;
+  setFilter: (mode: FilterMode) => void;
+  setLinkingFrom: (id: number | null) => void;
+  setPlaceMode: (on: boolean) => void;
+  setAutoCutout: (on: boolean) => void;
+  setSyncKey: (k: string) => void;
+  setSyncMsg: (m: string) => void;
+  setAutoSync: (on: boolean) => void;
+  setStatus: (s: string) => void;
+
+  // ── 作品库级 ──
+  replaceLibrary: (raw: unknown) => void;
+}
+
+const initialLibrary = loadLibrary();
+const initialActive =
+  initialLibrary.spaces.find((s) => s.id === initialLibrary.activeId) ?? initialLibrary.spaces[0];
+
+function baseUi(): UiState {
+  return {
+    selectedId: null,
+    editingId: null,
+    selectedStickerId: null,
+    croppingStickerId: null,
+    filterMode: null,
+    linkingFrom: null,
+    placeMode: false,
+    renamingSpaceId: null,
+    searchQuery: '',
+    autoCutout: true,
+    syncKey: loadSyncKey(),
+    syncMsg: '同一同步码 = 同一份数据。手机上填相同的码即可打通。',
+    autoSync: false,
+    status: '就绪',
+  };
+}
+
+/** 把活动空间的工作副本 commit 回 spaces 数组 */
+function committedSpaces(state: Store): Space[] {
+  return state.spaces.map((s) =>
+    s.id === state.activeId ? { ...s, doc: state.doc, view: state.view } : s
+  );
+}
+
+/** 切换空间时重置的瞬时 UI(保留同步相关字段) */
+function resetTransientUi(ui: UiState): UiState {
+  return {
+    ...ui,
+    selectedId: null,
+    editingId: null,
+    selectedStickerId: null,
+    croppingStickerId: null,
+    linkingFrom: null,
+    placeMode: false,
+    filterMode: null,
+    renamingSpaceId: null,
+  };
+}
+
+export const useStore = create<Store>((set, get) => ({
+  spaces: initialLibrary.spaces,
+  activeId: initialActive.id,
+  doc: initialActive.doc,
+  view: initialActive.view,
+  ui: baseUi(),
+
+  addNode(x, y, t = '', extra = {}) {
+    const doc = get().doc;
+    const node = makeNode(doc, x, y, t, extra);
+    set({ doc: { ...doc, nodes: [...doc.nodes, node], nid: doc.nid + 1 } });
+    return node.id;
+  },
+
+  updateNodeText(id, t) {
+    const doc = get().doc;
+    set({
+      doc: {
+        ...doc,
+        nodes: doc.nodes.map((n) => (n.id === id ? { ...n, t: t.trim() || '空' } : n)),
+      },
+    });
+  },
+
+  moveNode(id, x, y) {
+    const doc = get().doc;
+    set({ doc: { ...doc, nodes: doc.nodes.map((n) => (n.id === id ? { ...n, x, y } : n)) } });
+  },
+
+  setNodeColor(id, c) {
+    const doc = get().doc;
+    set({ doc: { ...doc, nodes: doc.nodes.map((n) => (n.id === id ? { ...n, c } : n)) } });
+  },
+
+  setNodeDue(id, due) {
+    const doc = get().doc;
+    set({ doc: { ...doc, nodes: doc.nodes.map((n) => (n.id === id ? { ...n, due } : n)) } });
+  },
+
+  deleteNode(id) {
+    const doc = { ...get().doc, nodes: [...get().doc.nodes], edges: [...get().doc.edges] };
+    removeNode(doc, id);
+    const ui = get().ui;
+    set({ doc, ui: { ...ui, selectedId: ui.selectedId === id ? null : ui.selectedId } });
+  },
+
+  addEdge(a, b) {
+    const doc = get().doc;
+    if (!canConnect(doc, a, b)) return;
+    const edge = makeEdge(doc, a, b);
+    set({ doc: { ...doc, edges: [...doc.edges, edge], eid: doc.eid + 1 } });
+  },
+
+  deleteEdge(id) {
+    const doc = get().doc;
+    set({ doc: { ...doc, edges: doc.edges.filter((e) => e.id !== id) } });
+  },
+
+  // ── 贴画 ──
+  addSticker(x, y, w, h, blobId, extra = {}) {
+    const doc = get().doc;
+    const sticker = makeSticker(doc, x, y, w, h, blobId, extra);
+    set({
+      doc: { ...doc, stickers: [...(doc.stickers || []), sticker], sid: (doc.sid ?? 1) + 1 },
+      ui: { ...get().ui, selectedStickerId: sticker.id, selectedId: null, editingId: null },
+    });
+    return sticker.id;
+  },
+
+  moveSticker(id, x, y) {
+    const doc = get().doc;
+    set({
+      doc: { ...doc, stickers: (doc.stickers || []).map((s) => (s.id === id ? { ...s, x, y } : s)) },
+    });
+  },
+
+  resizeSticker(id, x, y, w, h) {
+    const doc = get().doc;
+    set({
+      doc: {
+        ...doc,
+        stickers: (doc.stickers || []).map((s) => (s.id === id ? { ...s, x, y, w, h } : s)),
+      },
+    });
+  },
+
+  setStickerCrop(id, crop, w, h) {
+    const doc = get().doc;
+    set({
+      doc: {
+        ...doc,
+        stickers: (doc.stickers || []).map((s) => (s.id === id ? { ...s, crop, w, h } : s)),
+      },
+    });
+  },
+
+  markStickerCutout(id) {
+    const doc = get().doc;
+    set({
+      doc: {
+        ...doc,
+        stickers: (doc.stickers || []).map((s) => (s.id === id ? { ...s, cutout: true } : s)),
+      },
+    });
+  },
+
+  deleteSticker(id) {
+    const doc = { ...get().doc, stickers: [...(get().doc.stickers || [])] };
+    const blobId = removeSticker(doc, id);
+    if (blobId) void deleteImage(blobId);
+    const ui = get().ui;
+    set({
+      doc,
+      ui: {
+        ...ui,
+        selectedStickerId: ui.selectedStickerId === id ? null : ui.selectedStickerId,
+        croppingStickerId: ui.croppingStickerId === id ? null : ui.croppingStickerId,
+      },
+    });
+  },
+
+  selectSticker(id) {
+    set({ ui: { ...get().ui, selectedStickerId: id, selectedId: null, editingId: null, croppingStickerId: null } });
+  },
+
+  setCropping(id) {
+    set({ ui: { ...get().ui, croppingStickerId: id } });
+  },
+
+  setView(v) {
+    set({ view: v });
+  },
+
+  fit(rect, sizes) {
+    set({ view: fitToNodes(get().doc.nodes, rect, sizes) });
+  },
+
+  // ── 空间 ──
+  switchSpace(id) {
+    const state = get();
+    if (id === state.activeId) return;
+    const spaces = committedSpaces(state);
+    const target = spaces.find((s) => s.id === id);
+    if (!target) return;
+    set({
+      spaces,
+      activeId: id,
+      doc: target.doc,
+      view: target.view,
+      ui: resetTransientUi(state.ui),
+    });
+  },
+
+  addSpace(name) {
+    const state = get();
+    const s = makeSpace(name);
+    set({
+      spaces: [...committedSpaces(state), s],
+      activeId: s.id,
+      doc: s.doc,
+      view: s.view,
+      ui: { ...resetTransientUi(state.ui), renamingSpaceId: s.id }, // 新建后直接进入重命名
+    });
+  },
+
+  renameSpace(id, name) {
+    const state = get();
+    const clean = name.trim() || '未命名';
+    set({
+      spaces: committedSpaces(state).map((s) => (s.id === id ? { ...s, name: clean } : s)),
+      ui: { ...state.ui, renamingSpaceId: null },
+    });
+  },
+
+  deleteSpace(id) {
+    const state = get();
+    let spaces = committedSpaces(state).filter((s) => s.id !== id);
+    if (!spaces.length) spaces = [makeSpace('新分类')]; // 不能空
+    const wasActive = state.activeId === id;
+    const active = wasActive ? spaces[0] : spaces.find((s) => s.id === state.activeId) ?? spaces[0];
+    set({
+      spaces,
+      activeId: active.id,
+      doc: active.doc,
+      view: active.view,
+      ui: wasActive ? resetTransientUi(state.ui) : { ...state.ui, renamingSpaceId: null },
+    });
+  },
+
+  setRenaming(id) {
+    set({ ui: { ...get().ui, renamingSpaceId: id } });
+  },
+
+  setSearchQuery(q) {
+    set({ ui: { ...get().ui, searchQuery: q } });
+  },
+
+  snapshot() {
+    const state = get();
+    return { spaces: committedSpaces(state), activeId: state.activeId };
+  },
+
+  // ── UI ──
+  select(id) {
+    // 选中节点(或点空白)时清掉贴画选中/裁剪,保持二者互斥
+    set({ ui: { ...get().ui, selectedId: id, selectedStickerId: null, croppingStickerId: null } });
+  },
+  setEditing(id) {
+    set({ ui: { ...get().ui, editingId: id } });
+  },
+  setFilter(mode) {
+    set({ ui: { ...get().ui, filterMode: mode } });
+  },
+  setLinkingFrom(id) {
+    set({ ui: { ...get().ui, linkingFrom: id } });
+  },
+  setPlaceMode(on) {
+    set({ ui: { ...get().ui, placeMode: on } });
+  },
+  setAutoCutout(on) {
+    set({ ui: { ...get().ui, autoCutout: on } });
+  },
+  setSyncKey(k) {
+    set({ ui: { ...get().ui, syncKey: k } });
+  },
+  setSyncMsg(m) {
+    set({ ui: { ...get().ui, syncMsg: m } });
+  },
+  setAutoSync(on) {
+    set({ ui: { ...get().ui, autoSync: on } });
+  },
+  setStatus(s) {
+    set({ ui: { ...get().ui, status: s } });
+  },
+
+  // ── 作品库级 ──
+  replaceLibrary(raw) {
+    const lib = normalizeLibrary(raw);
+    const active = lib.spaces.find((s) => s.id === lib.activeId) ?? lib.spaces[0];
+    set({
+      spaces: lib.spaces,
+      activeId: active.id,
+      doc: active.doc,
+      view: active.view,
+      ui: resetTransientUi(get().ui),
+    });
+  },
+}));
+
+export { emptyDoc };
