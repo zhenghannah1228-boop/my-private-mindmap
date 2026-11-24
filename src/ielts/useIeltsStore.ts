@@ -113,6 +113,20 @@ function saveImages(m: Record<string, string>) {
   }
 }
 
+const BUILTIN_IDS = new Set(BUILTIN_WRONG_QUESTIONS.map((j) => j.id));
+
+/**
+ * 合并内置题与本地存的题:非内置 id 的自定义/导入题排在前面;
+ * 内置题按原顺序排列,但如果本地存里有同 id 的版本(编辑过的内置题)就用那个覆盖。
+ */
+function mergeItems(stored: WrongQuestion[]): WrongQuestion[] {
+  const overrides = new Map(stored.map((j) => [j.id, j]));
+  return [
+    ...stored.filter((j) => !BUILTIN_IDS.has(j.id)),
+    ...BUILTIN_WRONG_QUESTIONS.map((b) => overrides.get(b.id) ?? b),
+  ];
+}
+
 export interface QtypeKey {
   skill: IeltsSkill;
   qtype: string;
@@ -131,6 +145,7 @@ interface IeltsStore {
   mastered: Set<string>;
   status: string;
   creating: boolean;
+  editingId: string | null; // null = 新建,非空 = 正在编辑该 id 的题
   draftId: string;
   draft: Draft;
   createError: string;
@@ -152,6 +167,7 @@ interface IeltsStore {
   copyPrompt: () => Promise<void>;
   importFile: (file: File) => Promise<void>;
   startCreate: () => void;
+  startEdit: (id: string) => void;
   cancelCreate: () => void;
   updateDraft: (patch: Partial<Draft>) => void;
   toggleDraftTag: (k: ErrorTag) => void;
@@ -173,6 +189,7 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
   mastered: new Set(),
   status: '',
   creating: false,
+  editingId: null,
   draftId: '',
   draft: EMPTY_DRAFT,
   createError: '',
@@ -180,10 +197,7 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
 
   init() {
     if (get().loaded) return;
-    const imported = loadImported();
-    const builtinIds = new Set(BUILTIN_WRONG_QUESTIONS.map((j) => j.id));
-    const items = [...imported.filter((j) => !builtinIds.has(j.id)), ...BUILTIN_WRONG_QUESTIONS];
-    set({ items, mastered: loadMastered(), images: loadImages(), loaded: true });
+    set({ items: mergeItems(loadImported()), mastered: loadMastered(), images: loadImages(), loaded: true });
   },
 
   setSkill(s) {
@@ -265,11 +279,10 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
         setTimeout(() => set({ status: '' }), 3200);
         return;
       }
-      const builtinIds = new Set(BUILTIN_WRONG_QUESTIONS.map((j) => j.id));
       const prev = loadImported().filter((j) => !incoming.some((n) => n.id === j.id));
-      const next = [...incoming.filter((j) => !builtinIds.has(j.id)), ...prev];
+      const next = [...incoming, ...prev];
       saveImported(next);
-      set({ items: [...next, ...BUILTIN_WRONG_QUESTIONS], status: `✓ 导入 ${incoming.length} 道错题` });
+      set({ items: mergeItems(next), status: `✓ 导入 ${incoming.length} 道错题` });
       setTimeout(() => set({ status: '' }), 2600);
     } catch (e) {
       set({ status: '导入失败:' + ((e as Error).message || 'JSON 解析错误') });
@@ -278,20 +291,45 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
   },
 
   startCreate() {
-    set({ creating: true, activeId: null, draftId: newId(), draft: EMPTY_DRAFT, createError: '' });
+    set({ creating: true, editingId: null, activeId: null, draftId: newId(), draft: EMPTY_DRAFT, createError: '' });
+  },
+
+  startEdit(id) {
+    const item = get().items.find((j) => j.id === id);
+    if (!item) return;
+    set({
+      creating: true,
+      editingId: id,
+      draftId: id,
+      draft: {
+        skill: item.skill,
+        qtype: item.qtype,
+        source: item.source || '',
+        link: item.link || '',
+        stem: item.stem,
+        yourAnswer: item.yourAnswer || '',
+        correctAnswer: item.correctAnswer,
+        tags: [...item.tags],
+        analysis: item.analysis,
+      },
+      createError: '',
+    });
   },
 
   cancelCreate() {
-    const id = get().draftId;
-    const blobId = get().images[id];
-    if (blobId) {
-      void deleteImage(blobId);
-      const images = { ...get().images };
-      delete images[id];
-      saveImages(images);
-      set({ images });
+    // 只在「全新创建还没保存」时清理孤儿图片;编辑已有题目时图片本就属于它,不清
+    if (!get().editingId) {
+      const id = get().draftId;
+      const blobId = get().images[id];
+      if (blobId) {
+        void deleteImage(blobId);
+        const images = { ...get().images };
+        delete images[id];
+        saveImages(images);
+        set({ images });
+      }
     }
-    set({ creating: false, createError: '' });
+    set({ creating: false, editingId: null, createError: '' });
   },
 
   updateDraft(patch) {
@@ -320,7 +358,8 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
       set({ createError: '至少选一个错因标签' });
       return;
     }
-    const id = get().draftId || newId();
+    const editingId = get().editingId;
+    const id = editingId || get().draftId || newId();
     const item: WrongQuestion = {
       id,
       skill: d.skill,
@@ -333,19 +372,19 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
       tags: d.tags,
       analysis,
     };
-    const builtinIds = new Set(BUILTIN_WRONG_QUESTIONS.map((j) => j.id));
-    const prev = loadImported().filter((j) => !builtinIds.has(j.id));
+    const prev = loadImported().filter((j) => j.id !== id);
     const next = [item, ...prev];
     saveImported(next);
     set({
-      items: [...next, ...BUILTIN_WRONG_QUESTIONS],
+      items: mergeItems(next),
       creating: false,
+      editingId: null,
       activeId: id,
       activeQtype: { skill: item.skill, qtype: item.qtype },
       revealed: false,
       phase: 'read',
       guess: [],
-      status: '✓ 已添加错题',
+      status: editingId ? '✓ 已更新错题' : '✓ 已添加错题',
     });
     setTimeout(() => set({ status: '' }), 2600);
   },

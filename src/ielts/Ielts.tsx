@@ -237,6 +237,7 @@ function Result({ item }: { item: WrongQuestion }) {
 function CreateForm() {
   const draft = useIeltsStore((s) => s.draft);
   const draftId = useIeltsStore((s) => s.draftId);
+  const editingId = useIeltsStore((s) => s.editingId);
   const createError = useIeltsStore((s) => s.createError);
   const updateDraft = useIeltsStore((s) => s.updateDraft);
   const toggleDraftTag = useIeltsStore((s) => s.toggleDraftTag);
@@ -389,7 +390,7 @@ function CreateForm() {
 
       <div className="mr-actions">
         <button className="jk-reveal" onClick={saveCreate}>
-          保存错题
+          {editingId ? '保存修改' : '保存错题'}
         </button>
         <button className="mr-exit" onClick={cancelCreate}>
           取消
@@ -494,6 +495,7 @@ export function Ielts() {
   const phase = useIeltsStore((s) => s.phase);
   const status = useIeltsStore((s) => s.status);
   const creating = useIeltsStore((s) => s.creating);
+  const editingId = useIeltsStore((s) => s.editingId);
   const init = useIeltsStore((s) => s.init);
   const setSkill = useIeltsStore((s) => s.setSkill);
   const toggleOnlyUnmastered = useIeltsStore((s) => s.toggleOnlyUnmastered);
@@ -502,6 +504,7 @@ export function Ielts() {
   const copyPrompt = useIeltsStore((s) => s.copyPrompt);
   const importFile = useIeltsStore((s) => s.importFile);
   const startCreate = useIeltsStore((s) => s.startCreate);
+  const startEdit = useIeltsStore((s) => s.startEdit);
   const cancelCreate = useIeltsStore((s) => s.cancelCreate);
 
   useEffect(() => {
@@ -558,18 +561,23 @@ export function Ielts() {
       <div id="ielts-main">
         <div className="lib-head">
           <h2>
-            {creating ? '新建错题' : active ? active.qtype : activeQtype ? activeQtype.qtype : '雅思错题集'}
+            {creating ? (editingId ? '编辑错题' : '新建错题') : active ? active.qtype : activeQtype ? activeQtype.qtype : '雅思错题集'}
             <Sparkle className="head-sparkle" />
             <Squiggle className="head-squiggle" />
           </h2>
           {creating ? (
             <button className="meme-exit-link" onClick={cancelCreate}>
-              ← 全部错题
+              ← 取消
             </button>
           ) : active ? (
-            <button className="meme-exit-link" onClick={exitItem}>
-              ← {activeQtype?.qtype ?? '全部错题'}
-            </button>
+            <>
+              <button className="meme-exit-link" onClick={() => startEdit(active.id)}>
+                ✎ 编辑
+              </button>
+              <button className="meme-exit-link" onClick={exitItem}>
+                ← {activeQtype?.qtype ?? '全部错题'}
+              </button>
+            </>
           ) : (
             activeQtype && (
               <button className="meme-exit-link" onClick={exitQtype}>
