@@ -1885,6 +1885,13 @@ svg#edges {
   line-height: 1.95;
   color: #3f3e38;
   margin-bottom: 22px;
+  white-space: pre-wrap;
+}
+.mr-analysis p {
+  margin: 0 0 14px;
+}
+.mr-analysis p:last-child {
+  margin-bottom: 0;
 }
 .mra-title {
   font-size: 13px;
@@ -2254,6 +2261,7 @@ svg#edges {
   font-size: 16px;
   line-height: 1.95;
   color: #3f3e38;
+  white-space: pre-wrap;
 }
 .jk-reveal {
   margin-top: 6px;

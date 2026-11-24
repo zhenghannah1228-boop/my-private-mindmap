@@ -184,6 +184,22 @@ function Quiz() {
   );
 }
 
+/** 把一段纯文本按换行拆成段落,长解析按步骤分段显示,不堆成一整块 */
+function Paragraphs({ text }: { text: string }) {
+  const paras = text
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (paras.length <= 1) return <>{text}</>;
+  return (
+    <>
+      {paras.map((p, i) => (
+        <p key={i}>{p}</p>
+      ))}
+    </>
+  );
+}
+
 function Result({ item }: { item: WrongQuestion }) {
   const guess = useIeltsStore((s) => s.guess);
   const mastered = useIeltsStore((s) => s.mastered);
@@ -217,7 +233,7 @@ function Result({ item }: { item: WrongQuestion }) {
       <div className="mr-legend">✓ 命中 · · 漏选 · ✕ 这个其实没踩上</div>
       <div className="mr-analysis">
         <div className="mra-title">错题解析</div>
-        {item.analysis}
+        <Paragraphs text={item.analysis} />
       </div>
       <div className="mr-actions">
         <button className={'mr-replay' + (isMastered ? ' on' : '')} onClick={() => toggleMastered(item.id)}>
