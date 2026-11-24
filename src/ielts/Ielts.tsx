@@ -4,7 +4,15 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { ERROR_TAGS, ERROR_TAG_LABEL, SKILLS, SKILL_LABEL, type IeltsSkill, type WrongQuestion } from './types';
+import {
+  ERROR_TAGS,
+  ERROR_TAG_LABEL,
+  QTYPES_BY_SKILL,
+  SKILLS,
+  SKILL_LABEL,
+  type IeltsSkill,
+  type WrongQuestion,
+} from './types';
 import { useIeltsStore } from './useIeltsStore';
 import { getImage } from '../core/imagedb';
 import { Sparkle, Squiggle } from '../ui/doodles';
@@ -260,12 +268,43 @@ function CreateForm() {
 
       <div className="jk-block">
         <div className="jk-label">题型 *</div>
-        <input
-          className="ielts-input"
-          value={draft.qtype}
-          onChange={(e) => updateDraft({ qtype: e.target.value })}
-          placeholder="如 填空题 / Matching Headings / Task 2 议论文 / Part 2 长题"
-        />
+        {(() => {
+          const presets = QTYPES_BY_SKILL[draft.skill];
+          const selectValue = draft.qtype === '' ? '' : presets.includes(draft.qtype) ? draft.qtype : '__custom__';
+          return (
+            <>
+              <select
+                className="ielts-input"
+                value={selectValue}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === '__custom__') {
+                    if (selectValue !== '__custom__') updateDraft({ qtype: '' });
+                  } else {
+                    updateDraft({ qtype: v });
+                  }
+                }}
+              >
+                <option value="">请选择题型</option>
+                {presets.map((q) => (
+                  <option key={q} value={q}>
+                    {q}
+                  </option>
+                ))}
+                <option value="__custom__">其他(自定义)…</option>
+              </select>
+              {selectValue === '__custom__' && (
+                <input
+                  className="ielts-input"
+                  style={{ marginTop: 8 }}
+                  value={draft.qtype}
+                  onChange={(e) => updateDraft({ qtype: e.target.value })}
+                  placeholder="输入自定义题型"
+                />
+              )}
+            </>
+          );
+        })()}
       </div>
 
       <div className="jk-block">
