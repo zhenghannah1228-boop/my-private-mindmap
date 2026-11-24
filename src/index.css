@@ -2631,6 +2631,17 @@ svg#edges {
   color: #a0201f;
   margin-bottom: 14px;
 }
+.ielts-link {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ielts-link:hover {
+  color: #1c1b19;
+}
+.joke-card .ms-figure {
+  margin-top: 4px;
+}
 
 @media (max-width: 640px) {
   #ielts #side {

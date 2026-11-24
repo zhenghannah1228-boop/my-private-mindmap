@@ -6,9 +6,11 @@
 import { create } from 'zustand';
 import { BUILTIN_WRONG_QUESTIONS } from './builtin';
 import { IELTS_PROMPT, type ErrorTag, type IeltsSkill, type WrongQuestion } from './types';
+import { deleteImage, newImageId, putImage } from '../core/imagedb';
 
 const IMPORT_KEY = 'mm_ielts_imported';
 const MASTERED_KEY = 'mm_ielts_mastered';
+const IMAGE_KEY = 'mm_ielts_images'; // { questionId: blobId }
 
 type Phase = 'read' | 'quiz' | 'result';
 
@@ -16,6 +18,7 @@ interface Draft {
   skill: IeltsSkill;
   qtype: string;
   source: string;
+  link: string;
   stem: string;
   yourAnswer: string;
   correctAnswer: string;
@@ -27,6 +30,7 @@ const EMPTY_DRAFT: Draft = {
   skill: 'listening',
   qtype: '',
   source: '',
+  link: '',
   stem: '',
   yourAnswer: '',
   correctAnswer: '',
@@ -91,6 +95,24 @@ function saveMastered(s: Set<string>) {
   }
 }
 
+function loadImages(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(IMAGE_KEY);
+    const o = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    return o && typeof o === 'object' ? o : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveImages(m: Record<string, string>) {
+  try {
+    localStorage.setItem(IMAGE_KEY, JSON.stringify(m));
+  } catch {
+    /* ignore */
+  }
+}
+
 interface IeltsStore {
   items: WrongQuestion[];
   loaded: boolean;
@@ -103,8 +125,10 @@ interface IeltsStore {
   mastered: Set<string>;
   status: string;
   creating: boolean;
+  draftId: string;
   draft: Draft;
   createError: string;
+  images: Record<string, string>; // questionId -> IndexedDB blobId
 
   init: () => void;
   setSkill: (s: IeltsSkill | null) => void;
@@ -124,6 +148,8 @@ interface IeltsStore {
   updateDraft: (patch: Partial<Draft>) => void;
   toggleDraftTag: (k: ErrorTag) => void;
   saveCreate: () => void;
+  attachImage: (questionId: string, file: File) => Promise<void>;
+  removeImage: (questionId: string) => void;
 }
 
 export const useIeltsStore = create<IeltsStore>((set, get) => ({
@@ -138,15 +164,17 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
   mastered: new Set(),
   status: '',
   creating: false,
+  draftId: '',
   draft: EMPTY_DRAFT,
   createError: '',
+  images: {},
 
   init() {
     if (get().loaded) return;
     const imported = loadImported();
     const builtinIds = new Set(BUILTIN_WRONG_QUESTIONS.map((j) => j.id));
     const items = [...imported.filter((j) => !builtinIds.has(j.id)), ...BUILTIN_WRONG_QUESTIONS];
-    set({ items, mastered: loadMastered(), loaded: true });
+    set({ items, mastered: loadMastered(), images: loadImages(), loaded: true });
   },
 
   setSkill(s) {
@@ -226,10 +254,19 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
   },
 
   startCreate() {
-    set({ creating: true, activeId: null, draft: EMPTY_DRAFT, createError: '' });
+    set({ creating: true, activeId: null, draftId: newId(), draft: EMPTY_DRAFT, createError: '' });
   },
 
   cancelCreate() {
+    const id = get().draftId;
+    const blobId = get().images[id];
+    if (blobId) {
+      void deleteImage(blobId);
+      const images = { ...get().images };
+      delete images[id];
+      saveImages(images);
+      set({ images });
+    }
     set({ creating: false, createError: '' });
   },
 
@@ -259,12 +296,13 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
       set({ createError: '至少选一个错因标签' });
       return;
     }
-    const id = newId();
+    const id = get().draftId || newId();
     const item: WrongQuestion = {
       id,
       skill: d.skill,
       qtype,
       source: d.source.trim() || undefined,
+      link: d.link.trim() || undefined,
       stem,
       yourAnswer: d.yourAnswer.trim() || undefined,
       correctAnswer,
@@ -285,5 +323,35 @@ export const useIeltsStore = create<IeltsStore>((set, get) => ({
       status: '✓ 已添加错题',
     });
     setTimeout(() => set({ status: '' }), 2600);
+  },
+
+  async attachImage(questionId, file) {
+    if (!file.type.startsWith('image/')) {
+      set({ status: '请选图片文件' });
+      setTimeout(() => set({ status: '' }), 2200);
+      return;
+    }
+    try {
+      const prev = get().images[questionId];
+      const blobId = newImageId();
+      await putImage(blobId, file);
+      if (prev) void deleteImage(prev);
+      const images = { ...get().images, [questionId]: blobId };
+      saveImages(images);
+      set({ images });
+    } catch (e) {
+      set({ status: '贴图失败:' + ((e as Error).message || '') });
+      setTimeout(() => set({ status: '' }), 3000);
+    }
+  },
+
+  removeImage(questionId) {
+    const blobId = get().images[questionId];
+    if (!blobId) return;
+    void deleteImage(blobId);
+    const images = { ...get().images };
+    delete images[questionId];
+    saveImages(images);
+    set({ images });
   },
 }));
