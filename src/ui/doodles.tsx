@@ -70,6 +70,19 @@ export function Bulb({ size = 60, className }: D) {
   );
 }
 
+/** 打开的纸箱子,襟翼向外撇开(给分类/收纳用) */
+export function BoxDoodle({ size = 72, className }: D) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" className={className} {...base}>
+      <path d="M15 42h70" />
+      <path d="M15 42v43h70V42" />
+      <path d="M15 42L4 20l32 10" />
+      <path d="M85 42l11-22-32 10" />
+      <path d="M15 64h70" />
+    </svg>
+  );
+}
+
 /** 简单的书本 */
 export function BookDoodle({ size = 72, className }: D) {
   return (
