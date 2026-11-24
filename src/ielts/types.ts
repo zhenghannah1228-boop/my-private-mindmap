@@ -57,6 +57,8 @@ export interface WrongQuestion {
   qtype: string;
   /** 可选:来源,如「剑16 Test 2」「某机经」;拿不准就标「存疑」或留空 */
   source?: string;
+  /** 可选:网页链接(原题出处、在线真题页等) */
+  link?: string;
   /** 原题干 / 场景描述(铺垫) */
   stem: string;
   /** 你当时的答案,可选 */
@@ -82,6 +84,7 @@ export const IELTS_PROMPT = `雅思错题集 · 采集指令
   "skill": "listening | reading | writing | speaking",
   "qtype": "<题型,如 填空题 / Matching Headings / Task 2 议论文 / Part 2 长题>",
   "source": "<可选,来源,如 剑16 Test 2 / 存疑>",
+  "link": "<可选,原题网页链接>",
   "stem": "<原题干或场景描述,2–4 句,交代清楚上下文>",
   "yourAnswer": "<可选,你当时的答案>",
   "correctAnswer": "<正确答案 / 应有的回应>",

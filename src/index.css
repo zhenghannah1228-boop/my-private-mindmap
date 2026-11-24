@@ -2594,6 +2594,55 @@ svg#edges {
   max-width: 720px;
 }
 
+/* 手动新建错题表单 */
+.ielts-form {
+  max-width: 720px;
+}
+.ielts-form .jk-label {
+  margin-bottom: 8px;
+}
+.ielts-skill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ielts-skill-btn {
+  padding: 8px 18px;
+}
+.ielts-input,
+.ielts-textarea {
+  width: 100%;
+  border: 1.5px solid #1c1b19;
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 14px;
+  font-family: var(--font-hand), sans-serif;
+  color: #1c1b19;
+  background: #fff;
+  resize: vertical;
+}
+.ielts-input:focus,
+.ielts-textarea:focus {
+  outline: none;
+  background: #faf9f5;
+}
+.ielts-form-error {
+  font-size: 13px;
+  color: #a0201f;
+  margin-bottom: 14px;
+}
+.ielts-link {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ielts-link:hover {
+  color: #1c1b19;
+}
+.joke-card .ms-figure {
+  margin-top: 4px;
+}
+
 @media (max-width: 640px) {
   #ielts #side {
     width: 150px;
