@@ -15,7 +15,7 @@ import {
 } from './types';
 import { useIeltsStore } from './useIeltsStore';
 import { getImage } from '../core/imagedb';
-import { Sparkle, Squiggle } from '../ui/doodles';
+import { BoxDoodle, Sparkle, Squiggle } from '../ui/doodles';
 import { IconClip } from '../ui/icons';
 
 /** 原题配图:贴一张截图(可 Ctrl/⌘+V 粘贴,也可点按钮上传),没有就不显示画框 */
@@ -400,7 +400,8 @@ function CreateForm() {
   );
 }
 
-/** 题型合集:一个题型 = 一张卡片,新题归进已有合集,不在首页里不停新增方块 */
+/** 题型合集:一个题型 = 一张卡片,新题归进已有合集,不在首页里不停新增方块。
+ * 四个技能各装一个「箱子」,箱子里摆着这个技能下的题型合集卡片。 */
 function Chooser() {
   const items = useIeltsStore((s) => s.items);
   const activeSkill = useIeltsStore((s) => s.activeSkill);
@@ -419,7 +420,12 @@ function Chooser() {
     if (g) g.items.push(j);
     else groups.set(key, { skill: j.skill, qtype: j.qtype, items: [j] });
   }
-  const groupList = [...groups.values()];
+
+  const boxes = SKILLS.map((s) => ({
+    skill: s.key,
+    label: s.label,
+    groups: [...groups.values()].filter((g) => g.skill === s.key),
+  })).filter((b) => b.groups.length > 0);
 
   return (
     <div className="meme-chooser">
@@ -427,28 +433,39 @@ function Chooser() {
         选一个<b>题型</b>,打开它的错题合集:每道题都是先看<b>原题</b>,揭晓
         <b>正确答案</b>,再推理<b>错因</b>,最后对照解析——同一题型的新题会自动并进这张卡片,不会另开新的。
       </p>
-      {groupList.length === 0 ? (
+      {boxes.length === 0 ? (
         <div className="empty">
           <div className="empty-sub">这个筛选下还没有错题,换个技能看看,或导入 / 复制采集指令收集几道。</div>
         </div>
       ) : (
-        <div className="mc-grid">
-          {groupList.map((g) => {
-            const allMastered = g.items.every((it) => mastered.has(it.id));
-            return (
-              <button key={g.skill + '|' + g.qtype} className="mc-card" onClick={() => selectQtype(g.skill, g.qtype)}>
-                <div className="mcc-title">
-                  {g.qtype}
-                  {allMastered && <span className="fc-tag" style={{ marginLeft: 8 }}>✓ 已掌握</span>}
-                </div>
-                <div className="mcc-sum">
-                  {SKILL_LABEL[g.skill]} · 共 {g.items.length} 题
-                </div>
-                <div className="mcc-foot">查看 →</div>
-              </button>
-            );
-          })}
-        </div>
+        boxes.map((box) => (
+          <div className="ielts-box" key={box.skill}>
+            <div className="ielts-box-head">
+              <BoxDoodle size={34} className="ielts-box-ico" />
+              <span className="ielts-box-label">{box.label}</span>
+              <span className="ielts-box-count">{box.groups.reduce((n, g) => n + g.items.length, 0)} 题</span>
+            </div>
+            <div className="mc-grid">
+              {box.groups.map((g) => {
+                const allMastered = g.items.every((it) => mastered.has(it.id));
+                return (
+                  <button
+                    key={g.skill + '|' + g.qtype}
+                    className="mc-card"
+                    onClick={() => selectQtype(g.skill, g.qtype)}
+                  >
+                    <div className="mcc-title">
+                      {g.qtype}
+                      {allMastered && <span className="fc-tag" style={{ marginLeft: 8 }}>✓ 已掌握</span>}
+                    </div>
+                    <div className="mcc-sum">共 {g.items.length} 题</div>
+                    <div className="mcc-foot">查看 →</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))
       )}
     </div>
   );

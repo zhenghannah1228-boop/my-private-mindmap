@@ -2643,11 +2643,45 @@ svg#edges {
   margin-top: 4px;
 }
 
+/* 按技能分装的「箱子」:每个箱子里放这个技能下的题型合集卡片 */
+.ielts-box {
+  border: 2px dashed #1c1b19;
+  border-radius: 18px;
+  padding: 18px 20px 22px;
+  margin-bottom: 28px;
+  background: #faf9f5;
+}
+.ielts-box-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  color: #1c1b19;
+}
+.ielts-box-ico {
+  flex-shrink: 0;
+}
+.ielts-box-label {
+  font-size: 19px;
+  font-weight: 700;
+}
+.ielts-box-count {
+  font-size: 13px;
+  color: #8a8880;
+  margin-left: auto;
+}
+.ielts-box .mc-grid {
+  margin: 0;
+}
+
 @media (max-width: 640px) {
   #ielts #side {
     width: 150px;
   }
   #ielts-main {
     padding: 40px 18px 48px;
+  }
+  .ielts-box {
+    padding: 14px 14px 18px;
   }
 }
